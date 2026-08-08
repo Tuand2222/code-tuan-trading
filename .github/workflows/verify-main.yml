@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   verify:
-    name: Install, build and validate
+    name: Install, build, test and validate
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -32,5 +32,5 @@ jobs:
       - name: Install dependencies using Sites-compatible installer
         run: npm run install:ci
 
-      - name: Build and validate Sites artifact
-        run: npm run build
+      - name: Build, test and validate Sites artifact
+        run: npm test
