@@ -1,0 +1,13 @@
+{
+  "name": "Trading Plan Pro",
+  "short_name": "Trading Plan",
+  "description": "Nhật ký giao dịch, phân tích hiệu suất và quản trị rủi ro cho nhà đầu tư Việt Nam.",
+  "start_url": "/#overview",
+  "display": "standalone",
+  "background_color": "#090c11",
+  "theme_color": "#090c11",
+  "lang": "vi-VN",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
