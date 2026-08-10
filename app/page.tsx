@@ -1439,7 +1439,7 @@ export default function Home() {
       <section className="quote-strip">
         <div><span>NGUYÊN TẮC CỐT LÕI</span><strong>“Giao dịch tốt không phải lệnh thắng — mà là lệnh đúng kế hoạch.”</strong></div>
         <div className="quote-actions">
-          <button type="button" className="ghost-button excel-button" onClick={exportTradeHistory} disabled={!journalTrades.length} title={`Xuất ${journalTrades.length} giao dịch đang hiển thị`}><FileSpreadsheet size={16} /> Xuất Excel</button>
+          <button type="button" className="ghost-button excel-button" onClick={exportTradeHistory} disabled={!journalTrades.length} title={`Xuất báo cáo chi tiết cho ${journalTrades.length} giao dịch đang hiển thị`}><FileSpreadsheet size={16} /> Xuất báo cáo Excel</button>
           <button type="button" className="gold-button compact" onClick={openTradeModal}><Plus size={17} /> Thêm giao dịch</button>
         </div>
       </section>
