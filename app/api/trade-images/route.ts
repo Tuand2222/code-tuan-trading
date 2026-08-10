@@ -2,7 +2,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { env } from "cloudflare:workers";
 import { getDb } from "../../../db";
 import { tradeImages, trades } from "../../../db/schema";
-import { requireUserEmail, routeError } from "../../../lib/server-auth";
+import { requireUser, routeError } from "../../../lib/server-auth";
 
 const MAX_IMAGE_BYTES = 6 * 1024 * 1024;
 const MAX_IMAGES_PER_TRADE = 6;
@@ -33,7 +33,7 @@ function clientImage(row: {
 
 export async function GET(request: Request) {
   try {
-    const userEmail = requireUserEmail(request);
+    const accountUser = await requireUser(request);
     const searchParams = new URL(request.url).searchParams;
     const id = searchParams.get("id");
     const tradeId = searchParams.get("tradeId");
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
       const [row] = await db
         .select()
         .from(tradeImages)
-        .where(and(eq(tradeImages.id, id), eq(tradeImages.userEmail, userEmail)))
+        .where(and(eq(tradeImages.id, id), eq(tradeImages.userId, accountUser.id)))
         .limit(1);
       if (!row) return new Response("Image not found", { status: 404 });
 
@@ -70,8 +70,8 @@ export async function GET(request: Request) {
       })
       .from(tradeImages)
       .where(tradeId
-        ? and(eq(tradeImages.userEmail, userEmail), eq(tradeImages.tradeId, tradeId))
-        : eq(tradeImages.userEmail, userEmail))
+        ? and(eq(tradeImages.userId, accountUser.id), eq(tradeImages.tradeId, tradeId))
+        : eq(tradeImages.userId, accountUser.id))
       .orderBy(desc(tradeImages.createdAt))
       .limit(300);
 
@@ -83,7 +83,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const userEmail = requireUserEmail(request);
+    const accountUser = await requireUser(request);
     const formData = await request.formData();
     const tradeId = String(formData.get("tradeId") ?? "").trim();
     const file = formData.get("file");
@@ -95,14 +95,14 @@ export async function POST(request: Request) {
     const [ownedTrade] = await db
       .select({ id: trades.id })
       .from(trades)
-      .where(and(eq(trades.id, tradeId), eq(trades.userEmail, userEmail)))
+      .where(and(eq(trades.id, tradeId), eq(trades.userId, accountUser.id)))
       .limit(1);
     if (!ownedTrade) return new Response("Trade not found", { status: 404 });
 
     const existing = await db
       .select({ id: tradeImages.id })
       .from(tradeImages)
-      .where(and(eq(tradeImages.tradeId, tradeId), eq(tradeImages.userEmail, userEmail)))
+      .where(and(eq(tradeImages.tradeId, tradeId), eq(tradeImages.userId, accountUser.id)))
       .limit(MAX_IMAGES_PER_TRADE);
     if (existing.length >= MAX_IMAGES_PER_TRADE) throw new Error("Invalid image limit; each trade can store up to 6 images");
 
@@ -118,7 +118,8 @@ export async function POST(request: Request) {
         .insert(tradeImages)
         .values({
           id,
-          userEmail,
+          userId: accountUser.id,
+          userEmail: accountUser.email,
           tradeId,
           objectKey,
           filename,
@@ -145,7 +146,7 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    const userEmail = requireUserEmail(request);
+    const accountUser = await requireUser(request);
     const id = new URL(request.url).searchParams.get("id");
     if (!id) throw new Error("Image id is required");
 
@@ -153,14 +154,14 @@ export async function DELETE(request: Request) {
     const [row] = await db
       .select()
       .from(tradeImages)
-      .where(and(eq(tradeImages.id, id), eq(tradeImages.userEmail, userEmail)))
+      .where(and(eq(tradeImages.id, id), eq(tradeImages.userId, accountUser.id)))
       .limit(1);
     if (!row) return new Response("Image not found", { status: 404 });
 
     await getBucket().delete(row.objectKey);
     await db
       .delete(tradeImages)
-      .where(and(eq(tradeImages.id, id), eq(tradeImages.userEmail, userEmail)));
+      .where(and(eq(tradeImages.id, id), eq(tradeImages.userId, accountUser.id)));
     return Response.json({ deleted: true });
   } catch (error) {
     return routeError(error);

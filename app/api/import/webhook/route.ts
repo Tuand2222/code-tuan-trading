@@ -111,6 +111,7 @@ function normalizeTrade(
 
   return {
     id: crypto.randomUUID(),
+    userId: connection.userId,
     userEmail: connection.userEmail,
     externalId,
     market,

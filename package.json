@@ -16,6 +16,7 @@
     "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate"
   },
   "dependencies": {
+    "better-auth": "1.6.23",
     "drizzle-orm": "0.45.2",
     "lightweight-charts": "5.2.0",
     "lucide-react": "^1.29.0",

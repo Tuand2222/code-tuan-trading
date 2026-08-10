@@ -3,7 +3,7 @@ import { getDb } from "../../../db";
 import { brokerConnections } from "../../../db/schema";
 import { encryptBrokerSecrets } from "../../../lib/broker-crypto";
 import { getPublicBridgeUrl } from "../../../lib/bridge-url";
-import { requireUserEmail, routeError } from "../../../lib/server-auth";
+import { requireUser, routeError } from "../../../lib/server-auth";
 
 const PROVIDERS = new Set([
   "vps",
@@ -32,7 +32,7 @@ async function sha256Hex(value: string) {
 
 export async function GET(request: Request) {
   try {
-    const userEmail = requireUserEmail(request);
+    const accountUser = await requireUser(request);
     const rows = await getDb()
       .select({
         id: brokerConnections.id,
@@ -44,7 +44,7 @@ export async function GET(request: Request) {
         createdAt: brokerConnections.createdAt,
       })
       .from(brokerConnections)
-      .where(eq(brokerConnections.userEmail, userEmail))
+      .where(eq(brokerConnections.userId, accountUser.id))
       .orderBy(desc(brokerConnections.createdAt));
     return Response.json({ connections: rows });
   } catch (error) {
@@ -54,7 +54,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const userEmail = requireUserEmail(request);
+    const accountUser = await requireUser(request);
     const body = (await request.json()) as {
       provider?: string;
       label?: string;
@@ -101,7 +101,8 @@ export async function POST(request: Request) {
       .insert(brokerConnections)
       .values({
         id,
-        userEmail,
+        userId: accountUser.id,
+        userEmail: accountUser.email,
         provider,
         label,
         accountType,
@@ -111,6 +112,7 @@ export async function POST(request: Request) {
       .onConflictDoUpdate({
         target: [brokerConnections.userEmail, brokerConnections.provider, brokerConnections.label],
         set: {
+          userId: accountUser.id,
           accountType,
           credentialsCiphertext,
           webhookTokenHash,
@@ -134,12 +136,12 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    const userEmail = requireUserEmail(request);
+    const accountUser = await requireUser(request);
     const id = new URL(request.url).searchParams.get("id");
     if (!id) throw new Error("Connection id is required");
     await getDb()
       .delete(brokerConnections)
-      .where(and(eq(brokerConnections.id, id), eq(brokerConnections.userEmail, userEmail)));
+      .where(and(eq(brokerConnections.id, id), eq(brokerConnections.userId, accountUser.id)));
     return Response.json({ deleted: true });
   } catch (error) {
     return routeError(error);

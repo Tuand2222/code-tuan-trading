@@ -3,7 +3,7 @@ import { getDb } from "../../../../db";
 import { brokerConnections, trades } from "../../../../db/schema";
 import { decryptBrokerSecrets } from "../../../../lib/broker-crypto";
 import { getPublicBridgeUrl } from "../../../../lib/bridge-url";
-import { requireUserEmail, routeError } from "../../../../lib/server-auth";
+import { requireUser, routeError } from "../../../../lib/server-auth";
 
 type NormalizedTrade = typeof trades.$inferInsert;
 
@@ -288,13 +288,14 @@ async function bridgeTrades(
 
 export async function POST(request: Request) {
   try {
-    const userEmail = requireUserEmail(request);
+    const accountUser = await requireUser(request);
+    const userEmail = accountUser.email;
     const { connectionId } = (await request.json()) as { connectionId?: string };
     if (!connectionId) throw new Error("Connection id is required");
     const [connection] = await getDb()
       .select()
       .from(brokerConnections)
-      .where(and(eq(brokerConnections.id, connectionId), eq(brokerConnections.userEmail, userEmail)))
+      .where(and(eq(brokerConnections.id, connectionId), eq(brokerConnections.userId, accountUser.id)))
       .limit(1);
     if (!connection) throw new Error("Connection not found");
     const secrets = await decryptBrokerSecrets(connection.credentialsCiphertext);
@@ -306,6 +307,11 @@ export async function POST(request: Request) {
       rows = await bridgeTrades(connection, secrets, userEmail);
     }
     else throw new Error("This connection uses import or webhook instead of manual sync");
+    rows = rows.map((row) => ({
+      ...row,
+      userId: accountUser.id,
+      userEmail: accountUser.email,
+    }));
     const imported = rows.length
       ? await getDb().insert(trades).values(rows).onConflictDoNothing().returning()
       : [];

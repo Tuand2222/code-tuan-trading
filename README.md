@@ -22,6 +22,17 @@ npm run test
 npm run build
 ```
 
+## 🔐 Website accounts
+
+Trading Plan Pro uses its own Better Auth account system. Email/password works with a D1 database; Google, Facebook, Apple, password-reset email, and Cloudflare Turnstile are enabled only when their environment variables are configured.
+
+1. Copy `.env.example` to an ignored local environment file.
+2. Generate a long random `BETTER_AUTH_SECRET` and set the public `BETTER_AUTH_URL`.
+3. Add OAuth, Resend, and Turnstile credentials in the deployment environment when those providers are needed.
+4. Apply the checked-in Drizzle migrations before serving the new version.
+
+Never commit real provider credentials or reuse the authentication secret between unrelated applications.
+
 ## 📋 Repository Rules
 
 ✅ **Workflow:**

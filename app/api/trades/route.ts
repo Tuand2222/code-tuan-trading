@@ -2,15 +2,15 @@ import { and, desc, eq } from "drizzle-orm";
 import { env } from "cloudflare:workers";
 import { getDb } from "../../../db";
 import { tradeImages, trades } from "../../../db/schema";
-import { requireUserEmail, routeError } from "../../../lib/server-auth";
+import { requireUser, routeError, type AuthenticatedUser } from "../../../lib/server-auth";
 
 type TradePayload = typeof trades.$inferInsert;
 
-async function deleteTradeImages(userEmail: string, tradeId?: string) {
+async function deleteTradeImages(userId: string, tradeId?: string) {
   const db = getDb();
   const condition = tradeId
-    ? and(eq(tradeImages.userEmail, userEmail), eq(tradeImages.tradeId, tradeId))
-    : eq(tradeImages.userEmail, userEmail);
+    ? and(eq(tradeImages.userId, userId), eq(tradeImages.tradeId, tradeId))
+    : eq(tradeImages.userId, userId);
   const images = await db
     .select({ objectKey: tradeImages.objectKey })
     .from(tradeImages)
@@ -21,7 +21,7 @@ async function deleteTradeImages(userEmail: string, tradeId?: string) {
   if (images.length) await db.delete(tradeImages).where(condition);
 }
 
-function cleanTrade(value: Partial<TradePayload>, userEmail: string): TradePayload {
+function cleanTrade(value: Partial<TradePayload>, accountUser: AuthenticatedUser): TradePayload {
   const market = String(value.market ?? "Hàng hóa");
   const source = String(value.source ?? "Thủ công");
   const symbol = String(value.symbol ?? "").trim().toUpperCase();
@@ -31,7 +31,8 @@ function cleanTrade(value: Partial<TradePayload>, userEmail: string): TradePaylo
   }
   return {
     id: String(value.id ?? crypto.randomUUID()),
-    userEmail,
+    userId: accountUser.id,
+    userEmail: accountUser.email,
     externalId: value.externalId ? String(value.externalId) : null,
     market,
     source,
@@ -57,11 +58,11 @@ function cleanTrade(value: Partial<TradePayload>, userEmail: string): TradePaylo
 
 export async function GET(request: Request) {
   try {
-    const userEmail = requireUserEmail(request);
+    const accountUser = await requireUser(request);
     const rows = await getDb()
       .select()
       .from(trades)
-      .where(eq(trades.userEmail, userEmail))
+      .where(eq(trades.userId, accountUser.id))
       .orderBy(desc(trades.date), desc(trades.createdAt))
       .limit(5000);
     return Response.json({ trades: rows });
@@ -72,14 +73,14 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const userEmail = requireUserEmail(request);
+    const accountUser = await requireUser(request);
     const body = (await request.json()) as {
       trade?: Partial<TradePayload>;
       trades?: Partial<TradePayload>[];
     };
     const input = body.trades ?? (body.trade ? [body.trade] : []);
     if (!input.length || input.length > 2000) throw new Error("Trade data is required");
-    const values = input.map((trade) => cleanTrade(trade, userEmail));
+    const values = input.map((trade) => cleanTrade(trade, accountUser));
     const inserted = await getDb()
       .insert(trades)
       .values(values)
@@ -93,11 +94,11 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const userEmail = requireUserEmail(request);
+    const accountUser = await requireUser(request);
     const body = (await request.json()) as { trade?: Partial<TradePayload> };
     const id = String(body.trade?.id ?? "").trim();
     if (!id) throw new Error("Trade id is required");
-    const value = cleanTrade(body.trade ?? {}, userEmail);
+    const value = cleanTrade(body.trade ?? {}, accountUser);
     const [updated] = await getDb()
       .update(trades)
       .set({
@@ -122,7 +123,7 @@ export async function PATCH(request: Request) {
         note: value.note,
         durationMin: value.durationMin,
       })
-      .where(and(eq(trades.id, id), eq(trades.userEmail, userEmail)))
+      .where(and(eq(trades.id, id), eq(trades.userId, accountUser.id)))
       .returning();
     if (!updated) return new Response("Trade not found", { status: 404 });
     return Response.json({ trade: updated });
@@ -133,18 +134,18 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    const userEmail = requireUserEmail(request);
+    const accountUser = await requireUser(request);
     const searchParams = new URL(request.url).searchParams;
     const id = searchParams.get("id");
     if (searchParams.get("all") === "1") {
-      await deleteTradeImages(userEmail);
-      await getDb().delete(trades).where(eq(trades.userEmail, userEmail));
+      await deleteTradeImages(accountUser.id);
+      await getDb().delete(trades).where(eq(trades.userId, accountUser.id));
     } else {
       if (!id) throw new Error("Trade id is required");
-      await deleteTradeImages(userEmail, id);
+      await deleteTradeImages(accountUser.id, id);
       await getDb()
         .delete(trades)
-        .where(and(eq(trades.id, id), eq(trades.userEmail, userEmail)));
+        .where(and(eq(trades.id, id), eq(trades.userId, accountUser.id)));
     }
     return Response.json({ deleted: true });
   } catch (error) {

@@ -30,6 +30,7 @@ import {
   LayoutDashboard,
   ListChecks,
   LoaderCircle,
+  LogOut,
   Menu,
   NotebookPen,
   Pencil,
@@ -41,6 +42,7 @@ import {
   ShieldCheck,
   Sparkles,
   Trash2,
+  UserRound,
   ZoomIn,
   type LucideIcon,
 } from "lucide-react";
@@ -49,6 +51,7 @@ import CompanyValuation from "./components/CompanyValuation";
 import SystemTracker from "./components/SystemTracker";
 import TradingMetrix from "./components/TradingMetrix";
 import { normalizeNumericInput, selectNumericInput } from "./components/numeric-input";
+import { authClient } from "../lib/auth-client";
 
 type View =
   | "overview"
@@ -698,6 +701,12 @@ function EmptyState({ title, copy }: { title: string; copy: string }) {
 }
 
 export default function Home() {
+  const { data: accountSession, isPending: accountSessionPending } = authClient.useSession();
+  const accountId = accountSession?.user.id ?? "device";
+  const storageSuffix = accountId === "device" ? "" : `:${accountId}`;
+  const tradesStorageKey = `tuan-trader-trades${storageSuffix}`;
+  const notesStorageKey = `tuan-trader-notes${storageSuffix}`;
+  const demoStorageKey = `${DEMO_STORAGE_KEY}${storageSuffix}`;
   const [view, setView] = useState<View>("overview");
   const [trades, setTrades] = useState<Trade[]>(SAMPLE_TRADES);
   const [isDemo, setIsDemo] = useState(true);
@@ -729,6 +738,11 @@ export default function Home() {
   const [toast, setToast] = useState("");
   const [notes, setNotes] = useState("Tuần này chỉ giao dịch các setup A+ trên H1/H4.\n\nGiới hạn: tối đa 2 lệnh/ngày, rủi ro 1%/lệnh. Sau 2 lệnh thua liên tiếp phải dừng và review.");
   const [calendarMonth, setCalendarMonth] = useState(new Date(2026, 7, 1));
+
+  const signOutWebsite = async () => {
+    await authClient.signOut();
+    window.location.reload();
+  };
   const syncAllLock = useRef(false);
   const syncAllConnectionsRef = useRef<(silent?: boolean, staleOnly?: boolean) => Promise<void>>(async () => undefined);
 
@@ -742,9 +756,10 @@ export default function Home() {
   }, [draftImagePreviews]);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("tuan-trader-trades");
-    const storedNotes = window.localStorage.getItem("tuan-trader-notes");
-    const storedDemoMode = window.localStorage.getItem(DEMO_STORAGE_KEY);
+    if (accountSessionPending) return;
+    const stored = window.localStorage.getItem(tradesStorageKey);
+    const storedNotes = window.localStorage.getItem(notesStorageKey);
+    const storedDemoMode = window.localStorage.getItem(demoStorageKey);
     const storageTimer = window.setTimeout(() => {
       if (stored) {
         try {
@@ -769,14 +784,14 @@ export default function Home() {
         const cloudTrades = payload.trades ?? [];
         setTrades(cloudTrades);
         setIsDemo(false);
-        window.localStorage.setItem("tuan-trader-trades", JSON.stringify(cloudTrades));
-        window.localStorage.setItem(DEMO_STORAGE_KEY, "false");
+        window.localStorage.setItem(tradesStorageKey, JSON.stringify(cloudTrades));
+        window.localStorage.setItem(demoStorageKey, "false");
       } catch { /* preview and offline mode keep device data */ }
     })();
     void loadConnections();
     void loadTradeImages();
     return () => window.clearTimeout(storageTimer);
-  }, []);
+  }, [accountSessionPending, accountId, demoStorageKey, notesStorageKey, tradesStorageKey]);
 
   useEffect(() => {
     if (!modalOpen && !connectProvider && !activeImage) return;
@@ -936,7 +951,7 @@ export default function Home() {
       return;
     }
     if (dataMode !== "cloud") {
-      setToast("Đăng nhập bằng ChatGPT để hình ảnh được lưu riêng tư trên cloud.");
+      setToast("Đăng nhập tài khoản Trading Plan Pro để lưu hình ảnh riêng tư trên cloud.");
       return;
     }
     if (!effectiveImageTradeId) {
@@ -1006,8 +1021,8 @@ export default function Home() {
       : isDemo ? [trade] : [...trades, trade];
     setTrades(next);
     setIsDemo(false);
-    window.localStorage.setItem("tuan-trader-trades", JSON.stringify(next));
-    window.localStorage.setItem(DEMO_STORAGE_KEY, "false");
+    window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
+    window.localStorage.setItem(demoStorageKey, "false");
     setModalOpen(false);
     setEditingTradeId(null);
     setDraftImages([]);
@@ -1030,7 +1045,7 @@ export default function Home() {
     const next = trades.filter((trade) => trade.id !== id);
     setTrades(next);
     setTradeImages((current) => current.filter((image) => image.tradeId !== id));
-    window.localStorage.setItem("tuan-trader-trades", JSON.stringify(next));
+    window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
     setToast("Đã xóa giao dịch.");
     if (dataMode === "cloud") {
       try { await fetch(`/api/trades?id=${encodeURIComponent(id)}`, { method: "DELETE" }); } catch { /* optimistic device deletion */ }
@@ -1040,8 +1055,8 @@ export default function Home() {
   const restoreDemo = async () => {
     setTrades(SAMPLE_TRADES);
     setIsDemo(true);
-    window.localStorage.setItem("tuan-trader-trades", JSON.stringify(SAMPLE_TRADES));
-    window.localStorage.setItem(DEMO_STORAGE_KEY, "true");
+    window.localStorage.setItem(tradesStorageKey, JSON.stringify(SAMPLE_TRADES));
+    window.localStorage.setItem(demoStorageKey, "true");
     setToast("Đang hiển thị dữ liệu minh họa; dữ liệu cloud không bị thay đổi.");
   };
 
@@ -1049,8 +1064,8 @@ export default function Home() {
     setTrades([]);
     setTradeImages([]);
     setIsDemo(false);
-    window.localStorage.setItem("tuan-trader-trades", "[]");
-    window.localStorage.setItem(DEMO_STORAGE_KEY, "false");
+    window.localStorage.setItem(tradesStorageKey, "[]");
+    window.localStorage.setItem(demoStorageKey, "false");
     setToast("Đã chuyển sang nhật ký của bạn. Hãy thêm giao dịch đầu tiên.");
     navigate("journal");
   };
@@ -1064,8 +1079,8 @@ export default function Home() {
     setTrades([]);
     setTradeImages([]);
     setIsDemo(false);
-    window.localStorage.setItem("tuan-trader-trades", "[]");
-    window.localStorage.setItem(DEMO_STORAGE_KEY, "false");
+    window.localStorage.setItem(tradesStorageKey, "[]");
+    window.localStorage.setItem(demoStorageKey, "false");
     setToast("Đã xóa toàn bộ dữ liệu.");
     if (dataMode === "cloud") {
       try { await fetch("/api/trades?all=1", { method: "DELETE" }); } catch { setToast("Đã xóa trên thiết bị; cloud chưa phản hồi."); }
@@ -1073,7 +1088,7 @@ export default function Home() {
   };
 
   const saveNotes = () => {
-    window.localStorage.setItem("tuan-trader-notes", notes);
+    window.localStorage.setItem(notesStorageKey, notes);
     setToast("Đã lưu ghi chú.");
   };
 
@@ -1125,8 +1140,8 @@ export default function Home() {
       setTrades(next);
       setIsDemo(false);
       if (!Array.isArray(parsed) && typeof parsed.notes === "string") setNotes(parsed.notes);
-      window.localStorage.setItem("tuan-trader-trades", JSON.stringify(next));
-      window.localStorage.setItem(DEMO_STORAGE_KEY, "false");
+      window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
+      window.localStorage.setItem(demoStorageKey, "false");
       if (dataMode === "cloud") {
         await fetch("/api/trades", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ trades: incoming }) });
       }
@@ -1140,7 +1155,7 @@ export default function Home() {
 
   const openConnection = (provider: Provider) => {
     if (dataMode !== "cloud") {
-      setToast(authRequired ? "Đăng nhập bằng ChatGPT để dùng kết nối broker được mã hóa." : "Đồng bộ riêng tư chưa sẵn sàng; chưa thể lưu thông tin broker.");
+      setToast(authRequired ? "Đăng nhập tài khoản Trading Plan Pro để dùng kết nối broker được mã hóa." : "Đồng bộ riêng tư chưa sẵn sàng; chưa thể lưu thông tin broker.");
       return;
     }
     setWebhookToken("");
@@ -1213,11 +1228,11 @@ export default function Home() {
         if (!merged.has(key)) merged.set(key, trade);
       }
       const next = [...merged.values()];
-      window.localStorage.setItem("tuan-trader-trades", JSON.stringify(next));
+      window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
       return next;
     });
     setIsDemo(false);
-    window.localStorage.setItem(DEMO_STORAGE_KEY, "false");
+    window.localStorage.setItem(demoStorageKey, "false");
   };
 
   const performConnectionSync = async (connection: Connection) => {
@@ -1317,11 +1332,11 @@ export default function Home() {
           return true;
         });
         const next = [...unique, ...base];
-        window.localStorage.setItem("tuan-trader-trades", JSON.stringify(next));
+        window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
         return next;
       });
       setIsDemo(false);
-      window.localStorage.setItem(DEMO_STORAGE_KEY, "false");
+      window.localStorage.setItem(demoStorageKey, "false");
       setToast(`Đã nhập ${accepted.length} giao dịch mới từ ${files.length} file ${brokerName}.`);
     } catch (error) {
       setToast(error instanceof Error ? error.message : "Không thể đọc file CSV.");
@@ -1607,7 +1622,7 @@ export default function Home() {
   const renderSettings = () => <section className="settings-grid">
     <article className="panel settings-card"><div><span className="eyebrow">NHẬN DIỆN</span><h3>Hồ sơ nhật ký</h3></div><label>Tên hiển thị<input defaultValue="Tuan Trader" /></label><label>Khẩu hiệu<input defaultValue="Kỷ luật · Kiên định · Tăng trưởng" /></label><label>Tiền tệ<select defaultValue="VND"><option>VND</option><option>USD</option></select></label><button className="gold-button compact" onClick={() => setToast("Đã lưu cài đặt hiển thị.")}>Lưu thay đổi</button></article>
     <article className="panel settings-card"><div><span className="eyebrow">DỮ LIỆU & SAO LƯU</span><h3>Quản lý dữ liệu</h3></div><div className={`data-mode-card ${dataMode}`}><Database size={18} /><div><strong>{isDemo ? "Đang xem dữ liệu minh họa" : dataMode === "cloud" ? "Đồng bộ riêng tư đang hoạt động" : "Dữ liệu đang ở thiết bị này"}</strong><p>{isDemo ? "Các con số hiện tại chỉ để trải nghiệm tính năng, không phải kết quả giao dịch thật." : dataMode === "cloud" ? "Giao dịch được lưu theo tài khoản và đồng bộ giữa các thiết bị đã đăng nhập." : "Hãy xuất bản sao định kỳ; xóa dữ liệu trình duyệt có thể làm mất nhật ký cục bộ."}</p></div></div>
-      {authRequired && dataMode !== "cloud" && <a className="signin-button" href="/signin-with-chatgpt?return_to=%2F%23settings">Đăng nhập bằng ChatGPT để đồng bộ</a>}
+      {accountSession?.user ? <div className="settings-account"><span className="account-avatar">{accountSession.user.image ? <img src={accountSession.user.image} alt="" /> : <UserRound size={15} />}</span><div><strong>{accountSession.user.name}</strong><small>{accountSession.user.email}</small></div><button type="button" onClick={() => void signOutWebsite()}><LogOut size={14} /> Đăng xuất</button></div> : <a className="signin-button" href="/dang-nhap?returnTo=%2F%23settings">Đăng nhập tài khoản để đồng bộ</a>}
       <div className="backup-actions"><button className="ghost-button full" onClick={exportBackup}><FileDown size={16} /> Xuất bản sao JSON</button><label className="ghost-button full file-button backup-file"><FileUp size={16} /> Nhập bản sao<input type="file" accept="application/json,.json" onChange={importBackup} /></label></div>
       {!isDemo && <button className="ghost-button full" onClick={restoreDemo}>Xem dữ liệu minh họa</button>}
       <button className="danger-button" onClick={clearAll}>{isDemo ? "Bắt đầu với nhật ký trống" : "Xóa toàn bộ giao dịch"}</button>
@@ -1655,7 +1670,7 @@ export default function Home() {
         <header className="topbar">
           <button className="mobile-menu" aria-label="Mở menu" onClick={() => setMobileNav(true)}><Menu size={18} /></button>
           <div><h1>{meta.title}</h1><p>{meta.subtitle}</p></div>
-          <div className="top-actions"><span className={`data-state-chip ${isDemo ? "demo" : dataMode}`}><Database size={14} />{isDemo ? "Dữ liệu minh họa" : dataMode === "cloud" ? "Đã đồng bộ" : "Trên thiết bị"}</span>{view === "overview" && <select value={range} onChange={(e) => setRange(e.target.value)} aria-label="Khoảng thời gian"><option value="all">Toàn bộ thời gian</option><option value="30">30 ngày qua</option><option value="90">90 ngày qua</option></select>}<button className="quick-add" onClick={openTradeModal}><Plus size={16} /> <span>Thêm lệnh</span></button></div>
+          <div className="top-actions"><span className={`data-state-chip ${isDemo ? "demo" : dataMode}`}><Database size={14} />{isDemo ? "Dữ liệu minh họa" : dataMode === "cloud" ? "Đã đồng bộ" : "Trên thiết bị"}</span>{view === "overview" && <select value={range} onChange={(e) => setRange(e.target.value)} aria-label="Khoảng thời gian"><option value="all">Toàn bộ thời gian</option><option value="30">30 ngày qua</option><option value="90">90 ngày qua</option></select>}{accountSession?.user ? <div className="account-chip"><span className="account-avatar">{accountSession.user.image ? <img src={accountSession.user.image} alt="" /> : <UserRound size={14} />}</span><span>{accountSession.user.name || accountSession.user.email}</span><button className="account-signout" type="button" onClick={() => void signOutWebsite()} aria-label="Đăng xuất"><LogOut size={14} /></button></div> : <a className="account-login-link" href="/dang-nhap"><UserRound size={15} /><span>Đăng nhập</span></a>}<button className="quick-add" onClick={openTradeModal}><Plus size={16} /> <span>Thêm lệnh</span></button></div>
         </header>
         <div className="content-area">
           {isDemo && <section className="demo-banner" role="status"><div className="demo-icon"><Sparkles size={18} /></div><div><span>CHẾ ĐỘ MINH HỌA</span><strong>Toàn bộ 20 giao dịch và +23,9 triệu đang hiển thị là dữ liệu mẫu</strong><p>Dữ liệu này dùng để trải nghiệm tính năng, không phải thành tích giao dịch thực tế hay bằng chứng về lợi nhuận.</p></div><div className="demo-actions"><button type="button" onClick={startRealJournal}>Bắt đầu nhật ký thật</button><a href="/phuong-phap">Xem phương pháp</a></div></section>}

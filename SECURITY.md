@@ -33,6 +33,12 @@ Thay vào đó, vui lòng gửi email cho tôi với chi tiết:
 - ✅ Dùng GitHub Secrets
 - ✅ Rotate keys regularly
 
+### 5. Account Security
+- ✅ Mật khẩu được băm bởi Better Auth, không lưu dạng rõ
+- ✅ Session dùng cookie `HttpOnly`, `SameSite=Lax` và `Secure` trên HTTPS
+- ✅ Journal, ảnh và kết nối broker được truy vấn theo `user_id`
+- ✅ OAuth, email khôi phục và Turnstile chỉ đọc secret từ biến môi trường
+
 ---
 
 ## Supported Versions
