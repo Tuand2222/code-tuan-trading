@@ -20,6 +20,7 @@ import {
   Copy,
   Database,
   FileDown,
+  FileSpreadsheet,
   FileUp,
   Gauge,
   History,
@@ -1094,6 +1095,20 @@ export default function Home() {
     setToast("Đã tạo bản sao JSON; không bao gồm khóa broker.");
   };
 
+  const exportTradeHistory = async () => {
+    if (!journalTrades.length) {
+      setToast("Không có giao dịch phù hợp để xuất Excel.");
+      return;
+    }
+    try {
+      const { downloadTradeWorkbook } = await import("../lib/trade-excel");
+      downloadTradeWorkbook(journalTrades);
+      setToast(`Đã xuất ${journalTrades.length} giao dịch ra Excel.`);
+    } catch {
+      setToast("Chưa thể tạo tệp Excel. Vui lòng thử lại.");
+    }
+  };
+
   const importBackup = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -1423,7 +1438,10 @@ export default function Home() {
     <>
       <section className="quote-strip">
         <div><span>NGUYÊN TẮC CỐT LÕI</span><strong>“Giao dịch tốt không phải lệnh thắng — mà là lệnh đúng kế hoạch.”</strong></div>
-        <button className="gold-button compact" onClick={openTradeModal}>＋ Thêm giao dịch</button>
+        <div className="quote-actions">
+          <button type="button" className="ghost-button excel-button" onClick={exportTradeHistory} disabled={!journalTrades.length} title={`Xuất ${journalTrades.length} giao dịch đang hiển thị`}><FileSpreadsheet size={16} /> Xuất Excel</button>
+          <button type="button" className="gold-button compact" onClick={openTradeModal}><Plus size={17} /> Thêm giao dịch</button>
+        </div>
       </section>
       <section className="journal-media-panel" aria-labelledby="journal-media-title">
         <div className="journal-media-head">
@@ -1449,10 +1467,10 @@ export default function Home() {
         <select value={resultFilter} onChange={(e) => setResultFilter(e.target.value)} aria-label="Lọc theo kết quả"><option value="all">Mọi kết quả</option><option value="win">Thắng</option><option value="loss">Thua</option><option value="be">Hòa vốn</option></select>
         <button className="ghost-button" onClick={() => { setQuery(""); setSymbolFilter("all"); setResultFilter("all"); setJournalMarket("all"); }}>Xóa lọc</button>
       </section>
-      <section className="table-panel">
-        {journalTrades.length ? <div className="table-scroll"><table><thead><tr><th>Ngày</th><th>Thị trường</th><th>Sản phẩm</th><th>Nguồn</th><th>Hướng</th><th>Phiên</th><th>Setup</th><th>TF</th><th>Rủi ro</th><th>RR</th><th>Kết quả</th><th>Lãi / Lỗ</th><th>Kỷ luật</th><th>Ảnh</th><th /></tr></thead><tbody>
+      <section className="table-panel journal-results" aria-live="polite">
+        {journalTrades.length ? <><div className="journal-table-desktop"><div className="table-scroll" tabIndex={0} aria-label="Bảng lịch sử giao dịch, có thể cuộn ngang"><table><thead><tr><th>Ngày</th><th>Thị trường</th><th>Sản phẩm</th><th>Nguồn</th><th>Hướng</th><th>Phiên</th><th>Setup</th><th>TF</th><th>Rủi ro</th><th>RR</th><th>Kết quả</th><th>Lãi / Lỗ</th><th>Kỷ luật</th><th>Ảnh</th><th /></tr></thead><tbody>
           {journalTrades.map((trade) => { const images = imagesByTrade.get(trade.id) ?? []; return <tr key={trade.id}><td>{DATE.format(new Date(`${trade.date}T12:00:00`))}</td><td><span className={`market-badge market-${marketOf(trade).toLowerCase().replace(" ", "-")}`}>{marketOf(trade)}</span></td><td><strong>{trade.symbol}</strong></td><td><span className="source-badge">{trade.source ?? "Thủ công"}</span></td><td><span className={`side ${trade.side.toLowerCase()}`}>{trade.side}</span></td><td>{trade.session}</td><td>{trade.setup}</td><td>{trade.timeframe}</td><td>{money(trade.risk, true)}</td><td>{trade.risk ? (trade.pnl / trade.risk).toFixed(2) : "0.00"}R</td><td><span className={`result ${trade.pnl > 0 ? "win" : trade.pnl < 0 ? "loss" : "be"}`}>{trade.pnl > 0 ? "Thắng" : trade.pnl < 0 ? "Thua" : "Hòa"}</span></td><td className={trade.pnl >= 0 ? "positive-text" : "negative-text"}>{money(trade.pnl, true)}</td><td><span className={`score ${trade.discipline >= 90 ? "good" : "warn"}`}>{trade.discipline}%</span></td><td><button type="button" className={`trade-image-count ${images.length ? "has-images" : ""}`} disabled={!images.length} onClick={() => setActiveImage(images[0])} aria-label={images.length ? `Xem ${images.length} ảnh của ${trade.symbol}` : `${trade.symbol} chưa có ảnh`}><Camera size={13} />{images.length || "—"}</button></td><td><div className="table-actions"><button type="button" className="icon-button edit" onClick={() => openEditTradeModal(trade)} aria-label={`Sửa lệnh ${trade.symbol}`}><Pencil size={13} /></button><button type="button" className="icon-button delete" onClick={() => deleteTrade(trade.id)} aria-label={`Xóa lệnh ${trade.symbol}`}>×</button></div></td></tr>; })}
-        </tbody></table></div> : <EmptyState title="Chưa có giao dịch phù hợp" copy="Thử thay đổi bộ lọc hoặc thêm một giao dịch mới." />}
+        </tbody></table></div><p className="table-scroll-hint">Giữ Shift + lăn chuột hoặc kéo ngang để xem đủ dữ liệu.</p></div><div className="journal-mobile-list">{journalTrades.map((trade) => { const images = imagesByTrade.get(trade.id) ?? []; return <article className="journal-trade-card" key={trade.id}><header><div><strong>{trade.symbol}</strong><span>{DATE.format(new Date(`${trade.date}T12:00:00`))} · {marketOf(trade)}</span></div><span className={`result ${trade.pnl > 0 ? "win" : trade.pnl < 0 ? "loss" : "be"}`}>{trade.pnl > 0 ? "Thắng" : trade.pnl < 0 ? "Thua" : "Hòa"}</span></header><div className="journal-trade-summary"><div><span>Lãi / Lỗ</span><strong className={trade.pnl >= 0 ? "positive-text" : "negative-text"}>{money(trade.pnl, true)}</strong></div><div><span>R:R</span><strong>{trade.risk ? (trade.pnl / trade.risk).toFixed(2) : "0.00"}R</strong></div><div><span>Kỷ luật</span><strong>{trade.discipline}%</strong></div></div><dl><div><dt>Hướng · Phiên</dt><dd>{trade.side} · {trade.session}</dd></div><div><dt>Setup · Khung</dt><dd>{trade.setup} · {trade.timeframe}</dd></div><div><dt>Nguồn</dt><dd>{trade.source ?? "Thủ công"}</dd></div></dl><footer><button type="button" className="ghost-button" disabled={!images.length} onClick={() => setActiveImage(images[0])}><Camera size={15} /> {images.length ? `${images.length} ảnh` : "Chưa có ảnh"}</button><button type="button" className="ghost-button" onClick={() => openEditTradeModal(trade)}><Pencil size={15} /> Sửa</button><button type="button" className="icon-button delete" onClick={() => deleteTrade(trade.id)} aria-label={`Xóa lệnh ${trade.symbol}`}>×</button></footer></article>; })}</div></> : <EmptyState title="Chưa có giao dịch phù hợp" copy="Thử thay đổi bộ lọc hoặc thêm một giao dịch mới." />}
       </section>
     </>
   );
