@@ -1,26 +1,12 @@
-import { and, eq } from "drizzle-orm";
+�r�^�f��ئ{N�y�'vî���import { and, eq } from "drizzle-orm";
 import { getDb } from "../../../../db";
 import { brokerConnections, trades } from "../../../../db/schema";
+import { hmacHex } from "../../../../lib/broker-api";
 import { decryptBrokerSecrets } from "../../../../lib/broker-crypto";
 import { getPublicBridgeUrl } from "../../../../lib/bridge-url";
 import { requireUser, routeError } from "../../../../lib/server-auth";
 
 type NormalizedTrade = typeof trades.$inferInsert;
-
-function toHex(bytes: ArrayBuffer) {
-  return [...new Uint8Array(bytes)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-async function hmacHex(secret: string, payload: string) {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  return toHex(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload)));
-}
 
 function sessionFor(time: number) {
   const hour = new Date(time).getUTCHours();
@@ -96,6 +82,7 @@ async function bybitTrades(
 ) {
   if (!secrets.apiKey || !secrets.apiSecret) throw new Error("Bybit credentials are missing");
   const category = connection.accountType === "spot" ? "spot" : "linear";
+  const path = category === "spot" ? "/v5/execution/list" : "/v5/position/closed-pnl";
   const query = new URLSearchParams({ category, limit: "100" }).toString();
   const timestamp = String(Date.now());
   const receiveWindow = "5000";
@@ -103,7 +90,7 @@ async function bybitTrades(
     secrets.apiSecret,
     `${timestamp}${secrets.apiKey}${receiveWindow}${query}`,
   );
-  const response = await fetch(`https://api.bybit.com/v5/execution/list?${query}`, {
+  const response = await fetch(`https://api.bybit.com${path}?${query}`, {
     headers: {
       "X-BAPI-API-KEY": secrets.apiKey,
       "X-BAPI-TIMESTAMP": timestamp,
@@ -119,13 +106,13 @@ async function bybitTrades(
   if (!response.ok || payload.retCode !== 0) throw new Error(`Bybit: ${payload.retMsg ?? response.statusText}`);
   const fxRate = secrets.fxRate ?? 1;
   return (payload.result?.list ?? []).map((item): NormalizedTrade => {
-    const time = Number(item.execTime);
-    const pnl = Number(item.closedPnl ?? item.execPnl ?? 0) * fxRate;
-    const quote = Number(item.execValue ?? Number(item.execPrice) * Number(item.execQty));
+    const time = Number(item.execTime ?? item.updatedTime ?? item.createdTime);
+    const pnl = Number(item.closedPnl ?? 0) * fxRate;
+    const quote = Number(item.execValue ?? item.cumExitValue ?? Number(item.execPrice ?? item.avgExitPrice) * Number(item.execQty ?? item.closedSize));
     return {
       id: crypto.randomUUID(),
       userEmail,
-      externalId: String(item.execId),
+      externalId: String(item.execId ?? item.orderId),
       market: "Crypto",
       source: "Bybit",
       accountId: connection.id,
@@ -137,13 +124,13 @@ async function bybitTrades(
       timeframe: "Auto",
       risk: Math.max(Math.abs(pnl), quote * fxRate * 0.01, 1),
       pnl,
-      fees: Number(item.execFee ?? 0) * fxRate,
-      quantity: Number(item.execQty ?? 0),
-      entryPrice: Number(item.execPrice ?? 0),
-      exitPrice: Number(item.execPrice ?? 0),
+      fees: Math.abs(Number(item.execFee ?? 0) + Number(item.openFee ?? 0) + Number(item.closeFee ?? 0)) * fxRate,
+      quantity: Number(item.execQty ?? item.closedSize ?? item.qty ?? 0),
+      entryPrice: Number(item.avgEntryPrice ?? item.execPrice ?? 0),
+      exitPrice: Number(item.avgExitPrice ?? item.execPrice ?? 0),
       discipline: 0,
       psychology: "Chưa review",
-      note: category === "spot" ? "Bybit Spot execution · P/L, setup và rủi ro cần review" : "Bybit Derivatives · setup và rủi ro dự kiến cần review",
+      note: category === "spot" ? "Bybit Spot execution · P/L, setup và rủi ro cần review" : "Bybit Derivatives closed P/L · setup và rủi ro dự kiến cần review",
       durationMin: 0,
     };
   });
@@ -287,6 +274,7 @@ async function bridgeTrades(
 }
 
 export async function POST(request: Request) {
+  let failedConnection: typeof brokerConnections.$inferSelect | undefined;
   try {
     const accountUser = await requireUser(request);
     const userEmail = accountUser.email;
@@ -298,6 +286,7 @@ export async function POST(request: Request) {
       .where(and(eq(brokerConnections.id, connectionId), eq(brokerConnections.userId, accountUser.id)))
       .limit(1);
     if (!connection) throw new Error("Connection not found");
+    failedConnection = connection;
     const secrets = await decryptBrokerSecrets(connection.credentialsCiphertext);
     let rows: NormalizedTrade[];
     if (connection.provider === "binance") rows = await binanceTrades(connection, secrets, userEmail);
@@ -319,6 +308,15 @@ export async function POST(request: Request) {
     await getDb().update(brokerConnections).set({ status: "connected", lastSyncAt: now, updatedAt: now }).where(eq(brokerConnections.id, connection.id));
     return Response.json({ imported: imported.length, scanned: rows.length, trades: imported, lastSyncAt: now });
   } catch (error) {
+    if (failedConnection) {
+      const now = new Date().toISOString();
+      try {
+        await getDb()
+          .update(brokerConnections)
+          .set({ status: "error", updatedAt: now })
+          .where(eq(brokerConnections.id, failedConnection.id));
+      } catch { /* preserve the original provider error */ }
+    }
     return routeError(error);
   }
 }

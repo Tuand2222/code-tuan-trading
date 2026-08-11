@@ -1,6 +1,7 @@
-import { and, desc, eq } from "drizzle-orm";
+­r‡^Ñf¥–Ø¦{NìyÊ'vÃ®¶›­import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "../../../db";
 import { brokerConnections } from "../../../db/schema";
+import { verifyBrokerAccess } from "../../../lib/broker-api";
 import { encryptBrokerSecrets } from "../../../lib/broker-crypto";
 import { getPublicBridgeUrl } from "../../../lib/bridge-url";
 import { requireUser, routeError } from "../../../lib/server-auth";
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
       ? `tpp_${bytesToBase64Url(crypto.getRandomValues(new Uint8Array(32)))}`
       : undefined;
     const webhookTokenHash = webhookToken ? await sha256Hex(webhookToken) : null;
-    const credentialsCiphertext = await encryptBrokerSecrets({
+    const secrets = {
       apiKey: body.apiKey?.trim(),
       apiSecret: body.apiSecret?.trim(),
       symbols: body.symbols?.map((symbol) => symbol.trim().toUpperCase()).filter(Boolean),
@@ -96,7 +97,19 @@ export async function POST(request: Request) {
       bridgeUrl: body.bridgeUrl?.trim(),
       bridgeToken: body.bridgeToken?.trim(),
       brokerName: body.brokerName?.trim(),
+    };
+    const needsVerification = ["binance", "bybit"].includes(provider)
+      || (BRIDGE_PROVIDERS.has(provider) && accountType === "pull");
+    const verification = await verifyBrokerAccess({
+      provider,
+      accountType,
+      apiKey: secrets.apiKey,
+      apiSecret: secrets.apiSecret,
+      bridgeUrl: secrets.bridgeUrl,
+      bridgeToken: secrets.bridgeToken,
     });
+    const status = needsVerification ? "connected" : "awaiting-data";
+    const credentialsCiphertext = await encryptBrokerSecrets(secrets);
     const [connection] = await getDb()
       .insert(brokerConnections)
       .values({
@@ -108,6 +121,7 @@ export async function POST(request: Request) {
         accountType,
         credentialsCiphertext,
         webhookTokenHash,
+        status,
       })
       .onConflictDoUpdate({
         target: [brokerConnections.userEmail, brokerConnections.provider, brokerConnections.label],
@@ -116,7 +130,7 @@ export async function POST(request: Request) {
           accountType,
           credentialsCiphertext,
           webhookTokenHash,
-          status: "configured",
+          status,
           updatedAt: new Date().toISOString(),
         },
       })
@@ -128,7 +142,7 @@ export async function POST(request: Request) {
         status: brokerConnections.status,
         lastSyncAt: brokerConnections.lastSyncAt,
       });
-    return Response.json({ connection, webhookToken }, { status: 201 });
+    return Response.json({ connection, webhookToken, verification }, { status: 201 });
   } catch (error) {
     return routeError(error);
   }
