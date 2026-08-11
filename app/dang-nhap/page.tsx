@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
-  Check,
   Eye,
   EyeOff,
   LockKeyhole,
@@ -94,10 +93,10 @@ function TurnstileBox({ siteKey, onToken }: { siteKey: string | null; onToken: (
 
   if (!siteKey) {
     return (
-      <div className="captcha-placeholder" aria-label="Bảo vệ chống bot sẵn sàng cấu hình">
-        <span className="captcha-checkbox"><Check size={15} /></span>
-        <div><strong>Tôi không phải robot</strong><small>Turnstile sẽ tự bật khi có khóa cấu hình</small></div>
-        <ShieldCheck size={24} />
+      <div className="captcha-placeholder" aria-label="Bảo vệ chống bot đang chờ cấu hình">
+        <span className="captcha-checkbox"><ShieldCheck size={15} /></span>
+        <div><strong>Bảo vệ đăng nhập</strong><small>Turnstile sẽ tự bật khi khóa bảo vệ được cấu hình.</small></div>
+        <span className="captcha-status">Đang chờ cấu hình</span>
       </div>
     );
   }
@@ -276,6 +275,8 @@ export default function SignInPage() {
     }
   };
 
+  const configuredProviders = (Object.keys(PROVIDER_COPY) as AuthProvider[]).filter((provider) => capabilities.providers[provider]);
+
   if (!sessionPending && currentSession?.user) {
     return (
       <main className="auth-page">
@@ -308,8 +309,8 @@ export default function SignInPage() {
 
         {mode !== "forgot" && (
           <>
-            <div className="social-auth-grid">
-              {(Object.keys(PROVIDER_COPY) as AuthProvider[]).map((provider) => (
+            {configuredProviders.length > 0 ? <div className="social-auth-grid">
+              {configuredProviders.map((provider) => (
                 <button
                   type="button"
                   key={provider}
@@ -319,10 +320,9 @@ export default function SignInPage() {
                   title={capabilities.providers[provider] ? `Tiếp tục với ${PROVIDER_COPY[provider].label}` : `${PROVIDER_COPY[provider].label} cần cấu hình OAuth`}
                 >
                   <span>{PROVIDER_COPY[provider].mark}</span>{PROVIDER_COPY[provider].label}
-                  {!capabilities.providers[provider] && <small>Cấu hình</small>}
                 </button>
               ))}
-            </div>
+            </div> : <div className="auth-provider-note"><ShieldCheck size={17} /><span><strong>Đăng nhập nhanh đang được hoàn thiện</strong><small>Hiện bạn có thể đăng nhập an toàn bằng email hoặc số điện thoại.</small></span></div>}
             <div className="auth-divider"><span>hoặc tiếp tục bằng tài khoản</span></div>
           </>
         )}
