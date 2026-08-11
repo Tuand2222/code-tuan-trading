@@ -233,11 +233,98 @@ const VIEW_META: Record<View, { title: string; subtitle: string }> = {
   setup: { title: "Hiệu suất setup", subtitle: "Đo chất lượng từng mô hình giao dịch" },
   weekday: { title: "Hiệu suất theo thứ", subtitle: "Chọn đúng ngày để tập trung" },
   heatmap: { title: "Bản đồ nhiệt", subtitle: "Mật độ và hiệu suất theo ngày trong tuần" },
-  process: { title: "Quy trình setup", subtitle: "Checklist trước, trong và sau mỗi giao dịch" },
-  notes: { title: "Ghi chú", subtitle: "Luận điểm, bài học và kế hoạch tuần" },
+  process: { title: "Quy trình setup", subtitle: "Chuẩn hóa quyết định trước, trong và sau giao dịch" },
+  notes: { title: "Ghi chú & review", subtitle: "Ghi sự thật, đánh giá quy trình và chốt hành động cải thiện" },
   connections: { title: "Kết nối broker", subtitle: "Hợp nhất dữ liệu từ sàn và nền tảng giao dịch" },
   settings: { title: "Cài đặt", subtitle: "Cá nhân hóa nhật ký giao dịch" },
 };
+
+const NOTE_TEMPLATES = [
+  {
+    id: "daily-plan",
+    code: "01",
+    label: "Kế hoạch ngày",
+    description: "Bối cảnh, kịch bản và giới hạn rủi ro trước phiên.",
+    content: `KẾ HOẠCH GIAO DỊCH — [Ngày]
+
+1. BỐI CẢNH KHÁCH QUAN
+- Trạng thái thị trường (xu hướng / đi ngang / biến động cao):
+- Vùng giá và mốc thời gian quan trọng:
+- Tin tức hoặc sự kiện cần tránh:
+
+2. KỊCH BẢN GIAO DỊCH
+- Kịch bản ưu tiên:
+- Điều kiện kích hoạt setup:
+- Điểm làm luận điểm mất hiệu lực:
+- Kịch bản thay thế / điều kiện đứng ngoài:
+
+3. KẾ HOẠCH RỦI RO
+- Rủi ro tối đa mỗi lệnh: ___%
+- Mức dừng trong ngày: ___R
+- Số lệnh tối đa: ___
+
+4. CAM KẾT THỰC THI
+- Tôi chỉ vào lệnh khi đủ điều kiện A+.
+- Tôi không đuổi giá, nới SL hoặc trả thù thị trường.`,
+  },
+  {
+    id: "trade-review",
+    code: "02",
+    label: "Review một lệnh",
+    description: "Đánh giá chất lượng quyết định, không chỉ nhìn P&L.",
+    content: `REVIEW GIAO DỊCH — [Mã / Ngày / Phiên]
+
+1. SỰ THẬT
+- Setup và khung thời gian:
+- Entry / SL / TP / kết quả (R và số tiền):
+- Ảnh trước lệnh / sau lệnh:
+
+2. LUẬN ĐIỂM BAN ĐẦU
+- Lợi thế được kỳ vọng:
+- Tín hiệu kích hoạt:
+- Điều kiện làm setup mất hiệu lực:
+
+3. CHẤT LƯỢNG THỰC THI
+- Đúng setup: Có / Không
+- Đúng khối lượng và rủi ro: Có / Không
+- Tuân thủ kế hoạch quản lý lệnh: Có / Không
+- Trạng thái tâm lý (trước / trong / sau):
+
+4. KẾT LUẬN
+- Điều đã làm đúng:
+- Sai lệch so với kế hoạch:
+- Một bài học có thể kiểm chứng:
+- Một hành động cụ thể cho lệnh tiếp theo:`,
+  },
+  {
+    id: "weekly-review",
+    code: "03",
+    label: "Review tuần",
+    description: "Tổng hợp dữ liệu, sai lệch và ưu tiên cải thiện tuần tới.",
+    content: `REVIEW TUẦN — [Từ ngày / Đến ngày]
+
+1. KẾT QUẢ & CỠ MẪU
+- Tổng số lệnh / P&L / R ròng:
+- Win rate / Profit factor / Drawdown:
+- Setup đủ mẫu để đánh giá:
+
+2. CHẤT LƯỢNG QUY TRÌNH
+- Tỷ lệ lệnh đúng kế hoạch:
+- Quy tắc được tuân thủ tốt nhất:
+- Sai lệch đang lặp lại và tác động:
+
+3. ĐÁNH GIÁ LỢI THẾ
+- Setup / phiên / sản phẩm hoạt động tốt:
+- Dữ liệu nào còn chưa đủ để kết luận:
+- Điều gì tuyệt đối không thay đổi chỉ vì một vài lệnh:
+
+4. KẾ HOẠCH TUẦN TỚI
+- Tiếp tục:
+- Loại bỏ:
+- Thử nghiệm (rủi ro không đổi):
+- Một mục tiêu hành vi có thể đo lường:`,
+  },
+] as const;
 
 const MARKETS: { id: "all" | Market; label: string; icon: string }[] = [
   { id: "all", label: "Tất cả", icon: "◎" },
@@ -717,7 +804,7 @@ export default function Home() {
   const [mobileNav, setMobileNav] = useState(false);
   const [draft, setDraft] = useState<DraftTrade>(makeDraft);
   const [toast, setToast] = useState("");
-  const [notes, setNotes] = useState("Tuần này chỉ giao dịch các setup A+ trên H1/H4.\n\nGiới hạn: tối đa 2 lệnh/ngày, rủi ro 1%/lệnh. Sau 2 lệnh thua liên tiếp phải dừng và review.");
+  const [notes, setNotes] = useState(NOTE_TEMPLATES[0].content);
   const [calendarMonth, setCalendarMonth] = useState(new Date(2026, 7, 1));
 
   const signOutWebsite = async () => {
@@ -1071,6 +1158,13 @@ export default function Home() {
   const saveNotes = () => {
     window.localStorage.setItem(notesStorageKey, notes);
     setToast("Đã lưu ghi chú.");
+  };
+
+  const insertNoteTemplate = (template: (typeof NOTE_TEMPLATES)[number]) => {
+    setNotes((current) => current.trim()
+      ? `${current.trim()}\n\n────────────────────\n\n${template.content}`
+      : template.content);
+    setToast(`Đã chèn mẫu “${template.label}”.`);
   };
 
   const exportBackup = () => {
@@ -1543,18 +1637,91 @@ export default function Home() {
   };
 
   const renderProcess = () => {
-    const steps = [
-      { number: "01", title: "Bối cảnh", copy: "Xu hướng Daily/H4 rõ ràng? Có tin tức lớn trong 30 phút tới?" },
-      { number: "02", title: "Vùng giao dịch", copy: "Giá đang tại vùng cung/cầu, hỗ trợ/kháng cự hoặc vùng giá trị?" },
-      { number: "03", title: "Tín hiệu", copy: "Có xác nhận cấu trúc, khối lượng hoặc nến từ chối đúng setup?" },
-      { number: "04", title: "Rủi ro", copy: "SL hợp lý, tối đa 1%, RR kỳ vọng từ 1:2 và không tương quan quá mức?" },
-      { number: "05", title: "Thực thi", copy: "Đặt lệnh, SL, TP cùng lúc. Không nới SL, không đuổi giá." },
-      { number: "06", title: "Review", copy: "Chụp biểu đồ, chấm kỷ luật và ghi một bài học cụ thể." },
+    const phases = [
+      {
+        number: "01",
+        phase: "TRƯỚC LỆNH",
+        title: "Xây dựng luận điểm",
+        copy: "Tách dữ kiện khách quan khỏi kỳ vọng trước khi tìm điểm vào.",
+        checks: [
+          ["Bối cảnh", "Xu hướng D1/H4, trạng thái biến động, vùng giá và tin tức quan trọng."],
+          ["Lợi thế", "Gọi đúng tên setup trong playbook và nêu điều kiện kích hoạt cụ thể."],
+          ["Kịch bản", "Ghi entry, invalidation, SL, TP và trường hợp chủ động đứng ngoài."],
+        ],
+        gate: "Chỉ giao dịch khi setup A+ đủ điều kiện và RR kỳ vọng từ 1:2.",
+      },
+      {
+        number: "02",
+        phase: "TRONG LỆNH",
+        title: "Thực thi kế hoạch",
+        copy: "Quản trị phần có thể kiểm soát; không phản ứng theo P&L tức thời.",
+        checks: [
+          ["Kích hoạt", "Chờ tín hiệu đóng nến hoặc xác nhận cấu trúc; tuyệt đối không đuổi giá."],
+          ["Rủi ro", "Đúng khối lượng, rủi ro tối đa 1%; không nới SL hoặc trung bình giá lỗ."],
+          ["Quản lý", "Dời SL, chốt một phần hoặc thoát lệnh đúng điều kiện đã viết trước."],
+        ],
+        gate: "Nếu phải thay đổi kế hoạch, ghi lý do trước khi hành động.",
+      },
+      {
+        number: "03",
+        phase: "SAU LỆNH",
+        title: "Review quyết định",
+        copy: "Đánh giá chất lượng quy trình độc lập với kết quả lời hay lỗ.",
+        checks: [
+          ["Bằng chứng", "Lưu ảnh trước/sau lệnh, kết quả theo R và số tiền thực tế."],
+          ["Tuân thủ", "Chấm đúng setup, đúng rủi ro, đúng quản lý và trạng thái tâm lý."],
+          ["Cải thiện", "Ghi một bài học kiểm chứng được và một hành động cho lệnh kế tiếp."],
+        ],
+        gate: `Không sửa hệ thống từ một lệnh; chỉ kết luận khi có ít nhất ${MIN_ANALYTICS_SAMPLE} mẫu cùng điều kiện.`,
+      },
     ];
-    return <section className="process-grid">{steps.map((step, index) => <article className="process-card" key={step.number}><span>{step.number}</span><div><small>{index < 3 ? "TRƯỚC LỆNH" : index < 5 ? "TRONG LỆNH" : "SAU LỆNH"}</small><h3>{step.title}</h3><p>{step.copy}</p></div><i>✓</i></article>)}</section>;
+    const principles = [
+      ["Bảo vệ vốn", "Rủi ro được xác định trước lợi nhuận."],
+      ["Kỷ luật trước kết quả", "Một lệnh thắng sai quy trình vẫn là lệnh kém."],
+      ["Đủ mẫu mới kết luận", `Ít nhất ${MIN_ANALYTICS_SAMPLE} lệnh cùng điều kiện.`],
+      ["Đứng ngoài là một vị thế", "Không có setup A+ thì không cần giao dịch."],
+    ];
+    return <>
+      <section className="process-hero">
+        <div>
+          <span className="eyebrow">EXECUTION PROTOCOL</span>
+          <h2>Một quyết định tốt phải có thể giải thích và lặp lại</h2>
+          <p>Đi từ dữ kiện đến kế hoạch, từ kế hoạch đến thực thi, rồi dùng dữ liệu để cải thiện — không dùng cảm xúc hoặc một kết quả đơn lẻ để thay đổi hệ thống.</p>
+        </div>
+        <div className="process-priority"><small>THỨ TỰ ƯU TIÊN</small><strong>Bảo vệ vốn <i>→</i> Tuân thủ <i>→</i> Kết quả</strong></div>
+      </section>
+      <section className="process-grid">{phases.map((phase) => <article className="process-card" key={phase.number}>
+        <header><span>{phase.number}</span><div><small>{phase.phase}</small><h3>{phase.title}</h3><p>{phase.copy}</p></div></header>
+        <div className="process-checklist">{phase.checks.map(([label, copy]) => <div key={label}><i>✓</i><p><strong>{label}</strong><span>{copy}</span></p></div>)}</div>
+        <footer><ShieldCheck size={15} /><span><small>CỔNG KIỂM TRA</small><strong>{phase.gate}</strong></span></footer>
+      </article>)}</section>
+      <section className="process-principles"><div><span className="eyebrow">NGUYÊN TẮC BẤT BIẾN</span><h3>Giữ đúng hệ thống trước khi tối ưu kết quả</h3></div><div className="process-principle-grid">{principles.map(([title, copy], index) => <article key={title}><span>{String(index + 1).padStart(2, "0")}</span><div><strong>{title}</strong><p>{copy}</p></div></article>)}</div></section>
+    </>;
   };
 
-  const renderNotes = () => <section className="notes-layout"><article className="panel note-editor"><div className="panel-title"><div><span className="eyebrow">TRADING DESK</span><h3>Kế hoạch & bài học</h3></div><span className="auto-save">Lưu trên thiết bị</span></div><textarea value={notes} onChange={(e) => setNotes(e.target.value)} aria-label="Ghi chú giao dịch" /><button className="gold-button compact" onClick={saveNotes}>Lưu ghi chú</button></article><aside className="panel weekly-card"><span className="eyebrow">REVIEW TUẦN</span><h3>3 câu hỏi quan trọng</h3><ol><li>Setup nào tạo lợi nhuận thật?</li><li>Sai lầm nào đang lặp lại?</li><li>Tuần tới cần loại bỏ điều gì?</li></ol><div className="mindset"><span>TÂM THẾ</span><strong>“Không cần giao dịch mỗi ngày. Chỉ cần xuất hiện khi lợi thế xuất hiện.”</strong></div></aside></section>;
+  const renderNotes = () => <>
+    <section className="note-template-panel">
+      <div className="note-template-heading"><div><span className="eyebrow">MẪU GHI CHUYÊN NGHIỆP</span><h3>Bắt đầu bằng đúng cấu trúc</h3></div><p>Mẫu mới được chèn nối tiếp, không ghi đè nội dung hiện có.</p></div>
+      <div className="note-template-grid">{NOTE_TEMPLATES.map((template) => <button type="button" key={template.id} onClick={() => insertNoteTemplate(template)} aria-label={`Chèn mẫu ${template.label}`}><span>{template.code}</span><div><strong>{template.label}</strong><small>{template.description}</small></div><Copy size={15} /></button>)}</div>
+    </section>
+    <section className="notes-layout">
+      <article className="panel note-editor">
+        <div className="panel-title"><div><span className="eyebrow">DECISION JOURNAL</span><h3>Kế hoạch, bằng chứng & bài học</h3></div><span className="auto-save">Lưu trên thiết bị</span></div>
+        <div className="note-writing-rule"><ShieldCheck size={16} /><p><strong>Quy tắc viết:</strong> ghi sự thật trước nhận định, mô tả quyết định trước kết quả và luôn kết thúc bằng một hành động cụ thể.</p></div>
+        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} aria-label="Ghi chú và review giao dịch" spellCheck="false" />
+        <div className="note-editor-footer"><small>{notes.length.toLocaleString("vi-VN")} ký tự · Nội dung chỉ được lưu khi bạn bấm nút</small><button type="button" className="gold-button compact" onClick={saveNotes}>Lưu ghi chú</button></div>
+      </article>
+      <aside className="note-review-column">
+        <section className="panel review-framework"><span className="eyebrow">REVIEW FRAMEWORK</span><h3>4 lớp đánh giá</h3><div>{[
+          ["01", "Sự thật", "Điều gì đã xảy ra, có bằng chứng nào?"],
+          ["02", "Quyết định", "Tại sao vào lệnh và điều kiện nào bị vi phạm?"],
+          ["03", "Quy trình", "Kết quả đến từ lợi thế hay từ may mắn?"],
+          ["04", "Hành động", "Một thay đổi nhỏ nào sẽ được đo ở lần tới?"],
+        ].map(([number, title, copy]) => <article key={number}><span>{number}</span><p><strong>{title}</strong><small>{copy}</small></p></article>)}</div></section>
+        <section className="panel weekly-card"><span className="eyebrow">REVIEW TUẦN</span><h3>Câu hỏi ra quyết định</h3><ol><li><strong>Lợi thế nào đã đủ mẫu?</strong><span>So sánh setup, phiên và sản phẩm trên cùng điều kiện.</span></li><li><strong>Sai lệch nào đang lặp lại?</strong><span>Đo tần suất và tác động, không chỉ kể lại cảm xúc.</span></li><li><strong>Tuần tới ưu tiên điều gì?</strong><span>Chọn một hành vi có thể quan sát và đo lường.</span></li></ol><div className="mindset"><span>NGUYÊN TẮC</span><strong>Đánh giá quy trình bằng dữ liệu; không đánh giá bản thân bằng một lệnh.</strong></div></section>
+      </aside>
+    </section>
+  </>;
 
   const renderConnections = () => (
     <>
