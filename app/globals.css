@@ -587,3 +587,405 @@ td { padding: 13px; border-bottom: 1px solid var(--line-soft); color: #98a2ae; f
   .account-chip > span { display: none; }
   .account-login-link span { display: none; }
 }
+
+/* Global readability and layout refresh */
+:root {
+  --page-gutter: clamp(24px, 2.4vw, 42px);
+  --section-gap: 18px;
+  --readable-xs: 11px;
+  --readable-sm: 12px;
+  --readable-md: 14px;
+}
+
+body { font-size: 15px; line-height: 1.55; text-rendering: optimizeLegibility; }
+.app-shell { background: radial-gradient(circle at 70% -12%,rgba(46,93,73,.14),transparent 34%),var(--bg); }
+.sidebar { width: 284px; }
+.main-content { margin-left: 284px; }
+.brand { height: 148px; }
+.brand > strong { font-size: 22px; }
+.brand > small { margin-top: 7px; font-size: 11px; line-height: 1.3; }
+.nav-group { gap: 4px; margin-bottom: 13px; }
+.nav-group-label { padding: 9px 13px 5px; color: #73808d; font-size: 11px; line-height: 1.2; }
+.sidebar nav { padding: 10px 14px 16px; }
+.sidebar nav button { height: 44px; gap: 14px; padding: 0 14px; font-size: 13px; font-weight: 650; }
+.sidebar nav button .nav-icon { flex-basis: 19px; width: 19px; height: 19px; }
+.sidebar-footer { padding: 17px 18px 22px; }
+.sidebar-footer > div { font-size: 12px; }
+
+.topbar { min-height: 108px; padding: 27px var(--page-gutter) 22px; gap: 28px; }
+.topbar h1 { font-size: clamp(25px,2vw,30px); line-height: 1.2; }
+.topbar p { margin-top: 7px; color: #85909c; font-size: 14px; line-height: 1.45; }
+.top-actions { gap: 12px; }
+.top-actions select,.notification,.quick-add,.account-login-link,.account-chip { min-height: 44px; height: 44px; }
+.top-actions select { min-width: 160px; padding: 0 14px; font-size: 13px; }
+.account-login-link { padding: 0 13px; font-size: 12px; }
+.account-chip > span { max-width: 145px; font-size: 12px; }
+.content-area { max-width: 1680px; padding: 0 var(--page-gutter) 54px; }
+.app-footer { padding: 22px var(--page-gutter) 34px; color: #697581; font-size: 12px; line-height: 1.6; }
+
+.gold-button,.ghost-button,.danger-button,.ghost-link,.signin-button { min-height: 44px; font-size: 13px; }
+.gold-button.compact { min-height: 44px; padding-inline: 20px; }
+.filter-bar select,.search,.settings-card input,.settings-card select { height: 44px; font-size: 13px; }
+.filter-bar { gap: 11px; margin: 18px 0; padding: 14px; }
+
+.overview-hero { margin-bottom: 18px; padding: clamp(28px,2.5vw,38px); gap: 38px; border-radius: 18px; }
+.product-kicker { font-size: 11px; }
+.overview-hero h2 { margin: 12px 0 11px; font-size: clamp(28px,2.5vw,39px); }
+.overview-hero-copy > p { color: #a2acb6; font-size: 14px; line-height: 1.75; }
+.overview-actions { margin-top: 22px; gap: 11px; }
+.overview-principles { gap: 11px; }
+.overview-principles article { min-height: 78px; padding: 14px 15px; grid-template-columns: 38px 1fr; gap: 3px 12px; }
+.overview-principles article > span { width: 38px; height: 38px; font-size: 11px; }
+.overview-principles strong { font-size: 14px; }
+.overview-principles small { color: #8c98a4; font-size: 12px; line-height: 1.45; }
+.market-switcher { gap: 10px; margin-bottom: 16px; }
+.market-switcher button { height: 44px; padding: 0 17px; font-size: 13px; }
+.market-overview-grid { gap: 13px; margin-bottom: 16px; }
+.market-overview-grid article { min-height: 82px; padding: 15px 17px; }
+.market-overview-grid small { font-size: 12px; }
+.market-overview-grid strong { font-size: 14px; }
+.market-overview-grid b { font-size: 15px; }
+
+.metric-grid { gap: 15px; }
+.metric-card { min-height: 108px; padding: 20px 18px; border-radius: 14px; }
+.metric-card > span { color: #919ca8; font-size: 12px; line-height: 1.35; }
+.metric-card > strong { font-size: clamp(23px,1.7vw,28px); line-height: 1.1; }
+.metric-card i { width: 18px; height: 18px; right: 12px; top: 12px; font-size: 11px; }
+.dashboard-grid { margin-top: 20px; gap: 18px; }
+.panel,.metrix-panel,.metrix-section,.system-panel,.dcf-panel,.vlab-panel { padding: 22px; border-radius: 15px; }
+.panel-title h3 { margin-top: 6px; font-size: 18px; }
+.eyebrow { color: #909ba6; font-size: 11px; line-height: 1.3; }
+.status-chip,.data-state-chip,.cloud-status { min-height: 31px; padding: 0 10px; display: inline-flex; align-items: center; font-size: 12px; }
+.panel-copy { color: #a2acb6; font-size: 13px; line-height: 1.75; }
+.chart-axis,.bar-column { font-size: 11px; }
+.dual-axis-chart-toolbar { min-height: 46px; }
+.dual-axis-switches,.dual-axis-zoom { gap: 8px; }
+.dual-axis-switches button,.dual-axis-zoom button { min-height: 40px; font-size: 12px; }
+.dual-axis-switches button { padding-inline: 13px; }
+.dual-axis-zoom button { width: 40px; }
+.dual-axis-readout { min-height: 40px; gap: 16px; font-size: 11px; }
+.dual-axis-readout small { color: #788591; font-size: 11px; }
+.dual-axis-chart-frame { height: 320px; }
+.dual-axis-label { top: 10px; font-size: 10px; }
+.dual-axis-chart-empty strong { font-size: 14px; }
+.dual-axis-chart-empty p { font-size: 12px; }
+.donut { width: 170px; height: 170px; }
+.donut strong { font-size: 28px; }
+.donut span,.legend { font-size: 12px; }
+.legend { gap: 22px; }
+.bar-chart { height: 220px; }
+.bar-value { font-size: 11px; }
+.discipline-ring { width: 150px; height: 150px; }
+.discipline-ring strong { font-size: 32px; }
+.discipline-ring span { font-size: 13px; }
+
+.quote-strip { padding: 20px 22px; gap: 24px; }
+.quote-strip span { font-size: 11px; }
+.quote-strip strong { font-size: 16px; line-height: 1.5; }
+.journal-media-panel { margin-top: 18px; padding: 21px; }
+.journal-media-title h2 { font-size: 18px; }
+.journal-media-title p { color: #8e9a94; font-size: 13px; line-height: 1.55; }
+.journal-media-actions > label:first-child { font-size: 12px; }
+.journal-media-actions select,.journal-image-upload { height: 44px; font-size: 12px; }
+.journal-media-grid { margin-top: 18px; grid-template-columns: repeat(4,minmax(150px,1fr)); gap: 12px; }
+.journal-image-shade { padding: 28px 11px 10px; gap: 3px; }
+.journal-image-shade b { font-size: 13px; }
+.journal-image-shade small { font-size: 11px; }
+.journal-media-empty { min-height: 112px; }
+.journal-media-empty strong { font-size: 14px; }
+.journal-media-empty p { font-size: 12px; }
+.trade-image-count { min-width: 48px; height: 34px; font-size: 12px; }
+.table-scroll-hint { padding: 11px 15px; font-size: 12px; }
+th { padding: 15px; font-size: 12px; }
+td { padding: 15px; font-size: 13px; }
+.side,.result,.score,.market-badge,.source-badge { padding: 5px 8px; font-size: 11px; }
+.icon-button { width: 38px; height: 38px; }
+.empty-state strong { font-size: 15px; }
+.empty-state p { font-size: 13px; }
+
+.calendar-head { padding: 22px 24px; }
+.calendar-head h2 { font-size: 22px; }
+.weekdays span,.day-number { font-size: 12px; }
+.calendar-day { min-height: 128px; padding: 12px; }
+.day-result strong { font-size: 17px; }
+.day-result small { font-size: 11px; }
+.summary-row { gap: 15px; margin-bottom: 18px; }
+.summary-row article { padding: 18px; gap: 10px; }
+.summary-row span { font-size: 13px; }
+.summary-row strong { font-size: 19px; }
+.summary-row article small { font-size: 11px; }
+.horizontal-row { min-height: 66px; }
+.bar-info strong { font-size: 14px; }
+.bar-info span { font-size: 12px; }
+.insight-number { font-size: 32px; }
+.insight-card p { font-size: 13px; }
+.insight-rule span { font-size: 11px; }
+.insight-rule strong { font-size: 14px; }
+.risk-list > div > div:first-child { font-size: 13px; }
+.risk-rule-grid span,.risk-rule-grid small { font-size: 11px; }
+.risk-rule-grid strong { font-size: 22px; }
+.r-distribution > div,.heatmap > strong,.heatmap > span,.heatmap-note { font-size: 12px; }
+.heatmap > div:not(:first-child) { min-height: 74px; font-size: 13px; }
+
+.process-hero { margin-bottom: 18px; padding: 30px; gap: 34px; }
+.process-hero h2 { font-size: 26px; }
+.process-hero p { color: #a2acb6; font-size: 14px; line-height: 1.75; }
+.process-priority { min-width: 320px; padding: 19px 21px; }
+.process-priority small { font-size: 11px; }
+.process-priority strong { font-size: 14px; line-height: 1.55; }
+.process-grid { gap: 18px; }
+.process-card { min-height: 560px; padding: 24px; }
+.process-card > header { grid-template-columns: 50px 1fr; gap: 15px; }
+.process-card > header > span { font-size: 24px; }
+.process-card small { font-size: 11px; }
+.process-card h3 { font-size: 18px; }
+.process-card header p { min-height: 48px; color: #a1abb5; font-size: 13px; line-height: 1.65; }
+.process-checklist > div { padding: 17px 0; grid-template-columns: 27px 1fr; gap: 12px; }
+.process-checklist i { width: 25px; height: 25px; font-size: 11px; }
+.process-checklist strong { font-size: 13px; }
+.process-checklist span { color: #929da8; font-size: 12px; line-height: 1.6; }
+.process-card > footer { min-height: 84px; padding: 15px; }
+.process-card > footer small { font-size: 10px; }
+.process-card > footer strong { font-size: 12px; line-height: 1.6; }
+.process-principles { margin-top: 18px; padding: 23px; }
+.process-principles h3 { font-size: 17px; }
+.process-principle-grid article { min-height: 102px; padding: 17px; grid-template-columns: 30px 1fr; }
+.process-principle-grid article > span { font-size: 11px; }
+.process-principle-grid strong { font-size: 13px; }
+.process-principle-grid p { color: #8d98a3; font-size: 12px; line-height: 1.6; }
+
+.note-template-panel { margin-bottom: 18px; padding: 23px; }
+.note-template-heading h3 { font-size: 17px; }
+.note-template-heading > p { font-size: 12px; }
+.note-template-grid { gap: 12px; }
+.note-template-grid button { min-height: 102px; padding: 16px; grid-template-columns: 32px 1fr 20px; }
+.note-template-grid button > span { font-size: 12px; }
+.note-template-grid button strong { font-size: 13px; }
+.note-template-grid button small { font-size: 11px; line-height: 1.55; }
+.notes-layout,.settings-grid { gap: 18px; grid-template-columns: minmax(0,1.35fr) minmax(340px,.75fr); }
+.note-writing-rule { padding: 14px 15px; }
+.note-writing-rule p { font-size: 12px; line-height: 1.65; }
+.note-editor textarea { min-height: 570px; padding: 22px; font: 14px/1.8 ui-monospace,SFMono-Regular,Consolas,monospace; }
+.auto-save,.note-editor-footer small { font-size: 11px; }
+.review-framework h3,.weekly-card h3 { font-size: 17px; }
+.review-framework article { padding: 16px 0; grid-template-columns: 34px 1fr; }
+.review-framework article > span,.weekly-card li::before { font-size: 11px; }
+.review-framework article strong,.weekly-card li strong { font-size: 13px; }
+.review-framework article small,.weekly-card li span { color: #909ba6; font-size: 12px; line-height: 1.6; }
+.weekly-card li { padding-top: 16px; padding-bottom: 16px; }
+.mindset span { font-size: 11px; }
+.mindset strong { font-size: 14px; }
+.settings-card { gap: 20px; }
+.settings-card h3 { font-size: 17px; }
+.settings-card label,.settings-card p { font-size: 13px; }
+
+.security-banner { padding: 22px; grid-template-columns: 48px 1fr auto; gap: 18px; }
+.security-icon { width: 48px; height: 48px; }
+.security-banner h3,.auto-sync-banner h3 { font-size: 16px; }
+.security-banner p,.auto-sync-banner p { font-size: 13px; line-height: 1.55; }
+.auto-sync-banner { padding: 19px 21px; }
+.auto-sync-status small { font-size: 11px; }
+.broker-grid { gap: 16px; }
+.broker-card { min-height: 310px; padding: 21px; }
+.broker-head h3 { font-size: 16px; }
+.broker-head small,.connection-state { font-size: 11px; }
+.broker-card > p { font-size: 13px; line-height: 1.7; }
+.connection-meta span { font-size: 13px; }
+.connection-meta small,.broker-foot { font-size: 11px; }
+.quick-import-panel > div:first-child > p,.quick-import-card small,.sync-flow p { font-size: 12px; }
+.quick-import-card { min-height: 78px; padding: 13px; }
+.quick-import-card strong,.sync-flow strong { font-size: 13px; }
+.connection-body > label { font-size: 13px; }
+.connection-body input,.connection-body select { min-height: 46px; font-size: 13px; }
+.connection-notice strong { font-size: 14px; }
+.connection-notice p,.connection-help { font-size: 12px; }
+.sync-mode-options strong { font-size: 13px; }
+.sync-mode-options span,.webhook-flow span { font-size: 11px; }
+.webhook-flow b { font-size: 13px; }
+.code-label pre { font-size: 12px; }
+
+.trade-modal { width: min(1240px,100%); }
+.modal-head { padding: 25px 29px; }
+.modal-head h2 { font-size: 25px; }
+.modal-head p { color: #929da8; font-size: 13px; line-height: 1.6; }
+.trade-modal-head-actions > span { font-size: 11px; }
+.trade-modal-workspace { grid-template-columns: minmax(0,1fr) 310px; }
+.form-section { padding: 26px 29px; }
+.form-section-title { margin-bottom: 20px; }
+.form-section-title > span { width: 36px; height: 36px; flex-basis: 36px; font-size: 11px; }
+.form-section-title h3 { font-size: 17px; }
+.form-section-title p { font-size: 11px; }
+.discipline-live-score { font-size: 18px; }
+.form-grid { gap: 16px; }
+.form-grid label,.full-field,.trade-review-field label { font-size: 12px; }
+.form-grid label > small { font-size: 11px; }
+.form-grid input,.form-grid select,.full-field textarea,.trade-review-field textarea { min-height: 46px; padding-inline: 13px; font-size: 13px; }
+.side-switch { min-height: 46px; }
+.side-switch button { font-size: 12px; }
+.planned-rr-card { min-height: 94px; padding: 15px; }
+.planned-rr-card > span,.planned-rr-card small { font-size: 10px; }
+.planned-rr-card strong { font-size: 20px; }
+.trade-result-preview article { min-height: 78px; padding: 15px; }
+.trade-result-preview span { font-size: 10px; }
+.trade-result-preview strong { font-size: 14px; }
+.trade-image-drop strong { font-size: 13px; }
+.trade-image-drop span,.draft-image-grid figcaption span { font-size: 11px; }
+.check-grid { gap: 12px; }
+.check-grid label { min-height: 88px; padding: 15px; }
+.check-grid label strong { font-size: 13px; }
+.check-grid label small { font-size: 11px; line-height: 1.55; }
+.trade-form-summary { width: auto; padding: 24px; }
+.trade-form-summary :where(p,small,span,label) { font-size: 11px; line-height: 1.5; }
+.trade-form-summary strong { font-size: 14px; }
+.modal-actions { padding: 18px 28px; }
+
+.demo-banner { margin-bottom: 18px; padding: 17px 18px; }
+.demo-banner span { font-size: 11px; }
+.demo-banner strong { font-size: 14px; }
+.demo-banner p,.demo-actions button,.demo-actions a { font-size: 12px; }
+.data-mode-card strong { font-size: 14px; }
+.data-mode-card p,.sample-method-banner p { font-size: 12px; }
+.sample-method-banner strong { font-size: 14px; }
+.sample-method-banner a,.analytics-tabs button { font-size: 12px; }
+
+/* Dense analytical modules use a shared, legible minimum scale. */
+.metrix-shell :where(p,small,label,button,input,select,th,td,span),
+.system-shell :where(p,small,label,button,input,select,th,td,span),
+.dcf-shell :where(p,small,label,button,input,select,th,td,span),
+.vlab-shell :where(p,small,label,button,input,select,th,td,span) { font-size: 12px !important; line-height: 1.5; }
+.metrix-shell :where(strong,b),.system-shell :where(strong,b),.dcf-shell :where(strong,b),.vlab-shell :where(strong,b) { font-size: 14px; }
+.metrix-controlbar,.system-hero,.dcf-hero,.vlab-hero { min-height: 158px; padding: 28px 30px; }
+.metrix-controlbar h2,.system-hero h2,.dcf-hero h2,.vlab-hero h2 { font-size: 27px; }
+.metrix-controlbar p,.system-hero p,.dcf-hero p,.vlab-hero p { color: #94a0ad; font-size: 13px !important; }
+.metrix-controls select,.metrix-controls input,.system-controls input,.system-controls select,.dcf-field input,.dcf-field select,.vlab-field input,.vlab-field select { height: 46px; font-size: 13px !important; }
+.metrix-account-strip > div,.system-summary article { min-height: 108px; padding: 18px; }
+.metrix-account-strip strong { font-size: 16px; }
+.metrix-balance-grid article { min-height: 120px; padding: 19px; }
+.metrix-balance-grid strong,.system-summary strong { font-size: 22px; }
+.metrix-section-title h3,.metrix-panel-head h3,.system-panel-head h3,.dcf-panel-head h3,.vlab-panel-head h3 { font-size: 18px; }
+.metrix-objectives { gap: 13px; }
+.metrix-objective { min-height: 172px; padding: 17px; }
+.metrix-objective > strong { font-size: 20px; }
+.metrix-risk-gauge strong { font-size: 29px; }
+.metrix-chart-panel .dual-axis-chart-frame { height: 350px; }
+.metrix-table th,.metrix-table td,.system-table th,.system-table td,.dcf-forecast-table th,.dcf-forecast-table td,.vlab-forecast-table th,.vlab-forecast-table td { padding: 13px 12px; }
+.system-year-bars { height: 285px; }
+.dcf-primary-value strong,.vlab-primary strong { font-size: 29px; }
+.dcf-output-list > div,.vlab-output-table > div { min-height: 56px; }
+.vlab-input-grid,.dcf-field-grid { gap: 13px; }
+
+.info-page { width: min(1120px,calc(100% - 40px)); padding: 52px 0 82px; }
+.info-back { font-size: 14px; }
+.info-hero > span,.info-kicker { font-size: 11px; }
+.info-hero p { font-size: 15px; }
+.info-card { margin-top: 17px; }
+.info-card > p,.info-card li { font-size: 14px; }
+.method-table > div { min-height: 80px; padding: 17px 19px; grid-template-columns: 220px 1fr; }
+.method-table strong,.method-table p { font-size: 13px; }
+.sample-scale span,.sample-scale p,.security-grid p { font-size: 12px; }
+.security-grid strong { font-size: 14px; }
+
+.auth-card { width: min(100%,540px); padding: 36px 42px 33px; }
+.auth-brand strong { font-size: 20px; }
+.auth-brand small,.auth-kicker { font-size: 11px; }
+.auth-heading p,.signed-in-card > p { font-size: 14px; }
+.social-auth-button { height: 48px; font-size: 13px; }
+.social-auth-button small { font-size: 9px; }
+.auth-divider span,.auth-field,.auth-options,.terms-check,.auth-alert,.auth-switch { font-size: 12px; }
+.auth-input-wrap { height: 50px; }
+.auth-input-wrap input { font-size: 14px; }
+.captcha-placeholder strong { font-size: 12px; }
+.captcha-placeholder small,.auth-security-note { font-size: 10px; }
+.auth-primary-button,.auth-secondary-button { min-height: 49px; font-size: 13px; }
+.settings-account { min-height: 68px; padding: 12px; }
+.settings-account strong { font-size: 13px; }
+.settings-account small,.settings-account button { font-size: 11px; }
+
+@media (max-width: 1450px) {
+  .sidebar { width: 252px; }
+  .main-content { margin-left: 252px; }
+  .content-area { padding-inline: 26px; }
+  .topbar { padding-inline: 26px; }
+  .metric-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .journal-media-grid { grid-template-columns: repeat(3,minmax(150px,1fr)); }
+  .process-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .process-card:last-child { grid-column: span 2; min-height: 440px; }
+}
+
+@media (max-width: 1100px) {
+  .metric-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .market-overview-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .metrix-objectives,.metrix-balance-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .system-summary { grid-template-columns: repeat(3,minmax(0,1fr)); }
+}
+
+@media (max-width: 900px) {
+  :root { --page-gutter: 20px; }
+  .sidebar { width: min(88vw,320px); }
+  .main-content { margin-left: 0; }
+  .topbar { min-height: 88px; padding: max(16px,env(safe-area-inset-top)) var(--page-gutter) 16px; }
+  .topbar h1 { font-size: 24px; }
+  .content-area { padding: 0 var(--page-gutter) 38px; }
+  .metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .dashboard-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .dashboard-grid .panel:last-child { grid-column: span 2; }
+  .notes-layout,.settings-grid { grid-template-columns: 1fr; }
+  .process-grid { grid-template-columns: 1fr; }
+  .process-card,.process-card:last-child { grid-column: auto; min-height: 0; }
+  .trade-modal-workspace { grid-template-columns: 1fr; }
+  .trade-form-summary { width: auto; }
+  .metrix-controlbar,.system-hero,.dcf-hero,.vlab-hero { min-height: 0; padding: 24px; }
+}
+
+@media (max-width: 640px) {
+  :root { --page-gutter: 14px; }
+  body { font-size: 14px; }
+  .topbar { min-height: 78px; }
+  .topbar h1 { font-size: 21px; }
+  .content-area { padding-inline: var(--page-gutter); }
+  .panel,.metrix-panel,.metrix-section,.system-panel,.dcf-panel,.vlab-panel { padding: 17px; }
+  .overview-hero { padding: 22px 19px; }
+  .overview-hero h2 { font-size: 26px; }
+  .overview-hero-copy > p { font-size: 13px; }
+  .demo-actions { grid-template-columns: 1fr; }
+  .demo-actions button,.demo-actions a { width: 100%; min-height: 44px; white-space: normal; text-align: center; }
+  .metric-grid { gap: 10px; }
+  .metric-card { min-height: 103px; padding: 17px 14px; }
+  .metric-card > span { font-size: 11px; }
+  .metric-card > strong { font-size: 21px; }
+  .dashboard-grid { display: block; }
+  .dashboard-grid .panel { margin-top: 12px; }
+  .dual-axis-chart-frame,.metrix-chart-panel .dual-axis-chart-frame { height: 280px; }
+  .journal-media-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; }
+  .quote-strip { padding: 18px; }
+  .quote-strip strong { font-size: 15px; }
+  .calendar-day { min-height: 82px; padding: 8px; }
+  .process-hero { padding: 22px 19px; }
+  .process-hero h2 { font-size: 22px; }
+  .process-priority { min-width: 0; padding: 16px; }
+  .process-card { padding: 20px; }
+  .process-card header p { min-height: 0; }
+  .process-principles,.note-template-panel { padding: 18px; }
+  .note-editor textarea { min-height: 500px; padding: 16px; font-size: 13px; }
+  .form-section { padding: 22px 17px; }
+  .modal-head { padding: max(18px,env(safe-area-inset-top)) 17px 18px; }
+  .modal-head h2 { font-size: 22px; }
+  .modal-head p { font-size: 12px; }
+  .form-grid input,.form-grid select,.full-field textarea,.trade-review-field textarea { min-height: 48px; font-size: 16px; }
+  .trade-summary-metrics { grid-template-columns: 1fr 1fr; }
+  .journal-trade-card { padding: 17px; }
+  .journal-trade-card > header strong { font-size: 17px; }
+  .journal-trade-card > header > div span,.journal-trade-summary span,.journal-trade-card dt,.journal-trade-card dd { font-size: 12px; }
+  .journal-trade-summary strong { font-size: 14px; }
+  .metrix-shell :where(p,small,label,button,input,select,th,td,span),
+  .system-shell :where(p,small,label,button,input,select,th,td,span),
+  .dcf-shell :where(p,small,label,button,input,select,th,td,span),
+  .vlab-shell :where(p,small,label,button,input,select,th,td,span) { font-size: 11px !important; }
+  .metrix-controlbar h2,.system-hero h2,.dcf-hero h2,.vlab-hero h2 { font-size: 23px; }
+  .info-page { width: min(100% - 28px,1120px); padding-top: 28px; }
+  .info-hero { padding: 26px 21px; }
+  .info-hero p,.info-card > p,.info-card li { font-size: 13px; }
+  .method-table > div { grid-template-columns: 1fr; }
+  .auth-card { padding: 29px 22px 26px; }
+  .auth-input-wrap input { font-size: 16px; }
+}
