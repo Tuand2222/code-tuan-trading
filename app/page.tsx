@@ -1,4 +1,4 @@
-­r‡^Ñf¥–Ø¦{O,yÊ'vÃ®¶›­"use client";
+"use client";
 
 import {
   Fragment,
@@ -302,6 +302,1727 @@ const NOTE_TEMPLATES = [
   },
   {
     id: "weekly-review",
-    code: "03ãNµæÚ$z{-®éÜj×¢¶G&gD†5&–6UÆâbbG&gEÆææVE'"ÓÒçVÆÂÂ$VçG'’+r4Â+rEº7Î¸r%ÒÀ¢¶G&gBç67&VVç6†÷BÇÂG&gD–ÖvW2æÆVæwF‚âÂ.ª&æ‚G,k¹¶2ò6RÎ¸væ‚%ÒÀ¢´&ööÆVâ†G&gBææ÷FRçG&–Ò‚’’Â%&Wf–Wr<;2Œ:æ‚I¹–ær%ÒÀ¢ÒæÖ‚…¶FöæRÂÆ&VÅÒ’ÓâÆF—b6Æ74æÖS×¶FöæRò&FöæR"¢"'Ò¶W“×µ7G&–ær†Æ&VÂ—ÓãÆ“ç¶FöæRò.)É2"¢,+r'ÓÂö“ãÇ7ãç¶Æ&VÇÓÂ÷7ããÂöF—câ—ÓÂöF—cà¢ÆF—b6Æ74æÖSÒ'G&FR×7VÖÖ'’×&–æ6—ÆR#ãÅ6†–VÆD6†V6²6—¦S×³gÒóãÇãÇ7ãääuUœ8¤âNªä3Â÷7ããÇ7G&öæsä6ªWBÌkº6ær¹2<jVâG.¸ÖærŒjâf¸v2>¹Ì:ÒI«—¾«÷B^ª2ãÂ÷7G&öæsãÂ÷ãÂöF—cà¢Âö6–FSà¢ÂöF—cà¢ÆF—b6Æ74æÖSÒ&ÖöFÂÖ7F–öç2&öfW76–öæÂÖÖöFÂÖ7F–öç2#ãÆF—cãÇ7â6Æ74æÖS×¶G&gE&VG’ò'&VG’"¢"'ÓãÆ’óç¶G&gE&VG’ò%>«Vâ<:ærÌkR"¢$<;&âF†«÷RG,k¹Öær.ª÷B'^¹–2'ÓÂ÷7ããÇ6ÖÆÃç¶G&gD6ö×ÆWFVæW77ÒRI¹’†ü:âF†¸vâ¹2<jÂ÷6ÖÆÃãÂöF—cãÆ'WGFöâG—SÒ&'WGFöâ"6Æ74æÖSÒ&v†÷7BÖ'WGFöâ"öä6Æ–6³×²‚’Óâ²6WDÖöFÄ÷Vâ†fÇ6R“²6WDVF—F–æuG&FT–B†çVÆÂ“²×Óäºw“Âö'WGFöããÆ'WGFöâG—SÒ'7V&Ö—B"6Æ74æÖSÒ&vöÆBÖ'WGFöâ6ö×7B#ç¶VF—F–æuG&FT–Bò$ÌkRF†’I¹V’"¢$ÌkRv–òN¸¶6‚'ÓÂö'WGFöããÂöF—cà¢Âöf÷&ÓãÂöF—cçĞ¢¶6öææV7E&÷f–FW"bbÆF—b6Æ74æÖSÒ&ÖöFÂÖ÷fW&Æ’"&öÆSÒ'&W6VçFF–öâ"öäÖ÷W6TF÷vã×²†WfVçB’Óâ²–b†WfVçBçF&vWBÓÓÒWfVçBæ7W'&VçEF&vWB’²6WD6öææV7E&÷f–FW"†çVÆÂ“²6WEvV&†ööµFö¶Vâ‚""“²Ò×ÓãÆf÷&Ò6Æ74æÖSÒ&6öææV7F–öâÖÖöFÂ"&öÆSÒ&F–Æör"&–ÖÖöFÃÒ'G'VR"&–ÖÆ&VÆÆVF'“Ò&6öææV7F–öâÖF–Æör×F—FÆR"öå7V&Ö—C×·6fT6öææV7F–öçÓàĞ¢ÆF—b6Æ74æÖSÒ&ÖöFÂÖ†VB#ãÆF—cãÇ7â6Æ74æÖSÒ&W–V'&÷r#ä%$ô´U"4ôääT5D”ôãÂ÷7ããÆƒ"–CÒ&6öææV7F–öâÖF–Æör×F—FÆR#ç´%$ô´U%2æf–æB‚†'&ö¶W"’Óâ'&ö¶W"ç&÷f–FW"ÓÓÒ6öææV7E&÷f–FW"“òææÖWÓÂöƒ#ãÇç´%$ô´U%2æf–æB‚†'&ö¶W"’Óâ'&ö¶W"ç&÷f–FW"ÓÓÒ6öææV7E&÷f–FW"“òæÖöFWÓÂ÷ãÂöF—cãÆ'WGFöâG—SÒ&'WGFöâ"6Æ74æÖSÒ&ÖöFÂÖ6Æ÷6R"öä6Æ–6³×²‚’Óâ²6WD6öææV7E&÷f–FW"†çVÆÂ“²6WEvV&†ööµFö¶Vâ‚""“²×Ò&–ÖÆ&VÃÒ,I;6ær#ì9sÂö'WGFöããÂöF—càĞ¢¶6öææV7E&÷f–FW"ÓÓÒ'vV&†öö²"òÆF—b6Æ74æÖSÒ&6öææV7F–öâÖ&öG’#àĞ¢·vV&†ööµFö¶VâòÃàĞ¢ÆF—b6Æ74æÖSÒ&6öææV7F–öâÖæ÷F–6RÖ&W"#ãÄ¶W•&÷VæB6—¦S×³‡ÒóãÆF—cãÇ7G&öæsäÌkRFö¶Vâæv’(	B6¸’†¸6âF¸²Ş¹—BÎªvãÂ÷7G&öæsãÇäî«÷RŞªWBFö¶VâÂŒ:7’NªòFö¶VâŞ¹¶“²Fö¶Vâ<Z’>«Òæ~º¶ær†şªBI¹–ærãÂ÷ãÂöF—cãÂöF—càĞ¢ÆF—b6Æ74æÖSÒ'vV&†öö²×Fö¶VâÖ&÷‚#ãÇ7ãä$T$U"Dô´TãÂ÷7ããÆ6öFSç·vV&†ööµFö¶VçÓÂö6öFSãÆ'WGFöâG—SÒ&'WGFöâ"öä6Æ–6³×²‚’Óâfö–B6÷•vV&†ööµFö¶Vâ‚—ÓãÄ6÷’6—¦S×³WÒóâ6ò6Œ:—Fö¶VãÂö'WGFöããÂöF—càĞ¢ÆÆ&VÂ6Æ74æÖSÒ&6öFRÖÆ&VÂ#äVæGö–çBæªÖâÎ¸væƒÇ&Såõ5BµtT$„ôôµôTäEô”åGÓÂ÷&SãÂöÆ&VÃàĞ¢Ç6Æ74æÖSÒ&6öææV7F–öâÖ†VÇ#ä'&–FvR~ºÖ’†VFW"Æ#äWF†÷&—¦F–öã¢&V&W"Dô´TãÂö#ââŞ¹v’Î¸væ‚>ªvâW‡FW&æÄ–BÂÖ&¶WBl:7–Ö&öÃ²¸rF¹ær6¹æræª×G,;–ærF†VòÜ:2Î¸væ‚ãÂ÷àĞ¢Âóâ¢ÃàĞ¢ÆF—b6Æ74æÖSÒ&6öææV7F–öâÖæ÷F–6R#ãÄ¶W•&÷VæB6—¦S×³‡ÒóãÆF—cãÇ7G&öæsäŞ¹—BFö¶Vâ&œ:¦ær6†ò'&–FvRv–òN¸¶6ƒÂ÷7G&öæsãÇåFö¶Vâ6¸’L;–ærI¸2v†’Î¸væ‚l:ò¦÷W&æÂÂ¶Œ;Fær<;2W¸âI¸Ö2NºòÆ¸wR†ş«v2I«wBÎ¸væ‚'&ö¶W"ãÂ÷ãÂöF—cãÂöF—càĞ¢ÆÆ&VÃåL:¦â¾«÷Bî¹“Æ–çWBfÇVS×¶6öææV7F–öäG&gBæÆ&VÇÒöä6†ævS×²†R’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂÆ&VÃ¢RçF&vWBçfÇVRÒ—ÒÆ6V†öÆFW#Ò%l:ÒNºS¢'&–FvR'&ö¶W"&œ:¦ær"&WV—&VBóãÂöÆ&VÃàĞ¢ÆF—b6Æ74æÖSÒ'vV&†öö²ÖfÆ÷r#ãÆF—cãÆ#ä'&ö¶W"ò<:ãÂö#ãÇ7ãä¶¹·†ş«v2I;6ærÎ¸væƒÂ÷7ããÂöF—cãÆ“î(i#Âö“ãÆF—cãÆ#ä'&–FvSÂö#ãÇ7ãä6‡^ª–âŒ;6¥4ôãÂ÷7ããÂöF—cãÆ“î(i#Âö“ãÆF—cãÆ#ä¦÷W&æÃÂö#ãÇ7ãåN»6¹ærG,;–æsÂ÷7ããÂöF—cãÂöF—càĞ¢ÆÆ&VÂ6Æ74æÖSÒ&6öFRÖÆ&VÂ#äŞª·R–ÆöCÇ&Sç¶°Ğ¢&W‡FW&æÄ–B#¢&FVÂÓ#3CSb"ÀĞ¢&Ö&¶WB#¢$f÷&W‚"ÀĞ¢'7–Ö&öÂ#¢$UU%U4B"ÀĞ¢'6–FR#¢$%U’"ÀĞ¢&6Æ÷6VDB#¢###bÓ‚Ó…C“£3£¢"ÀĞ¢'æÂ#¢#SÀĞ¢&fVW2#¢CSÀĞ¢'VçF—G’#¢ã"ÀĞ¢&VçG'•&–6R#¢ãc#RÀĞ¢&W†—E&–6R#¢ãcCĞ§ÖÓÂ÷&SãÂöÆ&VÃàĞ¢Ç6Æ74æÖSÒ&6öææV7F–öâÖ†VÇ#äÖ&¶WBæªÖã¢6º–ær¶†ü:âÂf÷&W‚Â7'—Fòl:Œ:ærŒ;6â<;2F¸2~ºÖ’Ş¹—BÎ¸væ‚ÂŞ¹—BŞª6ær†ş«v2¶²'G&FW2#¢²ââå×ÖÒN¹’ISÎ¸væ‚öÎªvâãÂ÷àĞ¢ÂóçĞĞ¢ÂöF—câ¢—4'&–FvU&÷f–FW"†6öææV7E&÷f–FW"’òÆF—b6Æ74æÖSÒ&6öææV7F–öâÖ&öG’#àĞ¢·vV&†ööµFö¶VâòÃàĞ¢ÆF—b6Æ74æÖSÒ&6öææV7F–öâÖæ÷F–6RÖ&W"#ãÄ¶W•&÷VæB6—¦S×³‡ÒóãÆF—cãÇ7G&öæsäÌkRFö¶Vâ´%$”DtUôDUD”Å5¶6öææV7E&÷f–FW%Òç6÷W&6WÒæv“Â÷7G&öæsãÇåFö¶Vâ6¸’†¸6âF¸²Îªvâì:’âNªòFö¶VâŞ¹¶’>«Òl;B†¸wRFö¶Vâ<Z’ãÂ÷ãÂöF—cãÂöF—càĞ¢ÆF—b6Æ74æÖSÒ'vV&†öö²×Fö¶VâÖ&÷‚#ãÇ7ãä$T$U"Dô´TãÂ÷7ããÆ6öFSç·vV&†ööµFö¶VçÓÂö6öFSãÆ'WGFöâG—SÒ&'WGFöâ"öä6Æ–6³×²‚’Óâfö–B6÷•vV&†ööµFö¶Vâ‚—ÓãÄ6÷’6—¦S×³WÒóâ6ò6Œ:—Fö¶VãÂö'WGFöããÂöF—càĞ¢ÆÆ&VÂ6Æ74æÖSÒ&6öFRÖÆ&VÂ#äVæGö–çBW6‚#BósÇ&Såõ5BµtT$„ôôµôTäEô”åGÓÂ÷&SãÂöÆ&VÃàĞ¢Ç6Æ74æÖSÒ&6öææV7F–öâÖ†VÇ#ä~ºÖ’†VFW"Æ#äWF†÷&—¦F–öã¢&V&W"Dô´TãÂö#âân¹¶’´%$”DtUôDUD”Å5¶6öææV7E&÷f–FW%Òç6÷W&6WÒÂÖ&¶WBŞ«v2I¸¶æ‚Ì:Æ#ç´%$”DtUôDUD”Å5¶6öææV7E&÷f–FW%ÒæÖ&¶WGÓÂö#ã²6¸’>ªvâW‡FW&æÄ–Bl:7–Ö&öÂI¸2I¸¶æ‚Fæ‚Î¸væ‚ãÂ÷àĞ¢Âóâ¢ÃàĞ¢ÆF—b6Æ74æÖSÒ&6öææV7F–öâÖæ÷F–6R#ãÅ6†–VÆD6†V6²6—¦S×³‡ÒóãÆF—cãÇ7G&öæsä'&–FvRL:6‚&¸wB¶¸ö’L:’¶†şª6âv–òN¸¶6ƒÂ÷7G&öæsãÇç´%$”DtUôDUD”Å5¶6öææV7E&÷f–FW%Òææ÷F–6WÓÂ÷ãÂöF—cãÂöF—càĞ¢ÆÆ&VÃåL:¦â¾«÷Bî¹“Æ–çWBfÇVS×¶6öææV7F–öäG&gBæÆ&VÇÒöä6†ævS×²†R’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂÆ&VÃ¢RçF&vWBçfÇVRÒ—Ò&WV—&VBóãÂöÆ&VÃàĞ¢ÆF—b6Æ74æÖSÒ'7–æ2ÖÖöFRÖ÷F–öç2"&öÆSÒ&w&÷W"&–ÖÆ&VÃÒ$6¸Öâ6«òI¹’I¹6ær.¹’#àĞ¢Æ'WGFöâG—SÒ&'WGFöâ"6Æ74æÖS×¶6öææV7F–öäG&gBæ66÷VçEG—RÓÓÒ'W6‚"ò&7F—fR"¢"'Òöä6Æ–6³×²‚’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂ66÷VçEG—S¢'W6‚"Ò—ÓãÇ7G&öæsåW6‚#BósÂ÷7G&öæsãÇ7ãä¶‡Wœ:¦âL;–ær+r'&–FvR6ºrI¹–ær~ºÖ“Â÷7ããÂö'WGFöãàĞ¢Æ'WGFöâG—SÒ&'WGFöâ"6Æ74æÖS×¶6öææV7F–öäG&gBæ66÷VçEG—RÓÓÒ'VÆÂ"ò&7F—fR"¢"'Òöä6Æ–6³×²‚’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂ66÷VçEG—S¢'VÆÂ"Ò—ÓãÇ7G&öæsåVÆÂ'&–FvSÂ÷7G&öæsãÇ7ãåŒ:2F»2U$ÂG,k¹¶2¶†’ÌkR+rŞ¹v’RŒ;§CÂ÷7ããÂö'WGFöãà¢ÂöF—càĞ¢¶6öææV7F–öäG&gBæ66÷VçEG—RÓÓÒ'W6‚"òÃàĞ¢´%$”DtUôDUD”Å5¶6öææV7E&÷f–FW%Òæf÷&V–vä7W'&Væ7’bbÆÆ&VÃåN»rvœ:F¸âL:’¶†şª6â(i"dìIÆ–çWBG—SÒ&çVÖ&W""Ö–ãÒ#"fÇVS×¶6öææV7F–öäG&gBæg…&FWÒöäfö7W3×·6VÆV7DçVÖW&–4–çWGÒöä6†ævS×²†R’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂg…&FS¢æ÷&ÖÆ—¦TçVÖW&–4–çWB†RçF&vWBçfÇVR’Ò—ÒóãÇ6ÖÆÃåôÂÂ&—6²l:Œ:ÒNº²'&–FvR>«ÒIkº62æŒ:&ân¹¶’N»rvœ:ì:’ãÂ÷6ÖÆÃãÂöÆ&VÃçĞĞ¢ÆF—b6Æ74æÖSÒ'vV&†öö²ÖfÆ÷r#ãÆF—cãÆ#ç´%$”DtUôDUD”Å5¶6öææV7E&÷f–FW%Òç6÷W&6WÓÂö#ãÇ7ãäÎ¸væ‚I:2¶¹·üI;6æsÂ÷7ããÂöF—cãÆ“î(i#Âö“ãÆF—cãÆ#ä'&–FvR#BósÂö#ãÇ7ãä~ºÖ’¥4ôâ.ª6òŞª×CÂ÷7ããÂöF—cãÆ“î(i#Âö“ãÆF—cãÆ#ä¦÷W&æÃÂö#ãÇ7ãä6¹ærG,;–ærN»I¹–æsÂ÷7ããÂöF—cãÂöF—càĞ¢ÆÆ&VÂ6Æ74æÖSÒ&6öFRÖÆ&VÂ#å–ÆöBN¹’F†¸7RŞ¹ò.¹–æsÇ&Sç¶'&–FvU–ÆöDW†×ÆR†6öææV7E&÷f–FW"—ÓÂ÷&SãÂöÆ&VÃàĞ¢Ç6Æ74æÖSÒ&6öææV7F–öâÖ†VÇ#å6R¶†’ÌkRÂ>ªWŞ¹—BFö¶Vâv†’NºòÆ¸wR&œ:¦ærâ'&–FvR<;2F¸2~ºÖ’Ş¹—Bö&¦V7BÂŞ¹—BŞª6ær†ş«v2¶²'G&FW2#¢²ââå×ÖÒN¹’ISÎ¸væ‚öÎªvâãÂ÷àĞ¢Âóâ¢ÃàĞ¢ÆF—b6Æ74æÖSÒ&f÷&ÒÖw&–BGvò#ãÆÆ&VÃä'&–FvR…EE3Æ–çWBG—SÒ'W&Â"fÇVS×¶6öææV7F–öäG&gBæ'&–FvUW&ÇÒöä6†ævS×²†R’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂ'&–FvUW&Ã¢RçF&vWBçfÇVRÒ—ÒÆ6V†öÆFW#Ò&‡GG3¢òö'&–FvRÖ7VÖ&âæW†×ÆR÷G&FW2"&WV—&VBóãÂöÆ&VÃãÆÆ&VÃä'&–FvRFö¶VãÆ–çWBG—SÒ'77v÷&B"WFô6ö×ÆWFSÒ&æWr×77v÷&B"fÇVS×¶6öææV7F–öäG&gBæ'&–FvUFö¶VçÒöä6†ævS×²†R’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂ'&–FvUFö¶Vã¢RçF&vWBçfÇVRÒ—Ò&WV—&VBóãÂöÆ&VÃãÂöF—càĞ¢´%$”DtUôDUD”Å5¶6öææV7E&÷f–FW%Òæf÷&V–vä7W'&Væ7’bbÆÆ&VÃåN»rvœ:F¸âL:’¶†şª6â(i"dìIÆ–çWBG—SÒ&çVÖ&W""Ö–ãÒ#"fÇVS×¶6öææV7F–öäG&gBæg…&FWÒöäfö7W3×·6VÆV7DçVÖW&–4–çWGÒöä6†ævS×²†R’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂg…&FS¢æ÷&ÖÆ—¦TçVÖW&–4–çWB†RçF&vWBçfÇVR’Ò—ÒóãÇ6ÖÆÃåôÂÂ&—6²l:Œ:ÒNº²'&–FvR>«ÒIkº62æŒ:&ân¹¶’N»rvœ:ì:’ãÂ÷6ÖÆÃãÂöÆ&VÃçĞĞ¢ÆÆ&VÂ6Æ74æÖSÒ&6öFRÖÆ&VÂ#å&W7öç6R'&–FvRIkº626ªWæªÖãÇ&Sç¶·²ââçG&FRÕĞĞ¦†ş«v0Ğ§²'G&FW2#¢·²ââçG&FRÕÒÖÓÂ÷&SãÂöÆ&VÃàĞ¢Ç6Æ74æÖSÒ&6öææV7F–öâÖ†VÇ#ä¦÷W&æÂ~¸Ö’VæGö–çB…EE2n¹¶’†VFW"&V&W"ÂæªÖâN¹’IãÎ¸væ‚öÎªvâl:N»6¹ærG,;–ær.«ærW‡FW&æÄ–BãÂ÷àĞ¢ÂóçĞĞ¢ÂóçĞĞ¢ÂöF—câ¢6öææV7E&÷f–FW"ÓÓÒ'G&F–æwf–Wr"òÆF—b6Æ74æÖSÒ&6öææV7F–öâÖ&öG’#ãÆF—b6Æ74æÖSÒ&6öææV7F–öâÖæ÷F–6RÖ&W"#ãÇ7ãâÂ÷7ããÆF—cãÇ7G&öæsåG&F–æuf–Wr~ºÖ’ÆW'B.«ærvV&†öö³Â÷7G&öæsãÇäL;–ærWFò–×÷'B‡V"Ì:ÒVæGö–çB.ª6òŞª×Bâ¶Œ;FærIkŞª×B¶ª—R'&ö¶W"l:òî¹–’GVærÆW'BãÂ÷ãÂöF—cãÂöF—cãÆF—b6Æ74æÖSÒ'vV&†öö²ÖfÆ÷r#ãÆF—cãÆ#åG&F–æuf–WsÂö#ãÇ7ãäÆW'B¥4ôãÂ÷7ããÂöF—cãÆ“î(i#Âö“ãÆF—cãÆ#ä'&–FvSÂö#ãÇ7ãävŒ:—¾«÷B^ª2Î¸væƒÂ÷7ããÂöF—cãÆ“î(i#Âö“ãÆF—cãÆ#åGVâG&FW#Âö#ãÇ7ãä~ªöâl:ò¦÷W&æÃÂ÷7ããÂöF—cãÂöF—cãÆÆ&VÂ6Æ74æÖSÒ&6öFRÖÆ&VÂ#äŞª·R¥4ôâÆW'CÇ&Sç¶°Ğ¢'7–Ö&öÂ#¢'··F–6¶W'×Ò"ÀĞ¢'6–FR#¢$%U’"ÀĞ¢'&–6R#¢'·¶6Æ÷6W×Ò"ÀĞ¢'F–ÖR#¢'··F–ÖVæ÷w×Ò"ÀĞ¢&Ö&¶WB#¢$7'—Fò Ğ§ÖÓÂ÷&SãÂöÆ&VÃãÇ6Æ74æÖSÒ&6öææV7F–öâÖ†VÇ#äÆW'BÌ:L:Öâ†¸wS²¾«÷B^ª2ôÂì:¦âÎªW’Nº²W†V7WF–öâ>ºv&–ææ6RÂ'–&—BÂÕCR†ş«v2'&–FvR'&ö¶W"I¸2G,:æ‚v†’æªÖâ6’ãÂ÷ãÂöF—câ¢6öææV7E&÷f–FW"ÓÓÒ'fâÖ'&ö¶W""òÆF—b6Æ74æÖSÒ&6öææV7F–öâÖ&öG’#ãÆF—b6Æ74æÖSÒ&6öææV7F–öâÖæ÷F–6R#ãÇ7ãä55cÂ÷7ããÆF—cãÇ7G&öæsìI¸¶æ‚NªærIkº62æªÖâN»I¹–æsÂ÷7G&öæsãÇäL;"<:2>¹—BLkjærIkjæs¢æ|:’ÂÜ:2Â×Vö,:âÂ¶¹’Ìkº6ærÂvœ:ÂŒ:Òl:Ì:6’öÎ¹rãÂ÷ãÂöF—cãÂöF—cãÆÆ&VÃä'&ö¶W#Ç6VÆV7BfÇVS×¶6öææV7F–öäG&gBæ'&ö¶W$æÖWÒöä6†ævS×²†R’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂ'&ö¶W$æÖS¢RçF&vWBçfÇVRÒ—ÓãÆ÷F–öãåe3Âö÷F–öããÆ÷F–öãå54“Âö÷F–öããÆ÷F–öãåD4%3Âö÷F–öããÆ÷F–öãådäD•$T5CÂö÷F–öããÆ÷F–öãäÔ%3Âö÷F–öããÆ÷F–öãä…43Âö÷F–öããÆ÷F–öãä'&ö¶W"dãÂö÷F–öããÂ÷6VÆV7CãÂöÆ&VÃãÆÆ&VÂ6Æ74æÖSÒ&vöÆBÖ'WGFöâ6ö×7Bf–ÆRÖ'WGFöâÆ&vR#ä6¸Öâf–ÆR55cÆ–çWBG—SÒ&f–ÆR"66WCÒ"æ77bÂçG‡BÇFW‡Bö77b"×VÇF—ÆRFFÖÖ&¶WCÒ$6º–ær¶†ü:â"FFÖ'&ö¶W#×¶6öææV7F–öäG&gBæ'&ö¶W$æÖWÒöä6†ævS×²†WfVçB’Óâ²fö–B–×÷'D77b†WfVçB“²6WD6öææV7E&÷f–FW"†çVÆÂ“²×ÒóãÂöÆ&VÃãÂöF—câ¢ÆF—b6Æ74æÖSÒ&6öææV7F–öâÖ&öG’#àĞ¢ÆF—b6Æ74æÖSÒ&6öææV7F–öâÖæ÷F–6R#ãÇ7ãî)xsÂ÷7ããÆF—cãÇ7G&öæsåŒ:2F»2G.»2F«÷n¹¶’<:ãÂ÷7G&öæsãÇä6¸’L;–ær¶Œ;6&VBÔöæÇ“²Nª÷BG&FRl:v—F†G&râ¸rF¹ær¶¸6ÒG&¶Œ;6Fª×BG,k¹¶2¶†’ÌkRl:Ü:2Œ;66V7&WB.«ærU2Ôt4ÒãÂ÷ãÂöF—cãÂöF—cà¢ÆF—b6Æ74æÖSÒ&f÷&ÒÖw&–BGvò#ãÆÆ&VÃåL:¦â¾«÷Bî¹“Æ–çWBfÇVS×¶6öææV7F–öäG&gBæÆ&VÇÒöä6†ævS×²†R’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂÆ&VÃ¢RçF&vWBçfÇVRÒ—Ò&WV—&VBóãÂöÆ&VÃãÆÆ&VÃäÆşª’L:’¶†şª6ãÇ6VÆV7BfÇVS×¶6öææV7F–öäG&gBæ66÷VçEG—WÒöä6†ævS×²†R’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂ66÷VçEG—S¢RçF&vWBçfÇVRÒ—ÓãÆ÷F–öâfÇVS×¶6öææV7E&÷f–FW"ÓÓÒ&'–&—B"ò&Æ–æV""¢&gWGW&W2'ÓåŒ:’6–æ‚ògWGW&W3Âö÷F–öããÆ÷F–öâfÇVSÒ'7÷B#å7÷CÂö÷F–öããÂ÷6VÆV7CãÂöÆ&VÃãÂöF—càĞ¢ÃãÆF—b6Æ74æÖSÒ&f÷&ÒÖw&–BGvò#ãÆÆ&VÃä’¶W“Æ–çWBG—SÒ'77v÷&B"WFô6ö×ÆWFSÒ&æWr×77v÷&B"fÇVS×¶6öææV7F–öäG&gBæ”¶W—Òöä6†ævS×²†R’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂ”¶W“¢RçF&vWBçfÇVRÒ—Ò&WV—&VBóãÂöÆ&VÃãÆÆ&VÃä’6V7&WCÆ–çWBG—SÒ'77v÷&B"WFô6ö×ÆWFSÒ&æWr×77v÷&B"fÇVS×¶6öææV7F–öäG&gBæ•6V7&WGÒöä6†ævS×²†R’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂ•6V7&WC¢RçF&vWBçfÇVRÒ—Ò&WV—&VBóãÂöÆ&VÃãÂöF—cç¶6öææV7E&÷f–FW"ÓÓÒ&&–ææ6R"bbÆÆ&VÃå7–Ö&öÇ2>ªvâI¹6ær.¹“Æ–çWBfÇVS×¶6öææV7F–öäG&gBç7–Ö&öÇ7Òöä6†ævS×²†R’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂ7–Ö&öÇ3¢RçF&vWBçfÇVRÒ—ÒÆ6V†öÆFW#Ò$%D5U4EBÂUD…U4EB"óãÂöÆ&VÃçÓÂóàĞ¢ÆÆ&VÃåN»rvœ:U4BõU4EB(i"dìIÆ–çWBG—SÒ&çVÖ&W""Ö–ãÒ#"fÇVS×¶6öææV7F–öäG&gBæg…&FWÒöäfö7W3×·6VÆV7DçVÖW&–4–çWGÒöä6†ævS×²†R’Óâ6WD6öææV7F–öäG&gB‡²ââæ6öææV7F–öäG&gBÂg…&FS¢æ÷&ÖÆ—¦TçVÖW&–4–çWB†RçF&vWBçfÇVR’Ò—ÒóãÇ6ÖÆÃäL;–ærI¸2º7æªWBôÂ7'—Fòl:f÷&W‚l:òF6†&ö&BdìIãÂ÷6ÖÆÃãÂöÆ&VÃàĞ¢ÂöF—cçĞĞ¢ÆF—b6Æ74æÖSÒ&ÖöFÂÖ7F–öç2#ãÆ'WGFöâG—SÒ&'WGFöâ"6Æ74æÖSÒ&v†÷7BÖ'WGFöâ"F—6&ÆVC×·6f–æt6öææV7F–öçÒöä6Æ–6³×²‚’Óâ²6WD6öææV7E&÷f–FW"†çVÆÂ“²6WEvV&†ööµFö¶Vâ‚""“²×Óç·vV&†ööµFö¶Vâò,I;6ær"¢$ºw’'ÓÂö'WGFöãç¶6öææV7E&÷f–FW"ÓÓÒ'G&F–æwf–Wr"òÆ'WGFöâG—SÒ'7V&Ö—B"6Æ74æÖSÒ&vöÆBÖ'WGFöâ6ö×7B#ìI:2†¸7SÂö'WGFöãâ¢6öææV7E&÷f–FW"ÓÓÒ'vV&†öö²"ÇÂ†—4'&–FvU&÷f–FW"†6öææV7E&÷f–FW"’bb6öææV7F–öäG&gBæ66÷VçEG—RÓÓÒ'W6‚"’òvV&†ööµFö¶VâòÆ'WGFöâG—SÒ&'WGFöâ"6Æ74æÖSÒ&vöÆBÖ'WGFöâ6ö×7B"öä6Æ–6³×²‚’Óâ²6WD6öææV7E&÷f–FW"†çVÆÂ“²6WEvV&†ööµFö¶Vâ‚""“²×ÓìI:2ÌkRFö¶VãÂö'WGFöãâ¢Æ'WGFöâG—SÒ'7V&Ö—B"6Æ74æÖSÒ&vöÆBÖ'WGFöâ6ö×7B"F—6&ÆVC×·6f–æt6öææV7F–öçÓç·6f–æt6öææV7F–öâò,IærNªş(
-b"¢6öææV7E&÷f–FW"ÓÓÒ'vV&†öö²"ò%Nªò¶Œ;6.ª6òŞª×B"¢%Nªò¾«÷Bî¹’bFö¶Vâ'ÓÂö'WGFöãâ¢6öææV7E&÷f–FW"ÓÒ'fâÖ'&ö¶W""bbÆ'WGFöâG—SÒ'7V&Ö—B"6Æ74æÖSÒ&vöÆBÖ'WGFöâ6ö×7B"F—6&ÆVC×·6f–æt6öææV7F–öçÓç·6f–æt6öææV7F–öâò,IærŒ:2F»>(
-b"¢D•$T5Eô•õ$õd”DU%2æ–æ6ÇVFW2†6öææV7E&÷f–FW"’ò%Œ:2F»2b¾«÷Bî¹’"¢$¶¸6ÒG&b¾«÷Bî¹’'ÓÂö'WGFöãçÓÂöF—cà¢Âöf÷&ÓãÂöF—cçĞĞ¢¶7F—fT–ÖvRbbÆF—b6Æ74æÖSÒ&–ÖvR×f–WvW"Ö÷fW&Æ’"&öÆSÒ'&W6VçFF–öâ"öäÖ÷W6TF÷vã×²†WfVçB’Óâ²–b†WfVçBçF&vWBÓÓÒWfVçBæ7W'&VçEF&vWB’6WD7F—fT–ÖvR†çVÆÂ“²×ÓãÇ6V7F–öâ6Æ74æÖSÒ&–ÖvR×f–WvW""&öÆSÒ&F–Æör"&–ÖÖöFÃÒ'G'VR"&–ÖÆ&VÆÆVF'“Ò&–ÖvR×f–WvW"×F—FÆR#ãÆ†VFW#ãÆF—cãÇ7â6Æ74æÖSÒ&W–V'&÷r#îª$ä‚t”òN¸¤4ƒÂ÷7ããÆƒ"–CÒ&–ÖvR×f–WvW"×F—FÆR#ç¶7F—fT–ÖvUG&FSòç7–Ö&öÂóò$&¸7RI¹2'Ò+r¶7F—fT–ÖvUG&FSòç6–FRóò"'ÓÂöƒ#ãÇç¶7F—fT–ÖvUG&FRòDDRæf÷&ÖB†æWrFFR†G¶7F—fT–ÖvUG&FRæFFWÕC#££’’¢"'Ò+r¶7F—fT–ÖvRæf–ÆVæÖWÓÂ÷ãÂöF—cãÆ'WGFöâG—SÒ&'WGFöâ"öä6Æ–6³×²‚’Óâ6WD7F—fT–ÖvR†çVÆÂ—Ò&–ÖÆ&VÃÒ,I;6ærª6æ‚#ì9sÂö'WGFöããÂö†VFW#ãÆF—b6Æ74æÖSÒ&–ÖvR×f–WvW"×7FvR#ãÆ–Ör7&3×¶7F—fT–ÖvRçW&ÇÒÇC×¶&¸7RI¹2G¶7F—fT–ÖvUG&FSòç7–Ö&öÂóò&v–òN¸¶6‚'ÖÒóãÂöF—cç¶7F—fT–ÖvU6–&Æ–æw2æÆVæwF‚âbbÆF—b6Æ74æÖSÒ&–ÖvR×f–WvW"×F‡VÖ'2#ç¶7F—fT–ÖvU6–&Æ–æw2æÖ‚†–ÖvR’ÓâÆ'WGFöâG—SÒ&'WGFöâ"6Æ74æÖS×¶–ÖvRæ–BÓÓÒ7F—fT–ÖvRæ–Bò&7F—fR"¢"'Ò¶W“×¶–ÖvRæ–GÒöä6Æ–6³×²‚’Óâ6WD7F—fT–ÖvR†–ÖvR—ÓãÆ–Ör7&3×¶–ÖvRçW&ÇÒÇC×¶–ÖvRæf–ÆVæÖWÒóãÂö'WGFöãâ—ÓÂöF—cçÓÆfö÷FW#ãÇ7ãç²†7F—fT–ÖvRç6—¦T'—FW2ò#Bò#B’çFôf—†VBƒ—ÒÔ"+rÌkR&œ:¦ærLkÂ÷7ããÆ'WGFöâG—SÒ&'WGFöâ"6Æ74æÖSÒ&–ÖvRÖFVÆWFRÖ'WGFöâ"öä6Æ–6³×²‚’Óâfö–BFVÆWFUG&FT–ÖvR†7F—fT–ÖvR—ÓãÅG&6ƒ"6—¦S×³WÒóâŒ;6ª6æƒÂö'WGFöããÂöfö÷FW#ãÂ÷6V7F–öããÂöF—cçĞĞ¢·Fö7BbbÆF—b6Æ74æÖSÒ'Fö7B"&öÆSÒ'7FGW2#ãÇ7ãî)É3Â÷7ãç·Fö7GÓÂöF—cçĞĞ¢ÂöF—càĞ¢“°Ğ§ĞĞ 
+    code: "03",
+    label: "Review tuáº§n",
+    description: "Tá»•ng há»£p dá»¯ liá»‡u, sai lá»‡ch vÃ  Æ°u tiÃªn cáº£i thiá»‡n tuáº§n tá»›i.",
+    content: `REVIEW TUáº¦N â€” [Tá»« ngÃ y / Äáº¿n ngÃ y]
+
+1. Káº¾T QUáº¢ & Cá»  MáºªU
+- Tá»•ng sá»‘ lá»‡nh / P&L / R rÃ²ng:
+- Win rate / Profit factor / Drawdown:
+- Setup Ä‘á»§ máº«u Ä‘á»ƒ Ä‘Ã¡nh giÃ¡:
+
+2. CHáº¤T LÆ¯á»¢NG QUY TRÃŒNH
+- Tá»· lá»‡ lá»‡nh Ä‘Ãºng káº¿ hoáº¡ch:
+- Quy táº¯c Ä‘Æ°á»£c tuÃ¢n thá»§ tá»‘t nháº¥t:
+- Sai lá»‡ch Ä‘ang láº·p láº¡i vÃ  tÃ¡c Ä‘á»™ng:
+
+3. ÄÃNH GIÃ Lá»¢I THáº¾
+- Setup / phiÃªn / sáº£n pháº©m hoáº¡t Ä‘á»™ng tá»‘t:
+- Dá»¯ liá»‡u nÃ o cÃ²n chÆ°a Ä‘á»§ Ä‘á»ƒ káº¿t luáº­n:
+- Äiá»u gÃ¬ tuyá»‡t Ä‘á»‘i khÃ´ng thay Ä‘á»•i chá»‰ vÃ¬ má»™t vÃ i lá»‡nh:
+
+4. Káº¾ HOáº CH TUáº¦N Tá»šI
+- Tiáº¿p tá»¥c:
+- Loáº¡i bá»:
+- Thá»­ nghiá»‡m (rá»§i ro khÃ´ng Ä‘á»•i):
+- Má»™t má»¥c tiÃªu hÃ nh vi cÃ³ thá»ƒ Ä‘o lÆ°á»ng:`,
+  },
+] as const;
+
+const TRADE_REVIEW_TEMPLATE = `Bá»I Cáº¢NH & LUáº¬N ÄIá»‚M
+- Dá»¯ kiá»‡n khÃ¡ch quan trÆ°á»›c khi vÃ o lá»‡nh:
+- VÃ¬ sao setup nÃ y cÃ³ lá»£i tháº¿:
+- Äiá»u kiá»‡n lÃ m luáº­n Ä‘iá»ƒm máº¥t hiá»‡u lá»±c:
+
+THá»°C THI
+- Äiá»u Ä‘Ã£ lÃ m Ä‘Ãºng theo káº¿ hoáº¡ch:
+- Sai lá»‡ch trong entry / quáº£n lÃ½ / thoÃ¡t lá»‡nh:
+- TÃ¢m lÃ½ áº£nh hÆ°á»Ÿng Ä‘áº¿n quyáº¿t Ä‘á»‹nh:
+
+Káº¾T LUáº¬N
+- Má»™t bÃ i há»c cÃ³ thá»ƒ kiá»ƒm chá»©ng:
+- Má»™t hÃ nh Ä‘á»™ng cá»¥ thá»ƒ cho lá»‡nh tiáº¿p theo:`;
+
+const MARKETS: { id: "all" | Market; label: string; icon: string }[] = [
+  { id: "all", label: "Táº¥t cáº£", icon: "â—" },
+  { id: "HÃ ng hÃ³a", label: "HÃ ng hÃ³a", icon: "â—ˆ" },
+  { id: "Chá»©ng khoÃ¡n", label: "Chá»©ng khoÃ¡n", icon: "â–¥" },
+  { id: "Crypto", label: "Crypto", icon: "â‚¿" },
+  { id: "Forex", label: "Forex", icon: "â†•" },
+];
+
+const BROKERS: { provider: Provider; name: string; badge: string; mode: string; copy: string; scope: string }[] = [
+  { provider: "vps", name: "VPS", badge: "VP", mode: "Push 24/7 Â· Pull bridge", copy: "Nháº­n lá»‹ch sá»­ khá»›p lá»‡nh qua bridge cá»¥c bá»™/Ä‘á»‘i tÃ¡c, máº·c Ä‘á»‹nh nháº­n diá»‡n chá»©ng khoÃ¡n.", scope: "âœ“ Cá»• phiáº¿u Â· PhÃ¡i sinh VN" },
+  { provider: "ssi", name: "SSI FastConnect", badge: "SSI", mode: "Push 24/7 Â· Pull bridge", copy: "Sáºµn sÃ ng cho bridge FastConnect; khÃ³a kÃ½ vÃ  PIN/OTP luÃ´n náº±m ngoÃ i journal.", scope: "âœ“ CÆ¡ sá»Ÿ Â· PhÃ¡i sinh SSI" },
+  { provider: "tcx", name: "TCX / TCBS", badge: "TCX", mode: "Push 24/7 Â· Pull bridge", copy: "Nháº­n giao dá»‹ch TCX/TCBS qua bridge hoáº·c trÃ¬nh theo dÃµi statement tá»± Ä‘á»™ng.", scope: "âœ“ Cá»• phiáº¿u Â· TrÃ¡i phiáº¿u" },
+  { provider: "mt5", name: "MetaTrader 5", badge: "M5", mode: "Push 24/7 Â· Pull bridge", copy: "Bridge Python/EA Ä‘á»c deal Ä‘Ã£ Ä‘Ã³ng tá»« terminal MT5 rá»“i tá»± cáº­p nháº­t journal.", scope: "âœ“ Forex Â· CFD Â· Gold" },
+  { provider: "cqg", name: "CQG", badge: "CQG", mode: "Push 24/7 Â· Pull bridge", copy: "Nháº­n execution vÃ  lá»‹ch sá»­ lá»‡nh tá»« CQG WebAPI qua bridge Ä‘Æ°á»£c broker cáº¥p quyá»n.", scope: "âœ“ Futures Â· HÃ ng hÃ³a" },
+  { provider: "binance", name: "Binance", badge: "BN", mode: "API chá»‰ Ä‘á»c", copy: "Äá»“ng bá»™ Spot hoáº·c Futures theo danh sÃ¡ch symbol báº¡n chá»n.", scope: "âœ“ Spot & phÃ¡i sinh" },
+  { provider: "bybit", name: "Bybit", badge: "BY", mode: "API chá»‰ Ä‘á»c", copy: "Äá»“ng bá»™ lá»‹ch sá»­ execution cá»§a Spot hoáº·c USDT Perpetual.", scope: "âœ“ Spot & phÃ¡i sinh" },
+  { provider: "tradingview", name: "TradingView", badge: "TV", mode: "Alert workflow", copy: "Chuáº©n bá»‹ payload alert Ä‘á»ƒ ghÃ©p tÃ­n hiá»‡u vá»›i lá»‡nh thá»±c thi.", scope: "âœ“ Alert JSON" },
+  { provider: "vn-broker", name: "Broker chá»©ng khoÃ¡n VN", badge: "VN", mode: "CSV Ä‘a Ä‘á»‹nh dáº¡ng", copy: "Nháº­p lá»‹ch sá»­ tá»« VPS, SSI, TCBS, VNDIRECT, MBS vÃ  broker khÃ¡c.", scope: "âœ“ Giao dá»‹ch cÆ¡ sá»Ÿ" },
+  { provider: "webhook", name: "Auto Import Hub", badge: "AI", mode: "Webhook báº£o máº­t", copy: "Nháº­n lá»‡nh tá»± Ä‘á»™ng tá»« broker, sÃ n hoáº·c cÃ´ng cá»¥ trung gian khÃ¡c.", scope: "âœ“ Stock Â· Forex Â· Coin Â· CQG" },
+];
+
+const BRIDGE_PROVIDERS: BridgeProvider[] = ["vps", "ssi", "tcx", "mt5", "cqg"];
+const AUTO_SYNC_PROVIDERS: Provider[] = ["vps", "ssi", "tcx", "mt5", "cqg", "binance", "bybit"];
+const UNCLASSIFIED_SETUP = "ChÆ°a phÃ¢n loáº¡i";
+const WEBHOOK_ENDPOINT = "https://trading-plan-pro.tuann7260.chatgpt.site/api/import/webhook";
+
+const BRIDGE_DETAILS: Record<BridgeProvider, { market: Market; source: string; symbol: string; externalId: string; notice: string; foreignCurrency: boolean }> = {
+  vps: { market: "Chá»©ng khoÃ¡n", source: "VPS", symbol: "FPT", externalId: "vps-match-123456", foreignCurrency: false, notice: "VPS cáº§n bridge cá»¥c bá»™/Ä‘á»‘i tÃ¡c hoáº·c watcher lá»‹ch sá»­. Bridge chá»‰ gá»­i lá»‡nh Ä‘Ã£ khá»›p; journal khÃ´ng giá»¯ máº­t kháº©u giao dá»‹ch." },
+  ssi: { market: "Chá»©ng khoÃ¡n", source: "SSI FastConnect", symbol: "SSI", externalId: "ssi-match-123456", foreignCurrency: false, notice: "FastConnect bridge giá»¯ ConsumerSecret, PrivateKey vÃ  PIN/OTP bÃªn ngoÃ i journal; chá»‰ Ä‘áº©y dá»¯ liá»‡u lá»‹ch sá»­ khá»›p lá»‡nh." },
+  tcx: { market: "Chá»©ng khoÃ¡n", source: "TCX / TCBS", symbol: "TCB", externalId: "tcx-match-123456", foreignCurrency: false, notice: "TCX/TCBS cáº§n bridge cá»¥c bá»™/Ä‘á»‘i tÃ¡c hoáº·c watcher statement. Journal chá»‰ nháº­n dá»¯ liá»‡u Ä‘Ã£ chuáº©n hÃ³a." },
+  mt5: { market: "Forex", source: "MetaTrader 5", symbol: "EURUSD", externalId: "mt5-deal-123456", foreignCurrency: true, notice: "Bridge Python/EA Ä‘á»c history deal tá»« terminal MT5 vÃ  chá»‰ gá»­i deal Ä‘Ã£ Ä‘Ã³ng; máº­t kháº©u tÃ i khoáº£n MT5 khÃ´ng Ä‘i vÃ o journal." },
+  cqg: { market: "HÃ ng hÃ³a", source: "CQG", symbol: "XAUUSD", externalId: "cqg-exec-123456", foreignCurrency: true, notice: "CQG WebAPI cáº§n quyá»n truy cáº­p do broker/FCM cáº¥p. Bridge giá»¯ phiÃªn CQG vÃ  chá»‰ chuyá»ƒn execution/post-trade sang journal." },
+};
+
+function isBridgeProvider(provider: Provider): provider is BridgeProvider {
+  return BRIDGE_PROVIDERS.includes(provider as BridgeProvider);
+}
+
+function isAutoSyncConnection(connection: Connection) {
+  return AUTO_SYNC_PROVIDERS.includes(connection.provider)
+    && (!isBridgeProvider(connection.provider) || connection.accountType !== "push");
+}
+
+function bridgePayloadExample(provider: BridgeProvider) {
+  const profile = BRIDGE_DETAILS[provider];
+  return JSON.stringify({
+    externalId: profile.externalId,
+    symbol: profile.symbol,
+    side: "BUY",
+    closedAt: "2026-08-08T09:30:00Z",
+    pnl: profile.foreignCurrency ? 48.5 : 1250000,
+    fees: profile.foreignCurrency ? 1.2 : 45000,
+    quantity: profile.foreignCurrency ? 0.2 : 500,
+    entryPrice: profile.foreignCurrency ? 1.1625 : 125000,
+    exitPrice: profile.foreignCurrency ? 1.1649 : 127500,
+  }, null, 2);
+}
+
+const SETUP_GROUPS: Array<{ label: string; options: string[] }> = [
+  {
+    label: "Xu hÆ°á»›ng & Ä‘á»™ng lÆ°á»£ng",
+    options: [
+      "Breakout + Retest",
+      "Pullback xu hÆ°á»›ng",
+      "Momentum Continuation",
+      "Continuation sau tÃ­ch lÅ©y",
+      "Trendline Break + Retest",
+      "EMA / MA Pullback",
+      "Flag / Pennant Continuation",
+    ],
+  },
+  {
+    label: "Cáº¥u trÃºc thá»‹ trÆ°á»ng & Price Action",
+    options: [
+      "BOS + Retest",
+      "CHoCH Reversal",
+      "Tá»« chá»‘i há»— trá»£ / khÃ¡ng cá»±",
+      "False Breakout / Liquidity Sweep",
+      "Range Breakout",
+      "Range Rejection",
+      "Supply & Demand",
+      "Order Block + FVG",
+      "Pin Bar / Engulfing xÃ¡c nháº­n",
+    ],
+  },
+  {
+    label: "Khá»‘i lÆ°á»£ng & phiÃªn giao dá»‹ch",
+    options: [
+      "Volume Breakout",
+      "Volume Profile HVN / LVN",
+      "VWAP Reclaim / Reject",
+      "Opening Range Breakout (ORB)",
+      "Gap & Go",
+      "Failed Auction",
+    ],
+  },
+  {
+    label: "MÃ´ hÃ¬nh giÃ¡ cá»• Ä‘iá»ƒn",
+    options: [
+      "Double Top / Double Bottom",
+      "Head & Shoulders",
+      "Triangle / Wedge Breakout",
+      "Cup & Handle",
+      "Rounded Base Breakout",
+    ],
+  },
+  {
+    label: "Äáº£o chiá»u & há»“i quy trung bÃ¬nh",
+    options: [
+      "Mean Reversion",
+      "Divergence Reversal",
+      "Exhaustion Reversal",
+      "Wyckoff Spring / Upthrust",
+      "Climax Volume Reversal",
+    ],
+  },
+];
+const SETUP_OPTIONS = SETUP_GROUPS.flatMap((group) => group.options);
+
+const MONEY = new Intl.NumberFormat("vi-VN", {
+  style: "currency",
+  currency: "VND",
+  maximumFractionDigits: 0,
+});
+
+const DATE = new Intl.DateTimeFormat("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
+
+function money(value: number, compact = false) {
+  if (!compact) return MONEY.format(value);
+  const sign = value > 0 ? "+" : value < 0 ? "âˆ’" : "";
+  const absolute = Math.abs(value);
+  if (absolute >= 1_000_000) return `${sign}${(absolute / 1_000_000).toFixed(1)}tr`;
+  if (absolute >= 1_000) return `${sign}${Math.round(absolute / 1_000)}k`;
+  return `${sign}${absolute}`;
+}
+
+function dayName(date: string) {
+  return new Intl.DateTimeFormat("vi-VN", { weekday: "long" }).format(new Date(`${date}T12:00:00`));
+}
+
+function marketOf(trade: Trade): Market {
+  return trade.market ?? "HÃ ng hÃ³a";
+}
+
+function parseCsvLine(line: string, delimiter: string) {
+  const values: string[] = [];
+  let current = "";
+  let quoted = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const character = line[index];
+    if (character === '"') {
+      if (quoted && line[index + 1] === '"') { current += '"'; index += 1; }
+      else quoted = !quoted;
+    } else if (character === delimiter && !quoted) {
+      values.push(current.trim()); current = "";
+    } else current += character;
+  }
+  values.push(current.trim());
+  return values;
+}
+
+function normalizeHeader(value: string) {
+  return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+}
+
+function parseNumeric(value: string | undefined) {
+  if (!value) return 0;
+  const cleaned = value.replace(/[^0-9,.-]/g, "");
+  if (cleaned.includes(",") && cleaned.includes(".")) {
+    return Number(cleaned.lastIndexOf(",") > cleaned.lastIndexOf(".") ? cleaned.replace(/\./g, "").replace(",", ".") : cleaned.replace(/,/g, "")) || 0;
+  }
+  if ((cleaned.match(/,/g) ?? []).length > 1) return Number(cleaned.replace(/,/g, "")) || 0;
+  return Number(cleaned.replace(",", ".")) || 0;
+}
+
+function parseTradeDate(value: string | undefined) {
+  if (!value) return new Date().toISOString().slice(0, 10);
+  const trimmed = value.trim();
+  const match = trimmed.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+  if (match) return `${match[3]}-${match[2].padStart(2, "0")}-${match[1].padStart(2, "0")}`;
+  const parsed = new Date(trimmed);
+  return Number.isNaN(parsed.getTime()) ? new Date().toISOString().slice(0, 10) : parsed.toISOString().slice(0, 10);
+}
+
+function stableTextHash(value: string) {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
+}
+
+function csvToTrades(text: string, brokerName: string, market: Market): Trade[] {
+  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter((line) => line.trim());
+  if (lines.length < 2) throw new Error("File CSV chÆ°a cÃ³ dá»¯ liá»‡u giao dá»‹ch.");
+  const candidates = [",", ";", "\t"];
+  const delimiter = candidates.sort((a, b) => lines[0].split(b).length - lines[0].split(a).length)[0];
+  const headers = parseCsvLine(lines[0], delimiter).map(normalizeHeader);
+  const aliases: Record<string, string[]> = {
+    date: ["date", "ngay", "thoigian", "time", "ngaygiaodich", "closetime"],
+    symbol: ["symbol", "ticker", "mack", "ma", "instrument", "sanpham"],
+    side: ["side", "type", "mualban", "loailenh", "huong"],
+    pnl: ["pnl", "profit", "lailo", "loinhuan", "realizedpnl"],
+    quantity: ["quantity", "qty", "khoiluong", "volume"],
+    entryPrice: ["entryprice", "openprice", "price", "gia", "giavao", "giakhop"],
+    exitPrice: ["exitprice", "closeprice", "giara", "giadong"],
+    fees: ["fee", "fees", "commission", "phi"],
+    externalId: ["externalid", "tradeid", "orderid", "ticket", "deal", "id"],
+    risk: ["risk", "plannedrisk", "ruiro", "riskamount"],
+    setup: ["setup", "strategy", "chienluoc", "mohinh"],
+    timeframe: ["timeframe", "tf", "khungthoigian"],
+    note: ["note", "notes", "comment", "ghichu"],
+    psychology: ["psychology", "tamly", "emotion"],
+  };
+  const indexFor = (field: string) => headers.findIndex((header) => aliases[field].includes(header));
+  const positions = Object.fromEntries(Object.keys(aliases).map((field) => [field, indexFor(field)]));
+  if (positions.symbol < 0) throw new Error("KhÃ´ng tÃ¬m tháº¥y cá»™t mÃ£ chá»©ng khoÃ¡n/symbol trong CSV.");
+  return lines.slice(1).map((line, rowIndex) => {
+    const cells = parseCsvLine(line, delimiter);
+    const get = (field: string) => positions[field] >= 0 ? cells[positions[field]] : undefined;
+    const pnl = parseNumeric(get("pnl"));
+    const suppliedRisk = parseNumeric(get("risk"));
+    const sideText = normalizeHeader(get("side") ?? "buy");
+    const externalId = String(get("externalId") ?? "").trim();
+    return {
+      id: `CSV-${Date.now()}-${rowIndex}-${stableTextHash(line)}`,
+      externalId: externalId || `csv-${normalizeHeader(brokerName)}-${stableTextHash(line)}`,
+      date: parseTradeDate(get("date")),
+      symbol: String(get("symbol") ?? "UNKNOWN").trim().toUpperCase(),
+      side: sideText.includes("sell") || sideText.includes("ban") ? "Sell" : "Buy",
+      session: market === "Chá»©ng khoÃ¡n" ? "ChÃ¢u Ã" : "New York",
+      setup: String(get("setup") ?? "").trim() || UNCLASSIFIED_SETUP,
+      timeframe: String(get("timeframe") ?? "").trim() || (market === "Chá»©ng khoÃ¡n" ? "Daily" : "Auto"),
+      risk: suppliedRisk > 0 ? suppliedRisk : Math.max(Math.abs(pnl), 1),
+      pnl,
+      discipline: 0,
+      psychology: String(get("psychology") ?? "").trim() || "ChÆ°a review",
+      note: [String(get("note") ?? "").trim(), `${brokerName} Â· nháº­p tá»« CSV`, suppliedRisk > 0 ? "" : "Rá»§i ro dá»± kiáº¿n cáº§n review", get("setup") ? "" : "Setup cáº§n phÃ¢n loáº¡i"].filter(Boolean).join(" Â· "),
+      durationMin: 0,
+      market,
+      source: `CSV Â· ${brokerName}`,
+      quantity: parseNumeric(get("quantity")),
+      entryPrice: parseNumeric(get("entryPrice")),
+      stopLoss: parseNumeric(get("stopLoss")),
+      takeProfit: parseNumeric(get("takeProfit")),
+      exitPrice: parseNumeric(get("exitPrice")) || parseNumeric(get("entryPrice")),
+      fees: Math.abs(parseNumeric(get("fees"))),
+    } as Trade;
+  }).filter((trade) => trade.symbol !== "UNKNOWN");
+}
+
+function makeDraft(): DraftTrade {
+  return {
+    date: new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Ho_Chi_Minh" }).format(new Date()),
+    symbol: "",
+    side: "Buy",
+    session: "New York",
+    setup: UNCLASSIFIED_SETUP,
+    timeframe: "H1",
+    risk: "",
+    pnl: "",
+    psychology: "ChÆ°a review",
+    note: "",
+    durationMin: "",
+    fees: "",
+    quantity: "",
+    entryPrice: "",
+    stopLoss: "",
+    takeProfit: "",
+    exitPrice: "",
+    plan: false,
+    noFomo: false,
+    noRevenge: false,
+    screenshot: false,
+    market: "HÃ ng hÃ³a",
+    source: "Thá»§ cÃ´ng",
+  };
+}
+
+function makeDraftFromTrade(trade: Trade): DraftTrade {
+  const checked = Math.max(0, Math.min(4, Math.round(trade.discipline / 25)));
+  return {
+    date: trade.date,
+    symbol: trade.symbol,
+    side: trade.side,
+    session: trade.session,
+    setup: trade.setup,
+    timeframe: trade.timeframe,
+    risk: String(trade.risk),
+    pnl: String(trade.pnl),
+    psychology: trade.psychology,
+    note: trade.note,
+    durationMin: trade.durationMin ? String(trade.durationMin) : "",
+    fees: trade.fees ? String(trade.fees) : "",
+    quantity: trade.quantity ? String(trade.quantity) : "",
+    entryPrice: trade.entryPrice ? String(trade.entryPrice) : "",
+    stopLoss: trade.stopLoss ? String(trade.stopLoss) : "",
+    takeProfit: trade.takeProfit ? String(trade.takeProfit) : "",
+    exitPrice: trade.exitPrice ? String(trade.exitPrice) : "",
+    plan: checked >= 1,
+    noFomo: checked >= 2,
+    noRevenge: checked >= 3,
+    screenshot: checked >= 4,
+    market: marketOf(trade),
+    source: trade.source ?? "Thá»§ cÃ´ng",
+  };
+}
+
+function makeConnectionDraft(provider: Provider): ConnectionDraft {
+  const broker = BROKERS.find((item) => item.provider === provider);
+  const stockBridge = provider === "vps" || provider === "ssi" || provider === "tcx";
+  return {
+    provider,
+    label: broker?.name ?? provider,
+    accountType: isBridgeProvider(provider) ? "push" : provider === "bybit" ? "linear" : provider === "binance" ? "futures" : "default",
+    apiKey: "",
+    apiSecret: "",
+    symbols: "BTCUSDT, ETHUSDT, SOLUSDT",
+    fxRate: stockBridge ? "1" : "26000",
+    bridgeUrl: "",
+    bridgeToken: "",
+    brokerName: "VPS",
+  };
+}
+
+function calculateStats(source: Trade[]) {
+  const ordered = [...source].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+  const wins = source.filter((t) => t.pnl > 0);
+  const losses = source.filter((t) => t.pnl < 0);
+  const breakeven = source.filter((t) => t.pnl === 0);
+  const grossProfit = wins.reduce((sum, t) => sum + t.pnl, 0);
+  const grossLoss = Math.abs(losses.reduce((sum, t) => sum + t.pnl, 0));
+  const net = grossProfit - grossLoss;
+  const risk = source.reduce((sum, t) => sum + t.risk, 0);
+  let equity = 0;
+  let peak = 0;
+  let maxDrawdown = 0;
+  let currentWin = 0;
+  let currentLoss = 0;
+  let longestWin = 0;
+  let longestLoss = 0;
+  for (const trade of ordered) {
+    equity += trade.pnl;
+    peak = Math.max(peak, equity);
+    maxDrawdown = Math.max(maxDrawdown, peak - equity);
+    if (trade.pnl > 0) {
+      currentWin += 1;
+      currentLoss = 0;
+      longestWin = Math.max(longestWin, currentWin);
+    } else if (trade.pnl < 0) {
+      currentLoss += 1;
+      currentWin = 0;
+      longestLoss = Math.max(longestLoss, currentLoss);
+    }
+  }
+  const mean = source.length ? net / source.length : 0;
+  const variance = source.length
+    ? source.reduce((sum, t) => sum + (t.pnl - mean) ** 2, 0) / source.length
+    : 0;
+  const deviation = Math.sqrt(variance);
+  const last = ordered.at(-1);
+  let currentStreak = 0;
+  if (last) {
+    const positive = last.pnl > 0;
+    for (let index = ordered.length - 1; index >= 0; index -= 1) {
+      if ((ordered[index].pnl > 0) === positive && ordered[index].pnl !== 0) currentStreak += 1;
+      else break;
+    }
+    if (!positive) currentStreak *= -1;
+  }
+  return {
+    total: source.length,
+    wins: wins.length,
+    losses: losses.length,
+    breakeven: breakeven.length,
+    grossProfit,
+    grossLoss,
+    net,
+    winRate: source.length ? (wins.length / source.length) * 100 : 0,
+    profitFactor: grossLoss ? grossProfit / grossLoss : 0,
+    averageR: source.length ? source.reduce((sum, t) => sum + (t.risk ? t.pnl / t.risk : 0), 0) / source.length : 0,
+    avgWin: wins.length ? grossProfit / wins.length : 0,
+    avgLoss: losses.length ? grossLoss / losses.length : 0,
+    expectancy: source.length ? net / source.length : 0,
+    maxDrawdown,
+    recovery: maxDrawdown ? net / maxDrawdown : 0,
+    sharpe: deviation ? mean / deviation : 0,
+    longestWin,
+    longestLoss,
+    currentStreak,
+    avgDuration: source.length ? source.reduce((sum, t) => sum + t.durationMin, 0) / source.length : 0,
+    biggestWin: wins.length ? Math.max(...wins.map((t) => t.pnl)) : 0,
+    biggestLoss: losses.length ? Math.min(...losses.map((t) => t.pnl)) : 0,
+    roi: risk ? (net / risk) * 100 : 0,
+    discipline: source.length ? source.reduce((sum, t) => sum + t.discipline, 0) / source.length : 0,
+  };
+}
+
+function groupTrades(source: Trade[], key: "symbol" | "setup" | "session" | "weekday") {
+  const map = new Map<string, { label: string; pnl: number; count: number; wins: number }>();
+  for (const trade of source) {
+    const label = key === "weekday" ? dayName(trade.date) : String(trade[key]);
+    const current = map.get(label) ?? { label, pnl: 0, count: 0, wins: 0 };
+    current.pnl += trade.pnl;
+    current.count += 1;
+    current.wins += trade.pnl > 0 ? 1 : 0;
+    map.set(label, current);
+  }
+  return [...map.values()].sort((a, b) => b.pnl - a.pnl);
+}
+
+function EquityChart({ trades }: { trades: Trade[] }) {
+  const points = useMemo(() => {
+    const ordered = [...trades].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+    const daily = new Map<string, number>();
+    for (const trade of ordered) daily.set(trade.date, (daily.get(trade.date) ?? 0) + trade.pnl);
+    const totalRisk = Math.max(ordered.reduce((sum, trade) => sum + Math.max(trade.risk, 0), 0), 1);
+    let cumulative = 0;
+    return [...daily].map<EquityChartPoint>(([date, pnl]) => {
+      cumulative += pnl;
+      return { date, money: cumulative, percent: cumulative / totalRisk * 100 };
+    });
+  }, [trades]);
+  return (
+    <EquityTimeChart
+      points={points}
+      ariaLabel="ÄÆ°á»ng cong lá»£i nhuáº­n tÃ­ch lÅ©y theo thá»i gian vá»›i trá»¥c pháº§n trÄƒm bÃªn trÃ¡i vÃ  sá»‘ tiá»n bÃªn pháº£i"
+      percentLabel="ROI / tá»•ng rá»§i ro (%)"
+      moneyLabel="LÃ£i lá»— (VND)"
+    />
+  );
+}
+
+function MetricCard({ label, value, tone = "neutral", hint }: { label: string; value: string; tone?: "positive" | "negative" | "neutral" | "gold"; hint: string }) {
+  return (
+    <article className={`metric-card ${tone}`} title={hint}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <i aria-hidden="true">i</i>
+    </article>
+  );
+}
+
+function EmptyState({ title, copy }: { title: string; copy: string }) {
+  return <div className="empty-state"><span>â—‡</span><strong>{title}</strong><p>{copy}</p></div>;
+}
+
+export default function Home() {
+  const { data: accountSession, isPending: accountSessionPending } = authClient.useSession();
+  const accountId = accountSession?.user.id ?? "device";
+  const storageSuffix = accountId === "device" ? "" : `:${accountId}`;
+  const tradesStorageKey = `tuan-trader-trades${storageSuffix}`;
+  const notesStorageKey = `tuan-trader-notes${storageSuffix}`;
+  const demoStorageKey = `${DEMO_STORAGE_KEY}${storageSuffix}`;
+  const [view, setView] = useState<View>("overview");
+  const [trades, setTrades] = useState<Trade[]>(SAMPLE_TRADES);
+  const [isDemo, setIsDemo] = useState(true);
+  const [authRequired, setAuthRequired] = useState(false);
+  const [analyticsTab, setAnalyticsTab] = useState<AnalyticsTab>("symbol");
+  const [range, setRange] = useState("all");
+  const [query, setQuery] = useState("");
+  const [symbolFilter, setSymbolFilter] = useState("all");
+  const [resultFilter, setResultFilter] = useState("all");
+  const [journalMarket, setJournalMarket] = useState<"all" | Market>("all");
+  const [marketScope, setMarketScope] = useState<"all" | Market>("all");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingTradeId, setEditingTradeId] = useState<string | null>(null);
+  const [draftImages, setDraftImages] = useState<File[]>([]);
+  const [tradeImages, setTradeImages] = useState<TradeImage[]>([]);
+  const [imageTradeId, setImageTradeId] = useState("");
+  const [imageUploading, setImageUploading] = useState(false);
+  const [activeImage, setActiveImage] = useState<TradeImage | null>(null);
+  const [connectProvider, setConnectProvider] = useState<Provider | null>(null);
+  const [connectionDraft, setConnectionDraft] = useState<ConnectionDraft>(() => makeConnectionDraft("binance"));
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [syncingId, setSyncingId] = useState<string | null>(null);
+  const [autoSyncing, setAutoSyncing] = useState(false);
+  const [autoSyncStatus, setAutoSyncStatus] = useState("Sáºµn sÃ ng Ä‘á»“ng bá»™ khi má»Ÿ á»©ng dá»¥ng");
+  const [webhookToken, setWebhookToken] = useState("");
+  const [dataMode, setDataMode] = useState<"cloud" | "device">("device");
+  const [mobileNav, setMobileNav] = useState(false);
+  const [draft, setDraft] = useState<DraftTrade>(makeDraft);
+  const [toast, setToast] = useState("");
+  const [notes, setNotes] = useState(NOTE_TEMPLATES[0].content);
+  const [calendarMonth, setCalendarMonth] = useState(new Date(2026, 7, 1));
+
+  const signOutWebsite = async () => {
+    await authClient.signOut();
+    window.location.reload();
+  };
+  const syncAllLock = useRef(false);
+  const syncAllConnectionsRef = useRef<(silent?: boolean, staleOnly?: boolean) => Promise<void>>(async () => undefined);
+
+  const draftImagePreviews = useMemo(
+    () => draftImages.map((file) => ({ file, url: URL.createObjectURL(file) })),
+    [draftImages],
+  );
+
+  useEffect(() => {
+    return () => draftImagePreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
+  }, [draftImagePreviews]);
+
+  useEffect(() => {
+    if (accountSessionPending) return;
+    const stored = window.localStorage.getItem(tradesStorageKey);
+    const storedNotes = window.localStorage.getItem(notesStorageKey);
+    const storedDemoMode = window.localStorage.getItem(demoStorageKey);
+    const storageTimer = window.setTimeout(() => {
+      if (stored) {
+        try {
+          const localTrades = JSON.parse(stored) as Trade[];
+          setTrades(localTrades);
+          setIsDemo(storedDemoMode === "true" || (storedDemoMode === null && isDemoDataset(localTrades)));
+        } catch { /* keep the clearly labelled demo data */ }
+      }
+      if (storedNotes) setNotes(storedNotes);
+    }, 0);
+    void (async () => {
+      try {
+        const response = await fetch("/api/trades", { cache: "no-store" });
+        if (response.status === 401) {
+          setAuthRequired(true);
+          return;
+        }
+        if (!response.ok) return;
+        const payload = await response.json() as { trades?: Trade[] };
+        setDataMode("cloud");
+        setAuthRequired(false);
+        const cloudTrades = payload.trades ?? [];
+        setTrades(cloudTrades);
+        setIsDemo(false);
+        window.localStorage.setItem(tradesStorageKey, JSON.stringify(cloudTrades));
+        window.localStorage.setItem(demoStorageKey, "false");
+      } catch { /* preview and offline mode keep device data */ }
+    })();
+    void loadConnections();
+    void loadTradeImages();
+    return () => window.clearTimeout(storageTimer);
+  }, [accountSessionPending, accountId, demoStorageKey, notesStorageKey, tradesStorageKey]);
+
+  useEffect(() => {
+    if (!modalOpen && !connectProvider && !activeImage) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setModalOpen(false);
+      setConnectProvider(null);
+      setActiveImage(null);
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.classList.add("no-scroll");
+    return () => { window.removeEventListener("keydown", onKey); document.body.classList.remove("no-scroll"); };
+  }, [modalOpen, connectProvider, activeImage]);
+
+  useEffect(() => {
+    const syncViewFromUrl = () => {
+      const requested = window.location.hash.slice(1) as View;
+      if (requested && Object.prototype.hasOwnProperty.call(VIEW_META, requested)) setView(requested);
+      else if (!requested) setView("overview");
+    };
+    syncViewFromUrl();
+    window.addEventListener("hashchange", syncViewFromUrl);
+    window.addEventListener("popstate", syncViewFromUrl);
+    return () => {
+      window.removeEventListener("hashchange", syncViewFromUrl);
+      window.removeEventListener("popstate", syncViewFromUrl);
+    };
+  }, []);
+
+  useEffect(() => {
+    document.title = `${VIEW_META[view].title} Â· Trading Plan Pro`;
+  }, [view]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timeout = window.setTimeout(() => setToast(""), 2600);
+    return () => window.clearTimeout(timeout);
+  }, [toast]);
+
+  const filteredByRange = useMemo(() => {
+    const marketTrades = marketScope === "all" ? trades : trades.filter((trade) => marketOf(trade) === marketScope);
+    if (range === "all") return marketTrades;
+    const maxDate = new Date("2026-08-07T12:00:00");
+    const days = Number(range);
+    const cutoff = new Date(maxDate);
+    cutoff.setDate(cutoff.getDate() - days);
+    return marketTrades.filter((trade) => new Date(`${trade.date}T12:00:00`) >= cutoff);
+  }, [range, trades, marketScope]);
+
+  const stats = useMemo(() => calculateStats(filteredByRange), [filteredByRange]);
+  const allStats = useMemo(() => calculateStats(trades), [trades]);
+  const symbols = useMemo(() => [...new Set(trades.map((trade) => trade.symbol))].sort(), [trades]);
+  const journalTrades = useMemo(() => trades.filter((trade) => {
+    const haystack = `${trade.symbol} ${trade.setup} ${trade.note}`.toLowerCase();
+    const queryMatch = haystack.includes(query.toLowerCase());
+    const symbolMatch = symbolFilter === "all" || trade.symbol === symbolFilter;
+    const resultMatch = resultFilter === "all" || (resultFilter === "win" ? trade.pnl > 0 : resultFilter === "loss" ? trade.pnl < 0 : trade.pnl === 0);
+    const marketMatch = journalMarket === "all" || marketOf(trade) === journalMarket;
+    return queryMatch && symbolMatch && resultMatch && marketMatch;
+  }).sort((a, b) => b.date.localeCompare(a.date)), [trades, query, symbolFilter, resultFilter, journalMarket]);
+
+  const tradesById = useMemo(() => new Map(trades.map((trade) => [trade.id, trade])), [trades]);
+  const imagesByTrade = useMemo(() => {
+    const grouped = new Map<string, TradeImage[]>();
+    for (const image of tradeImages) {
+      const current = grouped.get(image.tradeId) ?? [];
+      current.push(image);
+      grouped.set(image.tradeId, current);
+    }
+    return grouped;
+  }, [tradeImages]);
+  const recentTradeImages = useMemo(
+    () => tradeImages.filter((image) => tradesById.has(image.tradeId)).slice(0, 6),
+    [tradeImages, tradesById],
+  );
+  const activeImageTrade = activeImage ? tradesById.get(activeImage.tradeId) : undefined;
+  const activeImageSiblings = activeImage ? imagesByTrade.get(activeImage.tradeId) ?? [] : [];
+  const latestTradeId = useMemo(
+    () => [...trades].sort((a, b) => b.date.localeCompare(a.date))[0]?.id ?? "",
+    [trades],
+  );
+  const effectiveImageTradeId = imageTradeId && tradesById.has(imageTradeId) ? imageTradeId : latestTradeId;
+
+  async function loadConnections() {
+    try {
+      const response = await fetch("/api/connections", { cache: "no-store" });
+      if (!response.ok) return;
+      const payload = await response.json() as { connections?: Connection[] };
+      setConnections(payload.connections ?? []);
+    } catch { /* connections stay empty in device-only preview */ }
+  }
+
+  async function loadTradeImages() {
+    try {
+      const response = await fetch("/api/trade-images", { cache: "no-store" });
+      if (!response.ok) return;
+      const payload = await response.json() as { images?: TradeImage[] };
+      setTradeImages(payload.images ?? []);
+    } catch { /* image gallery remains available after cloud reconnect */ }
+  }
+
+  const navigate = (next: View) => {
+    setView(next);
+    setMobileNav(false);
+    if (window.location.hash !== `#${next}`) window.history.pushState(null, "", `#${next}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const openTradeModal = () => {
+    setEditingTradeId(null);
+    setDraft(makeDraft());
+    setDraftImages([]);
+    setModalOpen(true);
+  };
+
+  const openEditTradeModal = (trade: Trade) => {
+    if (isDemo) {
+      setToast("HÃ£y báº¯t Ä‘áº§u nháº­t kÃ½ tháº­t trÆ°á»›c khi chá»‰nh sá»­a giao dá»‹ch.");
+      return;
+    }
+    setEditingTradeId(trade.id);
+    setDraft(makeDraftFromTrade(trade));
+    setDraftImages([]);
+    setModalOpen(true);
+  };
+
+  const selectDraftImages = (event: ChangeEvent<HTMLInputElement>) => {
+    const picked = [...(event.target.files ?? [])];
+    event.target.value = "";
+    const valid = picked.filter((file) => ["image/jpeg", "image/png", "image/webp"].includes(file.type) && file.size <= 6 * 1024 * 1024);
+    if (valid.length !== picked.length) setToast("Chá»‰ nháº­n JPG, PNG, WEBP tá»‘i Ä‘a 6 MB/áº£nh.");
+    setDraftImages((current) => [...current, ...valid].slice(0, 4));
+    if (valid.length) setDraft((current) => ({ ...current, screenshot: true }));
+  };
+
+  const uploadTradeImages = async (tradeId: string, files: File[]) => {
+    const uploaded: TradeImage[] = [];
+    for (const file of files) {
+      const formData = new FormData();
+      formData.set("tradeId", tradeId);
+      formData.set("file", file);
+      const response = await fetch("/api/trade-images", { method: "POST", body: formData });
+      const payload = await response.json().catch(() => ({})) as { image?: TradeImage; error?: string };
+      if (!response.ok || !payload.image) throw new Error(payload.error ?? "KhÃ´ng thá»ƒ lÆ°u hÃ¬nh áº£nh");
+      uploaded.push(payload.image);
+    }
+    if (uploaded.length) setTradeImages((current) => [...uploaded.reverse(), ...current]);
+    return uploaded.length;
+  };
+
+  const quickUploadImages = async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = [...(event.target.files ?? [])].slice(0, 4);
+    event.target.value = "";
+    if (!files.length) return;
+    if (isDemo) {
+      setToast("HÃ£y báº¯t Ä‘áº§u nháº­t kÃ½ tháº­t trÆ°á»›c khi lÆ°u hÃ¬nh áº£nh.");
+      return;
+    }
+    if (dataMode !== "cloud") {
+      setToast("ÄÄƒng nháº­p tÃ i khoáº£n Trading Plan Pro Ä‘á»ƒ lÆ°u hÃ¬nh áº£nh riÃªng tÆ° trÃªn cloud.");
+      return;
+    }
+    if (!effectiveImageTradeId) {
+      setToast("HÃ£y chá»n giao dá»‹ch cáº§n gáº¯n áº£nh.");
+      return;
+    }
+    setImageUploading(true);
+    try {
+      const count = await uploadTradeImages(effectiveImageTradeId, files);
+      setToast(`ÄÃ£ gáº¯n ${count} áº£nh vÃ o giao dá»‹ch.`);
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "KhÃ´ng thá»ƒ táº£i hÃ¬nh áº£nh.");
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
+  const deleteTradeImage = async (image: TradeImage) => {
+    if (!window.confirm("XÃ³a hÃ¬nh áº£nh nÃ y khá»i nháº­t kÃ½?")) return;
+    try {
+      const response = await fetch(`/api/trade-images?id=${encodeURIComponent(image.id)}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("KhÃ´ng thá»ƒ xÃ³a hÃ¬nh áº£nh");
+      setTradeImages((current) => current.filter((item) => item.id !== image.id));
+      setActiveImage(null);
+      setToast("ÄÃ£ xÃ³a hÃ¬nh áº£nh.");
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "KhÃ´ng thá»ƒ xÃ³a hÃ¬nh áº£nh.");
+    }
+  };
+
+  const saveTrade = async (event: FormEvent) => {
+    event.preventDefault();
+    const risk = Number(draft.risk);
+    const pnl = Number(draft.pnl);
+    if (!draft.date || !draft.symbol.trim() || draft.setup === UNCLASSIFIED_SETUP || !Number.isFinite(risk) || risk <= 0 || !Number.isFinite(pnl)) {
+      setToast("Vui lÃ²ng nháº­p ngÃ y, sáº£n pháº©m, setup, rá»§i ro vÃ  P&L trÆ°á»›c phÃ­.");
+      return;
+    }
+    const checks = [draft.plan, draft.noFomo, draft.noRevenge, draft.screenshot];
+    const existing = editingTradeId ? trades.find((item) => item.id === editingTradeId) : undefined;
+    const trade: Trade = {
+      id: existing?.id ?? `T${Date.now()}`,
+      date: draft.date,
+      symbol: draft.symbol.trim().toUpperCase(),
+      side: draft.side,
+      session: draft.session,
+      setup: draft.setup,
+      timeframe: draft.timeframe,
+      risk,
+      pnl,
+      discipline: Math.round((checks.filter(Boolean).length / checks.length) * 100),
+      psychology: draft.psychology,
+      note: draft.note,
+      durationMin: Number(draft.durationMin) || 0,
+      market: draft.market,
+      source: draft.source,
+      fees: Number(draft.fees) || 0,
+      quantity: Number(draft.quantity) || 0,
+      entryPrice: Number(draft.entryPrice) || 0,
+      stopLoss: Number(draft.stopLoss) || 0,
+      takeProfit: Number(draft.takeProfit) || 0,
+      exitPrice: Number(draft.exitPrice) || 0,
+      externalId: existing?.externalId,
+      accountId: existing?.accountId,
+    };
+    const imagesToUpload = [...draftImages];
+    const next = existing
+      ? trades.map((item) => item.id === trade.id ? trade : item)
+      : isDemo ? [trade] : [...trades, trade];
+    setTrades(next);
+    setIsDemo(false);
+    window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
+    window.localStorage.setItem(demoStorageKey, "false");
+    setModalOpen(false);
+    setEditingTradeId(null);
+    setDraftImages([]);
+    setImageTradeId(trade.id);
+    if (dataMode === "cloud") {
+      try {
+        const response = await fetch("/api/trades", { method: existing ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ trade }) });
+        if (!response.ok) throw new Error("KhÃ´ng thá»ƒ Ä‘á»“ng bá»™ giao dá»‹ch");
+        const imageCount = imagesToUpload.length ? await uploadTradeImages(trade.id, imagesToUpload) : 0;
+        setToast(imageCount ? `ÄÃ£ lÆ°u giao dá»‹ch vÃ  ${imageCount} hÃ¬nh áº£nh.` : existing ? "ÄÃ£ cáº­p nháº­t giao dá»‹ch." : "ÄÃ£ lÆ°u giao dá»‹ch má»›i.");
+      } catch { setToast("ÄÃ£ lÆ°u trÃªn thiáº¿t bá»‹; dá»¯ liá»‡u cloud hoáº·c hÃ¬nh áº£nh chÆ°a Ä‘á»“ng bá»™."); }
+    } else {
+      setToast(imagesToUpload.length ? "ÄÃ£ lÆ°u lá»‡nh trÃªn thiáº¿t bá»‹; Ä‘Äƒng nháº­p Ä‘á»ƒ lÆ°u hÃ¬nh áº£nh." : existing ? "ÄÃ£ cáº­p nháº­t giao dá»‹ch." : "ÄÃ£ lÆ°u giao dá»‹ch má»›i.");
+    }
+  };
+
+  const deleteTrade = async (id: string) => {
+    const trade = trades.find((item) => item.id === id);
+    if (!window.confirm(`XÃ³a giao dá»‹ch ${trade?.symbol ?? "nÃ y"}? HÃ nh Ä‘á»™ng nÃ y khÃ´ng thá»ƒ hoÃ n tÃ¡c.`)) return;
+    const next = trades.filter((trade) => trade.id !== id);
+    setTrades(next);
+    setTradeImages((current) => current.filter((image) => image.tradeId !== id));
+    window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
+    setToast("ÄÃ£ xÃ³a giao dá»‹ch.");
+    if (dataMode === "cloud") {
+      try { await fetch(`/api/trades?id=${encodeURIComponent(id)}`, { method: "DELETE" }); } catch { /* optimistic device deletion */ }
+    }
+  };
+
+  const restoreDemo = async () => {
+    setTrades(SAMPLE_TRADES);
+    setIsDemo(true);
+    window.localStorage.setItem(tradesStorageKey, JSON.stringify(SAMPLE_TRADES));
+    window.localStorage.setItem(demoStorageKey, "true");
+    setToast("Äang hiá»ƒn thá»‹ dá»¯ liá»‡u minh há»a; dá»¯ liá»‡u cloud khÃ´ng bá»‹ thay Ä‘á»•i.");
+  };
+
+  const startRealJournal = () => {
+    setTrades([]);
+    setTradeImages([]);
+    setIsDemo(false);
+    window.localStorage.setItem(tradesStorageKey, "[]");
+    window.localStorage.setItem(demoStorageKey, "false");
+    setToast("ÄÃ£ chuyá»ƒn sang nháº­t kÃ½ cá»§a báº¡n. HÃ£y thÃªm giao dá»‹ch Ä‘áº§u tiÃªn.");
+    navigate("journal");
+  };
+
+  const clearAll = async () => {
+    if (isDemo) {
+      startRealJournal();
+      return;
+    }
+    if (!window.confirm("XÃ³a toÃ n bá»™ giao dá»‹ch? HÃ£y xuáº¥t báº£n sao trÆ°á»›c náº¿u báº¡n cáº§n khÃ´i phá»¥c.")) return;
+    setTrades([]);
+    setTradeImages([]);
+    setIsDemo(false);
+    window.localStorage.setItem(tradesStorageKey, "[]");
+    window.localStorage.setItem(demoStorageKey, "false");
+    setToast("ÄÃ£ xÃ³a toÃ n bá»™ dá»¯ liá»‡u.");
+    if (dataMode === "cloud") {
+      try { await fetch("/api/trades?all=1", { method: "DELETE" }); } catch { setToast("ÄÃ£ xÃ³a trÃªn thiáº¿t bá»‹; cloud chÆ°a pháº£n há»“i."); }
+    }
+  };
+
+  const saveNotes = () => {
+    window.localStorage.setItem(notesStorageKey, notes);
+    setToast("ÄÃ£ lÆ°u ghi chÃº.");
+  };
+
+  const insertNoteTemplate = (template: (typeof NOTE_TEMPLATES)[number]) => {
+    setNotes((current) => current.trim()
+      ? `${current.trim()}\n\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n${template.content}`
+      : template.content);
+    setToast(`ÄÃ£ chÃ¨n máº«u â€œ${template.label}â€.`);
+  };
+
+  const insertTradeReviewTemplate = () => {
+    setDraft((current) => ({
+      ...current,
+      note: current.note.trim()
+        ? `${current.note.trim()}\n\nâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n${TRADE_REVIEW_TEMPLATE}`
+        : TRADE_REVIEW_TEMPLATE,
+    }));
+    setToast("ÄÃ£ chÃ¨n khung review vÃ o giao dá»‹ch.");
+  };
+
+  const exportBackup = () => {
+    const payload = JSON.stringify({
+      format: "trading-plan-pro-backup",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      trades,
+      notes,
+    }, null, 2);
+    const blob = new Blob([payload], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `trading-plan-pro-${new Date().toISOString().slice(0, 10)}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+    setToast("ÄÃ£ táº¡o báº£n sao JSON; khÃ´ng bao gá»“m khÃ³a broker.");
+  };
+
+  const exportTradeHistory = async () => {
+    if (!journalTrades.length) {
+      setToast("KhÃ´ng cÃ³ giao dá»‹ch phÃ¹ há»£p Ä‘á»ƒ xuáº¥t Excel.");
+      return;
+    }
+    try {
+      const { downloadTradeWorkbook } = await import("../lib/trade-excel");
+      downloadTradeWorkbook(journalTrades);
+      setToast(`ÄÃ£ xuáº¥t ${journalTrades.length} giao dá»‹ch ra Excel.`);
+    } catch {
+      setToast("ChÆ°a thá»ƒ táº¡o tá»‡p Excel. Vui lÃ²ng thá»­ láº¡i.");
+    }
+  };
+
+  const importBackup = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const parsed = JSON.parse(await file.text()) as { trades?: Trade[]; notes?: string } | Trade[];
+      const incoming = Array.isArray(parsed) ? parsed : parsed.trades;
+      if (!Array.isArray(incoming) || !incoming.length) throw new Error("Báº£n sao khÃ´ng cÃ³ giao dá»‹ch há»£p lá»‡.");
+      const invalid = incoming.some((trade) => !trade?.id || !trade?.date || !trade?.symbol || !Number.isFinite(Number(trade.pnl)));
+      if (invalid) throw new Error("Báº£n sao cÃ³ dÃ²ng dá»¯ liá»‡u khÃ´ng Ä‘Ãºng Ä‘á»‹nh dáº¡ng.");
+      const base = isDemo ? [] : trades;
+      const merged = new Map(base.map((trade) => [trade.id, trade]));
+      incoming.forEach((trade) => merged.set(trade.id, trade));
+      const next = [...merged.values()];
+      setTrades(next);
+      setIsDemo(false);
+      if (!Array.isArray(parsed) && typeof parsed.notes === "string") setNotes(parsed.notes);
+      window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
+      window.localStorage.setItem(demoStorageKey, "false");
+      if (dataMode === "cloud") {
+        await fetch("/api/trades", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ trades: incoming }) });
+      }
+      setToast(`ÄÃ£ nháº­p ${incoming.length} giao dá»‹ch tá»« báº£n sao.`);
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "KhÃ´ng thá»ƒ Ä‘á»c báº£n sao.");
+    } finally {
+      event.target.value = "";
+    }
+  };
+
+  const openConnection = (provider: Provider) => {
+    if (dataMode !== "cloud") {
+      setToast(authRequired ? "ÄÄƒng nháº­p tÃ i khoáº£n Trading Plan Pro Ä‘á»ƒ dÃ¹ng káº¿t ná»‘i broker Ä‘Æ°á»£c mÃ£ hÃ³a." : "Äá»“ng bá»™ riÃªng tÆ° chÆ°a sáºµn sÃ ng; chÆ°a thá»ƒ lÆ°u thÃ´ng tin broker.");
+      return;
+    }
+    setWebhookToken("");
+    const existing = connections.find((connection) => connection.provider === provider);
+    const nextDraft = makeConnectionDraft(provider);
+    if (existing) {
+      nextDraft.label = existing.label;
+      nextDraft.accountType = isBridgeProvider(provider) && !["push", "pull"].includes(existing.accountType)
+        ? "pull"
+        : existing.accountType;
+    }
+    setConnectionDraft(nextDraft);
+    setConnectProvider(provider);
+  };
+
+  const copyWebhookToken = async () => {
+    if (!webhookToken) return;
+    try {
+      await navigator.clipboard.writeText(webhookToken);
+      setToast("ÄÃ£ sao chÃ©p webhook token.");
+    } catch {
+      setToast("KhÃ´ng thá»ƒ sao chÃ©p tá»± Ä‘á»™ng; hÃ£y chá»n vÃ  sao chÃ©p token.");
+    }
+  };
+
+  const saveConnection = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!connectProvider) return;
+    if (connectProvider === "tradingview" || connectProvider === "vn-broker") {
+      setConnectProvider(null);
+      return;
+    }
+    try {
+      const response = await fetch("/api/connections", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...connectionDraft,
+          provider: connectProvider,
+          symbols: connectionDraft.symbols.split(",").map((symbol) => symbol.trim()).filter(Boolean),
+          fxRate: Number(connectionDraft.fxRate),
+        }),
+      });
+      const payload = await response.json() as { error?: string; webhookToken?: string };
+      if (!response.ok) throw new Error(payload.error ?? "KhÃ´ng thá»ƒ lÆ°u káº¿t ná»‘i");
+      await loadConnections();
+      setDataMode("cloud");
+      const tokenConnection = connectProvider === "webhook"
+        || (isBridgeProvider(connectProvider) && connectionDraft.accountType === "push");
+      if (tokenConnection) {
+        if (!payload.webhookToken) throw new Error("MÃ¡y chá»§ chÆ°a tráº£ vá» token báº£o máº­t.");
+        setWebhookToken(payload.webhookToken);
+        setToast(`ÄÃ£ táº¡o khÃ³a ${BROKERS.find((broker) => broker.provider === connectProvider)?.name ?? "bridge"}. Token chá»‰ hiá»ƒn thá»‹ láº§n nÃ y.`);
+      } else {
+        setConnectProvider(null);
+        setToast("ÄÃ£ lÆ°u káº¿t ná»‘i an toÃ n. KhÃ³a bridge/API Ä‘Æ°á»£c mÃ£ hÃ³a.");
+      }
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "KhÃ´ng thá»ƒ lÆ°u káº¿t ná»‘i.");
+    }
+  };
+
+  const mergeSyncedTrades = (incoming: Trade[]) => {
+    if (!incoming.length) return;
+    setTrades((current) => {
+      const base = isDemoDataset(current) ? [] : current;
+      const merged = new Map(base.map((trade) => [`${trade.source ?? ""}:${trade.externalId ?? trade.id}`, trade]));
+      for (const trade of incoming) {
+        const key = `${trade.source ?? ""}:${trade.externalId ?? trade.id}`;
+        if (!merged.has(key)) merged.set(key, trade);
+      }
+      const next = [...merged.values()];
+      window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
+      return next;
+    });
+    setIsDemo(false);
+    window.localStorage.setItem(demoStorageKey, "false");
+  };
+
+  const performConnectionSync = async (connection: Connection) => {
+    const response = await fetch("/api/connections/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ connectionId: connection.id }),
+    });
+    const payload = await response.json() as { error?: string; imported?: number; trades?: Trade[] };
+    if (!response.ok) throw new Error(payload.error ?? "Äá»“ng bá»™ tháº¥t báº¡i");
+    mergeSyncedTrades(payload.trades ?? []);
+    return payload.imported ?? 0;
+  };
+
+  const syncConnection = async (connection: Connection) => {
+    setSyncingId(connection.id);
+    try {
+      const imported = await performConnectionSync(connection);
+      await loadConnections();
+      setAutoSyncStatus(`Äá»“ng bá»™ gáº§n nháº¥t lÃºc ${new Intl.DateTimeFormat("vi-VN", { hour: "2-digit", minute: "2-digit" }).format(new Date())}`);
+      setToast(`ÄÃ£ nháº­p ${imported} giao dá»‹ch má»›i.`);
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "Äá»“ng bá»™ tháº¥t báº¡i.");
+    } finally {
+      setSyncingId(null);
+    }
+  };
+
+  const syncAllConnections = async (silent = false, staleOnly = false) => {
+    if (syncAllLock.current) return;
+    const eligible = connections.filter(isAutoSyncConnection);
+    const targets = staleOnly
+      ? eligible.filter((connection) => !connection.lastSyncAt || Date.now() - new Date(connection.lastSyncAt).getTime() >= 15 * 60 * 1000)
+      : eligible;
+    if (!targets.length) {
+      if (eligible.length) setAutoSyncStatus("Dá»¯ liá»‡u Ä‘Ã£ Ä‘Æ°á»£c kiá»ƒm tra trong 15 phÃºt gáº§n nháº¥t");
+      return;
+    }
+    syncAllLock.current = true;
+    setAutoSyncing(true);
+    setAutoSyncStatus(`Äang kiá»ƒm tra ${targets.length} káº¿t ná»‘iâ€¦`);
+    let imported = 0;
+    const errors: string[] = [];
+    try {
+      for (const connection of targets) {
+        try {
+          imported += await performConnectionSync(connection);
+        } catch (error) {
+          errors.push(`${connection.label}: ${error instanceof Error ? error.message : "lá»—i Ä‘á»“ng bá»™"}`);
+        }
+      }
+      await loadConnections();
+      const time = new Intl.DateTimeFormat("vi-VN", { hour: "2-digit", minute: "2-digit" }).format(new Date());
+      setAutoSyncStatus(errors.length ? `HoÃ n táº¥t ${time} Â· ${errors.length} káº¿t ná»‘i cáº§n kiá»ƒm tra` : `HoÃ n táº¥t ${time} Â· ${imported} lá»‡nh má»›i`);
+      if (!silent) setToast(errors.length ? errors[0] : `ÄÃ£ Ä‘á»“ng bá»™ táº¥t cáº£, thÃªm ${imported} giao dá»‹ch.`);
+    } finally {
+      setAutoSyncing(false);
+      syncAllLock.current = false;
+    }
+  };
+
+  const disconnect = async (connection: Connection) => {
+    if (!window.confirm(`Ngáº¯t káº¿t ná»‘i ${connection.label}? Dá»¯ liá»‡u giao dá»‹ch Ä‘Ã£ nháº­p váº«n Ä‘Æ°á»£c giá»¯ láº¡i.`)) return;
+    try {
+      const response = await fetch(`/api/connections?id=${encodeURIComponent(connection.id)}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("KhÃ´ng thá»ƒ ngáº¯t káº¿t ná»‘i");
+      await loadConnections();
+      setToast("ÄÃ£ ngáº¯t káº¿t ná»‘i broker.");
+    } catch (error) { setToast(error instanceof Error ? error.message : "KhÃ´ng thá»ƒ ngáº¯t káº¿t ná»‘i."); }
+  };
+
+  const importCsv = async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = [...(event.target.files ?? [])];
+    if (!files.length) return;
+    const brokerName = event.target.dataset.broker ?? "Nguá»“n dá»¯ liá»‡u";
+    const market = (event.target.dataset.market ?? "Chá»©ng khoÃ¡n") as Market;
+    try {
+      const importedTrades = (await Promise.all(files.map(async (file) => csvToTrades(await file.text(), brokerName, market)))).flat();
+      if (!importedTrades.length) throw new Error("KhÃ´ng cÃ³ dÃ²ng giao dá»‹ch há»£p lá»‡.");
+      let accepted = importedTrades;
+      if (dataMode === "cloud") {
+        accepted = [];
+        for (let index = 0; index < importedTrades.length; index += 1500) {
+          const response = await fetch("/api/trades", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ trades: importedTrades.slice(index, index + 1500) }) });
+          const payload = await response.json() as { error?: string; trades?: Trade[] };
+          if (!response.ok) throw new Error(payload.error ?? "KhÃ´ng thá»ƒ nháº­p dá»¯ liá»‡u");
+          accepted.push(...(payload.trades ?? []));
+        }
+      }
+      setTrades((current) => {
+        const base = isDemoDataset(current) ? [] : current;
+        const known = new Set(base.map((trade) => `${trade.source ?? ""}:${trade.externalId ?? trade.id}`));
+        const unique = accepted.filter((trade) => {
+          const key = `${trade.source ?? ""}:${trade.externalId ?? trade.id}`;
+          if (known.has(key)) return false;
+          known.add(key);
+          return true;
+        });
+        const next = [...unique, ...base];
+        window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
+        return next;
+      });
+      setIsDemo(false);
+      window.localStorage.setItem(demoStorageKey, "false");
+      setToast(`ÄÃ£ nháº­p ${accepted.length} giao dá»‹ch má»›i tá»« ${files.length} file ${brokerName}.`);
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "KhÃ´ng thá»ƒ Ä‘á»c file CSV.");
+    } finally {
+      event.target.value = "";
+    }
+  };
+
+  useEffect(() => {
+    syncAllConnectionsRef.current = syncAllConnections;
+  });
+
+  useEffect(() => {
+    if (dataMode !== "cloud" || !connections.some(isAutoSyncConnection)) return;
+    const initial = window.setTimeout(() => { void syncAllConnectionsRef.current(true, true); }, 800);
+    const interval = window.setInterval(() => { void syncAllConnectionsRef.current(true); }, 15 * 60 * 1000);
+    return () => {
+      window.clearTimeout(initial);
+      window.clearInterval(interval);
+    };
+  }, [dataMode, connections]);
+
+  const renderOverview = () => {
+    const tone = (value: number): "positive" | "negative" | "neutral" => value > 0 ? "positive" : value < 0 ? "negative" : "neutral";
+    const metricCards = [
+      ["Tá»•ng sá»‘ lá»‡nh", String(stats.total), "neutral", "Sá»‘ lá»‡nh trong khoáº£ng thá»i gian Ä‘ang lá»c."],
+      ["Tá»· lá»‡ tháº¯ng", `${stats.winRate.toFixed(1)}%`, stats.winRate >= 50 ? "positive" : "negative", "Sá»‘ lá»‡nh tháº¯ng chia cho tá»•ng sá»‘ lá»‡nh."],
+      ["Há»‡ sá»‘ lá»£i nhuáº­n", stats.profitFactor.toFixed(2), stats.profitFactor >= 1.5 ? "positive" : "gold", "Tá»•ng lÃ£i chia tá»•ng lá»—; trÃªn 1 lÃ  cÃ³ lÃ£i rÃ²ng."],
+      ["Ká»³ vá»ng theo R", `${stats.averageR.toFixed(2)}R`, tone(stats.averageR), "R trung bÃ¬nh thá»±c nháº­n trÃªn má»—i giao dá»‹ch, gá»“m cáº£ lá»‡nh tháº¯ng vÃ  lá»‡nh thua."],
+      ["LÃ£i TB/lá»‡nh tháº¯ng", money(stats.avgWin, true), "positive", "Tiá»n lÃ£i trung bÃ¬nh cá»§a má»—i lá»‡nh tháº¯ng."],
+      ["Lá»— TB/lá»‡nh thua", money(-stats.avgLoss, true), "negative", "Tiá»n lá»— trung bÃ¬nh cá»§a má»—i lá»‡nh thua."],
+      ["Ká»³ vá»ng lá»£i nhuáº­n", money(stats.expectancy, true), tone(stats.expectancy), "Káº¿t quáº£ trung bÃ¬nh ká»³ vá»ng cho má»—i lá»‡nh."],
+      ["Lá»£i nhuáº­n rÃ²ng", money(stats.net, true), tone(stats.net), "Tá»•ng lÃ£i trá»« tá»•ng lá»—."],
+      ["Lá»‡nh tháº¯ng", String(stats.wins), "positive", "Sá»‘ giao dá»‹ch cÃ³ lÃ£i."],
+      ["Lá»‡nh thua", String(stats.losses), "negative", "Sá»‘ giao dá»‹ch thua lá»—."],
+      ["HÃ²a vá»‘n", String(stats.breakeven), "neutral", "Sá»‘ giao dá»‹ch khÃ´ng lÃ£i khÃ´ng lá»—."],
+      ["Chuá»—i hiá»‡n táº¡i", stats.currentStreak > 0 ? `W${stats.currentStreak}` : stats.currentStreak < 0 ? `L${Math.abs(stats.currentStreak)}` : "0", tone(stats.currentStreak), "Chuá»—i tháº¯ng hoáº·c thua gáº§n nháº¥t."],
+      ["Chuá»—i tháº¯ng dÃ i nháº¥t", String(stats.longestWin), "positive", "Chuá»—i lá»‡nh tháº¯ng dÃ i nháº¥t."],
+      ["Chuá»—i thua dÃ i nháº¥t", String(stats.longestLoss), "negative", "Chuá»—i lá»‡nh thua dÃ i nháº¥t."],
+      ["Sá»¥t giáº£m tá»‘i Ä‘a", money(-stats.maxDrawdown, true), "negative", "Má»©c giáº£m lá»›n nháº¥t tá»« Ä‘á»‰nh vá»‘n xuá»‘ng Ä‘Ã¡y."],
+      ["Há»‡ sá»‘ phá»¥c há»“i", stats.recovery.toFixed(2), tone(stats.recovery), "Lá»£i nhuáº­n rÃ²ng chia cho sá»¥t giáº£m tá»‘i Ä‘a."],
+      ["Chá»‰ sá»‘ á»•n Ä‘á»‹nh", stats.sharpe.toFixed(2), tone(stats.sharpe), "Lá»£i nhuáº­n trung bÃ¬nh so vá»›i Ä‘á»™ biáº¿n Ä‘á»™ng káº¿t quáº£."],
+      ["Thá»i gian giá»¯ lá»‡nh TB", `${Math.round(stats.avgDuration)}m`, "neutral", "Thá»i gian giá»¯ lá»‡nh trung bÃ¬nh."],
+      ["Lá»‡nh tháº¯ng lá»›n nháº¥t", money(stats.biggestWin, true), "positive", "Lá»£i nhuáº­n lá»›n nháº¥t trong má»™t giao dá»‹ch."],
+      ["Lá»‡nh thua lá»›n nháº¥t", money(stats.biggestLoss, true), "negative", "Thua lá»— lá»›n nháº¥t trong má»™t giao dá»‹ch."],
+      ["Tá»•ng lÃ£i", money(stats.grossProfit, true), "positive", "Tá»•ng tiá»n lÃ£i trÆ°á»›c khi trá»« lá»—."],
+      ["Tá»•ng lá»—", money(-stats.grossLoss, true), "negative", "Tá»•ng tiá»n lá»— trÆ°á»›c khi cá»™ng lÃ£i."],
+      ["ROI / Tá»•ng rá»§i ro", `${stats.roi.toFixed(1)}%`, tone(stats.roi), "Lá»£i nhuáº­n rÃ²ng chia cho tá»•ng vá»‘n Ä‘Ã£ máº¡o hiá»ƒm."],
+      ["Ká»· luáº­t trung bÃ¬nh", `${stats.discipline.toFixed(0)}%`, stats.discipline >= 85 ? "positive" : "gold", "Tá»· lá»‡ tuÃ¢n thá»§ checklist trÃªn táº¥t cáº£ giao dá»‹ch."],
+    ] as const;
+    const winDeg = stats.total ? (stats.wins / stats.total) * 360 : 0;
+    const lossDeg = stats.total ? (stats.losses / stats.total) * 360 : 0;
+    const donutStyle = { "--win": `${winDeg}deg`, "--loss": `${winDeg + lossDeg}deg` } as CSSProperties;
+    const daily = groupTrades(filteredByRange, "weekday");
+    const maxDaily = Math.max(...daily.map((item) => Math.abs(item.pnl)), 1);
+    const marketRollup = MARKETS.slice(1).map((market) => {
+      const marketTrades = trades.filter((trade) => marketOf(trade) === market.id);
+      return { ...market, stats: calculateStats(marketTrades) };
+    });
+    return (
+      <>
+        <section className="overview-hero">
+          <div className="overview-hero-copy">
+            <span className="product-kicker"><Sparkles size={14} /> TRADING PLAN PRO</span>
+            <h2>Biáº¿n má»—i giao dá»‹ch thÃ nh dá»¯ liá»‡u Ä‘á»ƒ ra quyáº¿t Ä‘á»‹nh tá»‘t hÆ¡n</h2>
+            <p>Nháº­t kÃ½ Ä‘a thá»‹ trÆ°á»ng dÃ nh cho nhÃ  Ä‘áº§u tÆ° Viá»‡t Nam: ghi láº¡i bá»‘i cáº£nh, Ä‘o ká»· luáº­t, kiá»ƒm soÃ¡t rá»§i ro vÃ  chá»‰ káº¿t luáº­n lá»£i tháº¿ khi máº«u dá»¯ liá»‡u Ä‘á»§ lá»›n.</p>
+            <div className="overview-actions">
+              <button className="gold-button compact" onClick={openTradeModal}><Plus size={16} /> Ghi giao dá»‹ch</button>
+              <a className="ghost-link" href="/phuong-phap">Xem phÆ°Æ¡ng phÃ¡p tÃ­nh</a>
+            </div>
+          </div>
+          <div className="overview-principles" aria-label="Ba nguyÃªn táº¯c cá»§a Trading Plan Pro">
+            <article><span>01</span><strong>Ghi Ä‘Ãºng káº¿ hoáº¡ch</strong><small>Káº¿t quáº£ khÃ´ng thay tháº¿ ká»· luáº­t.</small></article>
+            <article><span>02</span><strong>Äá»§ máº«u má»›i káº¿t luáº­n</strong><small>Tá»‘i thiá»ƒu 20 lá»‡nh má»—i nhÃ³m.</small></article>
+            <article><span>03</span><strong>Báº£o vá»‡ vá»‘n trÆ°á»›c</strong><small>Rá»§i ro luÃ´n cÃ³ giá»›i háº¡n rÃµ rÃ ng.</small></article>
+          </div>
+        </section>
+        <div className="market-switcher" role="group" aria-label="Lá»c theo thá»‹ trÆ°á»ng">
+          {MARKETS.map((market) => <button key={market.id} className={marketScope === market.id ? "active" : ""} onClick={() => setMarketScope(market.id)}><span>{market.icon}</span>{market.label}</button>)}
+        </div>
+        <div className="market-overview-grid">
+          {marketRollup.map((market) => <article key={market.id}><div><span>{market.icon}</span><div><small>{market.label}</small><strong>{market.stats.total} lá»‡nh</strong></div></div><b className={market.stats.net >= 0 ? "positive-text" : "negative-text"}>{money(market.stats.net, true)}</b></article>)}
+        </div>
+        <div className="metric-grid">
+          {metricCards.map(([label, value, toneValue, hint]) => <MetricCard key={label} label={label} value={value} tone={toneValue} hint={hint} />)}
+        </div>
+        <div className="dashboard-grid">
+          <article className="panel panel-wide">
+            <div className="panel-title"><div><span className="eyebrow">HIá»†U SUáº¤T TÃCH LÅ¨Y</span><h3>ÄÆ°á»ng cong vá»‘n</h3></div><span className="status-chip">POC</span></div>
+            <EquityChart trades={filteredByRange} />
+          </article>
+          <article className="panel donut-panel">
+            <div className="panel-title"><div><span className="eyebrow">PHÃ‚N Bá»” Káº¾T QUáº¢</span><h3>Tháº¯ng / Thua</h3></div></div>
+            <div className="donut" style={donutStyle}><div><strong>{stats.winRate.toFixed(1)}%</strong><span>Tá»· lá»‡ tháº¯ng</span></div></div>
+            <div className="legend"><span className="win">Tháº¯ng {stats.wins}</span><span className="loss">Thua {stats.losses}</span><span className="be">HÃ²a {stats.breakeven}</span></div>
+          </article>
+          <article className="panel">
+            <div className="panel-title"><div><span className="eyebrow">THEO NGÃ€Y</span><h3>LÃ£i / Lá»— trong tuáº§n</h3></div></div>
+            <div className="bar-chart">
+              {daily.map((item) => <div className="bar-column" key={item.label}><div className="bar-value">{money(item.pnl, true)}</div><div className={`bar ${item.pnl >= 0 ? "up" : "down"}`} style={{ height: `${22 + Math.abs(item.pnl) / maxDaily * 90}px` }} /><span>{item.label.replace("Thá»© ", "T")}</span></div>)}
+            </div>
+          </article>
+          <article className="panel">
+            <div className="panel-title"><div><span className="eyebrow">QUáº¢N TRá»Š Vá»N</span><h3>Ká»· luáº­t rá»§i ro</h3></div><strong className="positive-text">{stats.discipline.toFixed(0)}%</strong></div>
+            <div className="discipline-ring" style={{ "--score": `${stats.discipline * 3.6}deg` } as CSSProperties}><div><strong>{stats.discipline.toFixed(0)}</strong><span>/ 100</span></div></div>
+            <p className="panel-copy">{stats.discipline >= 90 ? "Báº¡n Ä‘ang giá»¯ ká»· luáº­t ráº¥t tá»‘t. HÃ£y tiáº¿p tá»¥c Æ°u tiÃªn cháº¥t lÆ°á»£ng setup hÆ¡n sá»‘ lÆ°á»£ng lá»‡nh." : "Ká»· luáº­t Ä‘ang giáº£m. HÃ£y dá»«ng sau 2 lá»‡nh thua vÃ  review checklist trÆ°á»›c lá»‡nh má»›i."}</p>
+          </article>
+        </div>
+      </>
+    );
+  };
+
+  const renderJournal = () => (
+    <>
+      <section className="quote-strip">
+        <div><span>NGUYÃŠN Táº®C Cá»T LÃ•I</span><strong>â€œGiao dá»‹ch tá»‘t khÃ´ng pháº£i lá»‡nh tháº¯ng â€” mÃ  lÃ  lá»‡nh Ä‘Ãºng káº¿ hoáº¡ch.â€</strong></div>
+        <div className="quote-actions">
+          <button type="button" className="ghost-button excel-button" onClick={exportTradeHistory} disabled={!journalTrades.length} title={`Xuáº¥t bÃ¡o cÃ¡o chi tiáº¿t cho ${journalTrades.length} giao dá»‹ch Ä‘ang hiá»ƒn thá»‹`}><FileSpreadsheet size={16} /> Xuáº¥t bÃ¡o cÃ¡o Excel</button>
+          <button type="button" className="gold-button compact" onClick={openTradeModal}><Plus size={17} /> ThÃªm giao dá»‹ch</button>
+        </div>
+      </section>
+      <section className="journal-media-panel" aria-labelledby="journal-media-title">
+        <div className="journal-media-head">
+          <div className="journal-media-title">
+            <span className="journal-media-icon"><Images size={19} /></span>
+            <div><span className="eyebrow">HÃŒNH áº¢NH GIAO Dá»ŠCH</span><h2 id="journal-media-title">Cáº­p nháº­t biá»ƒu Ä‘á»“ vÃ o tá»«ng lá»‡nh</h2><p>Chá»n lá»‡nh, táº£i áº£nh tá»« Ä‘iá»‡n thoáº¡i vÃ  xem láº¡i ngay trong nháº­t kÃ½.</p></div>
+          </div>
+          <div className="journal-media-actions">
+            <label><span>Gáº¯n vÃ o lá»‡nh</span><select value={effectiveImageTradeId} onChange={(event) => setImageTradeId(event.target.value)} disabled={isDemo || !trades.length} aria-label="Chá»n giao dá»‹ch Ä‘á»ƒ gáº¯n áº£nh"><option value="">Chá»n giao dá»‹ch</option>{[...trades].sort((a, b) => b.date.localeCompare(a.date)).map((trade) => <option value={trade.id} key={trade.id}>{trade.date} Â· {trade.symbol} Â· {trade.side}</option>)}</select></label>
+            <label className={`journal-image-upload ${isDemo || !trades.length ? "disabled" : ""}`} aria-disabled={isDemo || !trades.length}><input type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={isDemo || !trades.length || imageUploading} onChange={quickUploadImages} />{imageUploading ? <LoaderCircle className="spin" size={16} /> : <ImagePlus size={16} />}<span>{imageUploading ? "Äang táº£i..." : "Táº£i áº£nh nhanh"}</span></label>
+          </div>
+        </div>
+        {recentTradeImages.length ? <div className="journal-media-grid">{recentTradeImages.map((image) => {
+          const trade = tradesById.get(image.tradeId);
+          if (!trade) return null;
+          return <button type="button" className="journal-image-card" key={image.id} onClick={() => setActiveImage(image)} aria-label={`Xem áº£nh giao dá»‹ch ${trade.symbol}`}><img src={image.url} alt={`Biá»ƒu Ä‘á»“ ${trade.symbol} ngÃ y ${trade.date}`} loading="lazy" /><span className="journal-image-shade"><b>{trade.symbol}</b><small>{DATE.format(new Date(`${trade.date}T12:00:00`))} Â· {trade.side}</small></span><i><ZoomIn size={14} /></i></button>;
+        })}</div> : <div className="journal-media-empty"><Camera size={24} /><div><strong>{isDemo ? "áº¢nh chá»‰ lÆ°u trong nháº­t kÃ½ tháº­t" : "ChÆ°a cÃ³ áº£nh biá»ƒu Ä‘á»“"}</strong><p>{isDemo ? "Báº¯t Ä‘áº§u nháº­t kÃ½ tháº­t rá»“i táº£i áº£nh trÆ°á»›c/sau lá»‡nh tá»« Ä‘iá»‡n thoáº¡i." : "DÃ¹ng nÃºt â€œTáº£i áº£nh nhanhâ€ hoáº·c Ä‘Ã­nh kÃ¨m khi thÃªm giao dá»‹ch."}</p></div></div>}
+      </section>
+      <section className="filter-bar">
+        <label className="search"><span>âŒ•</span><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="TÃ¬m sáº£n pháº©m, setup, ghi chÃº..." /></label>
+        <select value={journalMarket} onChange={(e) => setJournalMarket(e.target.value as "all" | Market)} aria-label="Lá»c theo thá»‹ trÆ°á»ng"><option value="all">Táº¥t cáº£ thá»‹ trÆ°á»ng</option>{MARKETS.slice(1).map((market) => <option key={market.id} value={market.id}>{market.label}</option>)}</select>
+        <select value={symbolFilter} onChange={(e) => setSymbolFilter(e.target.value)} aria-label="Lá»c theo sáº£n pháº©m"><option value="all">Táº¥t cáº£ sáº£n pháº©m</option>{symbols.map((symbol) => <option key={symbol}>{symbol}</option>)}</select>
+        <select value={resultFilter} onChange={(e) => setResultFilter(e.target.value)} aria-label="Lá»c theo káº¿t quáº£"><option value="all">Má»i káº¿t quáº£</option><option value="win">Tháº¯ng</option><option value="loss">Thua</option><option value="be">HÃ²a vá»‘n</option></select>
+        <button className="ghost-button" onClick={() => { setQuery(""); setSymbolFilter("all"); setResultFilter("all"); setJournalMarket("all"); }}>XÃ³a lá»c</button>
+      </section>
+      <section className="table-panel journal-results" aria-live="polite">
+        {journalTrades.length ? <><div className="journal-table-desktop"><div className="table-scroll" tabIndex={0} aria-label="Báº£ng lá»‹ch sá»­ giao dá»‹ch, cÃ³ thá»ƒ cuá»™n ngang"><table><thead><tr><th>NgÃ y</th><th>Thá»‹ trÆ°á»ng</th><th>Sáº£n pháº©m</th><th>Nguá»“n</th><th>HÆ°á»›ng</th><th>PhiÃªn</th><th>Setup</th><th>TF</th><th>Rá»§i ro</th><th>RR</th><th>Káº¿t quáº£</th><th>LÃ£i / Lá»—</th><th>Ká»· luáº­t</th><th>áº¢nh</th><th /></tr></thead><tbody>
+          {journalTrades.map((trade) => { const images = imagesByTrade.get(trade.id) ?? []; return <tr key={trade.id}><td>{DATE.format(new Date(`${trade.date}T12:00:00`))}</td><td><span className={`market-badge market-${marketOf(trade).toLowerCase().replace(" ", "-")}`}>{marketOf(trade)}</span></td><td><strong>{trade.symbol}</strong></td><td><span className="source-badge">{trade.source ?? "Thá»§ cÃ´ng"}</span></td><td><span className={`side ${trade.side.toLowerCase()}`}>{trade.side}</span></td><td>{trade.session}</td><td>{trade.setup}</td><td>{trade.timeframe}</td><td>{money(trade.risk, true)}</td><td>{trade.risk ? (trade.pnl / trade.risk).toFixed(2) : "0.00"}R</td><td><span className={`result ${trade.pnl > 0 ? "win" : trade.pnl < 0 ? "loss" : "be"}`}>{trade.pnl > 0 ? "Tháº¯ng" : trade.pnl < 0 ? "Thua" : "HÃ²a"}</span></td><td className={trade.pnl >= 0 ? "positive-text" : "negative-text"}>{money(trade.pnl, true)}</td><td><span className={`score ${trade.discipline >= 90 ? "good" : "warn"}`}>{trade.discipline}%</span></td><td><button type="button" className={`trade-image-count ${images.length ? "has-images" : ""}`} disabled={!images.length} onClick={() => setActiveImage(images[0])} aria-label={images.length ? `Xem ${images.length} áº£nh cá»§a ${trade.symbol}` : `${trade.symbol} chÆ°a cÃ³ áº£nh`}><Camera size={13} />{images.length || "â€”"}</button></td><td><div className="table-actions"><button type="button" className="icon-button edit" onClick={() => openEditTradeModal(trade)} aria-label={`Sá»­a lá»‡nh ${trade.symbol}`}><Pencil size={13} /></button><button type="button" className="icon-button delete" onClick={() => deleteTrade(trade.id)} aria-label={`XÃ³a lá»‡nh ${trade.symbol}`}>Ã—</button></div></td></tr>; })}
+        </tbody></table></div><p className="table-scroll-hint">Giá»¯ Shift + lÄƒn chuá»™t hoáº·c kÃ©o ngang Ä‘á»ƒ xem Ä‘á»§ dá»¯ liá»‡u.</p></div><div className="journal-mobile-list">{journalTrades.map((trade) => { const images = imagesByTrade.get(trade.id) ?? []; return <article className="journal-trade-card" key={trade.id}><header><div><strong>{trade.symbol}</strong><span>{DATE.format(new Date(`${trade.date}T12:00:00`))} Â· {marketOf(trade)}</span></div><span className={`result ${trade.pnl > 0 ? "win" : trade.pnl < 0 ? "loss" : "be"}`}>{trade.pnl > 0 ? "Tháº¯ng" : trade.pnl < 0 ? "Thua" : "HÃ²a"}</span></header><div className="journal-trade-summary"><div><span>LÃ£i / Lá»—</span><strong className={trade.pnl >= 0 ? "positive-text" : "negative-text"}>{money(trade.pnl, true)}</strong></div><div><span>R:R</span><strong>{trade.risk ? (trade.pnl / trade.risk).toFixed(2) : "0.00"}R</strong></div><div><span>Ká»· luáº­t</span><strong>{trade.discipline}%</strong></div></div><dl><div><dt>HÆ°á»›ng Â· PhiÃªn</dt><dd>{trade.side} Â· {trade.session}</dd></div><div><dt>Setup Â· Khung</dt><dd>{trade.setup} Â· {trade.timeframe}</dd></div><div><dt>Nguá»“n</dt><dd>{trade.source ?? "Thá»§ cÃ´ng"}</dd></div></dl><footer><button type="button" className="ghost-button" disabled={!images.length} onClick={() => setActiveImage(images[0])}><Camera size={15} /> {images.length ? `${images.length} áº£nh` : "ChÆ°a cÃ³ áº£nh"}</button><button type="button" className="ghost-button" onClick={() => openEditTradeModal(trade)}><Pencil size={15} /> Sá»­a</button><button type="button" className="icon-button delete" onClick={() => deleteTrade(trade.id)} aria-label={`XÃ³a lá»‡nh ${trade.symbol}`}>Ã—</button></footer></article>; })}</div></> : <EmptyState title="ChÆ°a cÃ³ giao dá»‹ch phÃ¹ há»£p" copy="Thá»­ thay Ä‘á»•i bá»™ lá»c hoáº·c thÃªm má»™t giao dá»‹ch má»›i." />}
+      </section>
+    </>
+  );
+
+  const renderCalendar = () => {
+    const year = calendarMonth.getFullYear();
+    const month = calendarMonth.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const offset = firstDay === 0 ? 6 : firstDay - 1;
+    const days = new Date(year, month + 1, 0).getDate();
+    const cells = Array.from({ length: 42 }, (_, index) => {
+      const day = index - offset + 1;
+      return day >= 1 && day <= days ? day : null;
+    });
+    const tradesByDay = new Map<number, Trade[]>();
+    trades.filter((trade) => { const date = new Date(`${trade.date}T12:00:00`); return date.getFullYear() === year && date.getMonth() === month; }).forEach((trade) => {
+      const day = Number(trade.date.slice(-2));
+      tradesByDay.set(day, [...(tradesByDay.get(day) ?? []), trade]);
+    });
+    const monthLabel = new Intl.DateTimeFormat("vi-VN", { month: "long", year: "numeric" }).format(calendarMonth);
+    return <section className="calendar-panel panel"><div className="calendar-head"><button className="icon-button" onClick={() => setCalendarMonth(new Date(year, month - 1, 1))}>â€¹</button><div><span className="eyebrow">NHá»ŠP Äá»˜ GIAO Dá»ŠCH</span><h2>{monthLabel}</h2></div><button className="icon-button" onClick={() => setCalendarMonth(new Date(year, month + 1, 1))}>â€º</button></div><div className="weekdays">{["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((day) => <span key={day}>{day}</span>)}</div><div className="calendar-grid">{cells.map((day, index) => {
+      const dayTrades = day ? tradesByDay.get(day) ?? [] : [];
+      const pnl = dayTrades.reduce((sum, trade) => sum + trade.pnl, 0);
+      return <div className={`calendar-day ${dayTrades.length ? pnl >= 0 ? "profit" : "loss" : ""}`} key={`${day}-${index}`}>{day && <><span className="day-number">{day}</span>{dayTrades.length > 0 && <div className="day-result"><strong>{money(pnl, true)}</strong><small>{dayTrades.length} lá»‡nh</small></div>}</>}</div>;
+    })}</div></section>;
+  };
+
+  const renderPerformance = (dimension: "symbol" | "setup" | "session" | "weekday", title?: string) => {
+    const grouped = groupTrades(trades, dimension);
+    const max = Math.max(...grouped.map((item) => Math.abs(item.pnl)), 1);
+    const leader = grouped[0];
+    const enoughSample = Boolean(leader && leader.count >= MIN_ANALYTICS_SAMPLE);
+    return <div className="performance-grid"><section className="panel performance-main"><div className="panel-title"><div><span className="eyebrow">SO SÃNH HIá»†U SUáº¤T</span><h3>{title ?? "Lá»£i nhuáº­n theo nhÃ³m"}</h3></div><small className="sample-rule">NgÆ°á»¡ng káº¿t luáº­n: â‰¥ {MIN_ANALYTICS_SAMPLE} lá»‡nh/nhÃ³m</small></div><div className="horizontal-bars">{grouped.map((item, index) => <div className="horizontal-row" key={item.label}><div className="rank">{String(index + 1).padStart(2, "0")}</div><div className="bar-info"><div><strong>{item.label}</strong><span>{item.count} lá»‡nh Â· {(item.wins / item.count * 100).toFixed(0)}% tháº¯ng Â· <em className={item.count >= MIN_ANALYTICS_SAMPLE ? "confidence-ready" : "confidence-low"}>{item.count >= MIN_ANALYTICS_SAMPLE ? "Ä‘á»§ máº«u" : "máº«u nhá»"}</em></span></div><div className="bar-track"><i className={item.pnl >= 0 ? "up" : "down"} style={{ width: `${Math.max(8, Math.abs(item.pnl) / max * 100)}%` }} /></div></div><strong className={item.pnl >= 0 ? "positive-text" : "negative-text"}>{money(item.pnl, true)}</strong></div>)}</div></section><aside className={`panel insight-card ${enoughSample ? "" : "insufficient"}`}><span className="eyebrow">DIá»„N GIáº¢I Dá»® LIá»†U</span><h3>{enoughSample ? "Lá»£i tháº¿ Ä‘Ã£ Ä‘á»§ máº«u" : "ChÆ°a Ä‘á»§ dá»¯ liá»‡u Ä‘á»ƒ káº¿t luáº­n"}</h3><div className="insight-number">{leader?.label ?? "â€”"}</div><p>{leader ? enoughSample ? `${leader.label} Ä‘ang dáº«n Ä‘áº§u trÃªn ${leader.count} giao dá»‹ch. Chá»‰ tÄƒng táº§n suáº¥t khi Ä‘iá»u kiá»‡n setup vÃ  má»©c rá»§i ro váº«n giá»¯ nguyÃªn.` : `${leader.label} hiá»‡n Ä‘á»©ng Ä‘áº§u nhÆ°ng má»›i cÃ³ ${leader.count} giao dá»‹ch. Cáº§n thÃªm Ã­t nháº¥t ${Math.max(0, MIN_ANALYTICS_SAMPLE - leader.count)} lá»‡nh cÃ¹ng Ä‘iá»u kiá»‡n trÆ°á»›c khi coi Ä‘Ã¢y lÃ  lá»£i tháº¿.` : "ThÃªm giao dá»‹ch Ä‘á»ƒ há»‡ thá»‘ng báº¯t Ä‘áº§u so sÃ¡nh cÃ¡c nhÃ³m."}</p><div className="insight-rule"><span>NguyÃªn táº¯c</span><strong>KhÃ´ng tÄƒng rá»§i ro dá»±a trÃªn máº«u nhá»</strong></div></aside></div>;
+  };
+
+  const renderAnalytics = () => {
+    const reliable = (dimension: "symbol" | "setup" | "session") => groupTrades(trades, dimension).find((item) => item.count >= MIN_ANALYTICS_SAMPLE)?.label ?? "ChÆ°a Ä‘á»§ máº«u";
+    const quality = trades.length >= 100 ? "Tá»‘t" : trades.length >= 50 ? "Äang hÃ¬nh thÃ nh" : "Máº«u cÃ²n nhá»";
+    const analyticsOptions: Array<{ id: AnalyticsTab; label: string }> = [
+      { id: "symbol", label: "Sáº£n pháº©m" },
+      { id: "setup", label: "Setup" },
+      { id: "session", label: "PhiÃªn" },
+      { id: "weekday", label: "Theo thá»©" },
+      { id: "heatmap", label: "Báº£n Ä‘á»“ nhiá»‡t" },
+    ];
+    const titles: Record<Exclude<AnalyticsTab, "heatmap">, string> = {
+      symbol: "LÃ£i / Lá»— theo sáº£n pháº©m",
+      setup: "LÃ£i / Lá»— theo setup",
+      session: "LÃ£i / Lá»— theo phiÃªn",
+      weekday: "LÃ£i / Lá»— theo ngÃ y trong tuáº§n",
+    };
+    return <>
+      <div className="summary-row"><article><span>Sáº£n pháº©m Ä‘á»§ máº«u</span><strong>{reliable("symbol")}</strong></article><article><span>Setup Ä‘á»§ máº«u</span><strong>{reliable("setup")}</strong></article><article><span>PhiÃªn Ä‘á»§ máº«u</span><strong>{reliable("session")}</strong></article><article><span>Cháº¥t lÆ°á»£ng dá»¯ liá»‡u</span><strong className={trades.length >= 100 ? "positive-text" : "gold-text"}>{quality}</strong><small>{trades.length} giao dá»‹ch Ä‘Ã£ ghi</small></article></div>
+      <section className="sample-method-banner"><ShieldCheck size={18} /><div><strong>Káº¿t quáº£ Ä‘ang Ä‘Æ°á»£c kiá»ƒm soÃ¡t theo cá»¡ máº«u</strong><p>Xáº¿p háº¡ng váº«n hiá»ƒn thá»‹ Ä‘á»ƒ quan sÃ¡t, nhÆ°ng chá»‰ Ä‘Æ°á»£c gá»i lÃ  â€œlá»£i tháº¿â€ khi má»™t nhÃ³m cÃ³ Ã­t nháº¥t {MIN_ANALYTICS_SAMPLE} giao dá»‹ch cÃ¹ng Ä‘iá»u kiá»‡n.</p></div><a href="/phuong-phap">Äá»c phÆ°Æ¡ng phÃ¡p</a></section>
+      <div className="analytics-tabs" role="tablist" aria-label="Chiá»u phÃ¢n tÃ­ch">{analyticsOptions.map((option) => <button type="button" role="tab" aria-selected={analyticsTab === option.id} className={analyticsTab === option.id ? "active" : ""} key={option.id} onClick={() => setAnalyticsTab(option.id)}>{option.label}</button>)}</div>
+      {analyticsTab === "heatmap" ? renderHeatmap() : renderPerformance(analyticsTab, titles[analyticsTab])}
+    </>;
+  };
+
+  const renderRisk = () => {
+    const riskRows = [
+      { label: "Rá»§i ro trung bÃ¬nh / lá»‡nh", value: trades.length ? trades.reduce((sum, t) => sum + t.risk, 0) / trades.length : 0, limit: 2000000 },
+      { label: "Lá»‡nh lá»— lá»›n nháº¥t", value: Math.abs(allStats.biggestLoss), limit: 2000000 },
+      { label: "Sá»¥t giáº£m tá»‘i Ä‘a", value: allStats.maxDrawdown, limit: 6000000 },
+    ];
+    return <div className="risk-layout"><section className="panel"><div className="panel-title"><div><span className="eyebrow">HÃ€NG RÃ€O Báº¢O Vá»†</span><h3>Giá»›i háº¡n rá»§i ro</h3></div><span className="status-chip success">ÄANG TUÃ‚N THá»¦</span></div><div className="risk-list">{riskRows.map((row) => <div key={row.label}><div><span>{row.label}</span><strong>{money(row.value, true)} / {money(row.limit, true)}</strong></div><div className="risk-track"><i style={{ width: `${Math.min(100, row.value / row.limit * 100)}%` }} /></div></div>)}</div><div className="risk-rule-grid"><div><span>Rá»§i ro tá»‘i Ä‘a</span><strong>1.0%</strong><small>má»—i giao dá»‹ch</small></div><div><span>Dá»«ng trong ngÃ y</span><strong>âˆ’2R</strong><small>khÃ´ng tráº£ thÃ¹</small></div><div><span>Tá»‘i Ä‘a má»—i ngÃ y</span><strong>2</strong><small>giao dá»‹ch</small></div></div></section><section className="panel"><div className="panel-title"><div><span className="eyebrow">PHÃ‚N PHá»I Káº¾T QUáº¢</span><h3>Lá»£i nhuáº­n theo R</h3></div></div><div className="r-distribution">{["â‰¤ âˆ’1R", "âˆ’1R â†’ 0", "0 â†’ 1R", "1R â†’ 2R", "> 2R"].map((bucket, index) => { const counts = [trades.filter(t => t.pnl / t.risk <= -1).length, trades.filter(t => t.pnl / t.risk > -1 && t.pnl < 0).length, trades.filter(t => t.pnl >= 0 && t.pnl / t.risk < 1).length, trades.filter(t => t.pnl / t.risk >= 1 && t.pnl / t.risk <= 2).length, trades.filter(t => t.pnl / t.risk > 2).length]; const maximum = Math.max(...counts, 1); return <div key={bucket}><span>{bucket}</span><i style={{ height: `${28 + counts[index] / maximum * 130}px` }} className={index < 2 ? "down" : "up"} /><strong>{counts[index]}</strong></div>; })}</div></section></div>;
+  };
+
+  const renderHeatmap = () => {
+    const days = ["Thá»© Hai", "Thá»© Ba", "Thá»© TÆ°", "Thá»© NÄƒm", "Thá»© SÃ¡u", "Thá»© Báº£y", "Chá»§ Nháº­t"];
+    const sessions: Trade["session"][] = ["ChÃ¢u Ã", "London", "New York"];
+    const maximum = Math.max(...trades.map((trade) => Math.abs(trade.pnl)), 1);
+    return <section className="panel heatmap-panel"><div className="panel-title"><div><span className="eyebrow">THá»œI ÄIá»‚M GIAO Dá»ŠCH</span><h3>NgÃ y Ã— PhiÃªn</h3></div></div><div className="heatmap"><div />{sessions.map((session) => <strong key={session}>{session}</strong>)}{days.map((day) => <Fragment key={day}><span>{day.replace("Thá»© ", "T")}</span>{sessions.map((session) => { const matching = trades.filter((trade) => dayName(trade.date) === day && trade.session === session); const pnl = matching.reduce((sum, trade) => sum + trade.pnl, 0); const opacity = matching.length ? .18 + Math.abs(pnl) / maximum * .55 : .04; return <div key={`${day}-${session}`} className={pnl >= 0 ? "cell-up" : "cell-down"} style={{ opacity }} title={`${day} Â· ${session}: ${money(pnl)}`}>{matching.length ? money(pnl, true) : "â€”"}</div>; })}</Fragment>)} </div><div className="heatmap-note"><span /> LÃ£i <span /> Lá»— <small>MÃ u Ä‘áº­m hÆ¡n = tÃ¡c Ä‘á»™ng lá»›n hÆ¡n</small></div></section>;
+  };
+
+  const renderProcess = () => {
+    const phases = [
+      {
+        number: "01",
+        phase: "TRÆ¯á»šC Lá»†NH",
+        title: "XÃ¢y dá»±ng luáº­n Ä‘iá»ƒm",
+        copy: "TÃ¡ch dá»¯ kiá»‡n khÃ¡ch quan khá»i ká»³ vá»ng trÆ°á»›c khi tÃ¬m Ä‘iá»ƒm vÃ o.",
+        checks: [
+          ["Bá»‘i cáº£nh", "Xu hÆ°á»›ng D1/H4, tráº¡ng thÃ¡i biáº¿n Ä‘á»™ng, vÃ¹ng giÃ¡ vÃ  tin tá»©c quan trá»ng."],
+          ["Lá»£i tháº¿", "Gá»i Ä‘Ãºng tÃªn setup trong playbook vÃ  nÃªu Ä‘iá»u kiá»‡n kÃ­ch hoáº¡t cá»¥ thá»ƒ."],
+          ["Ká»‹ch báº£n", "Ghi entry, invalidation, SL, TP vÃ  trÆ°á»ng há»£p chá»§ Ä‘á»™ng Ä‘á»©ng ngoÃ i."],
+        ],
+        gate: "Chá»‰ giao dá»‹ch khi setup A+ Ä‘á»§ Ä‘iá»u kiá»‡n vÃ  RR ká»³ vá»ng tá»« 1:2.",
+      },
+      {
+        number: "02",
+        phase: "TRONG Lá»†NH",
+        title: "Thá»±c thi káº¿ hoáº¡ch",
+        copy: "Quáº£n trá»‹ pháº§n cÃ³ thá»ƒ kiá»ƒm soÃ¡t; khÃ´ng pháº£n á»©ng theo P&L tá»©c thá»i.",
+        checks: [
+          ["KÃ­ch hoáº¡t", "Chá» tÃ­n hiá»‡u Ä‘Ã³ng náº¿n hoáº·c xÃ¡c nháº­n cáº¥u trÃºc; tuyá»‡t Ä‘á»‘i khÃ´ng Ä‘uá»•i giÃ¡."],
+          ["Rá»§i ro", "ÄÃºng khá»‘i lÆ°á»£ng, rá»§i ro tá»‘i Ä‘a 1%; khÃ´ng ná»›i SL hoáº·c trung bÃ¬nh giÃ¡ lá»—."],
+          ["Quáº£n lÃ½", "Dá»i SL, chá»‘t má»™t pháº§n hoáº·c thoÃ¡t lá»‡nh Ä‘Ãºng Ä‘iá»u kiá»‡n Ä‘Ã£ viáº¿t trÆ°á»›c."],
+        ],
+        gate: "Náº¿u pháº£i thay Ä‘á»•i káº¿ hoáº¡ch, ghi lÃ½ do trÆ°á»›c khi hÃ nh Ä‘á»™ng.",
+      },
+      {
+        number: "03",
+        phase: "SAU Lá»†NH",
+        title: "Review quyáº¿t Ä‘á»‹nh",
+        copy: "ÄÃ¡nh giÃ¡ cháº¥t lÆ°á»£ng quy trÃ¬nh Ä‘á»™c láº­p vá»›i káº¿t quáº£ lá»i hay lá»—.",
+        checks: [
+          ["Báº±ng chá»©ng", "LÆ°u áº£nh trÆ°á»›c/sau lá»‡nh, káº¿t quáº£ theo R vÃ  sá»‘ tiá»n thá»±c táº¿."],
+          ["TuÃ¢n thá»§", "Cháº¥m Ä‘Ãºng setup, Ä‘Ãºng rá»§i ro, Ä‘Ãºng quáº£n lÃ½ vÃ  tráº¡ng thÃ¡i tÃ¢m lÃ½."],
+          ["Cáº£i thiá»‡n", "Ghi má»™t bÃ i há»c kiá»ƒm chá»©ng Ä‘Æ°á»£c vÃ  má»™t hÃ nh Ä‘á»™ng cho lá»‡nh káº¿ tiáº¿p."],
+        ],
+        gate: `KhÃ´ng sá»­a há»‡ thá»‘ng tá»« má»™t lá»‡nh; chá»‰ káº¿t luáº­n khi cÃ³ Ã­t nháº¥t ${MIN_ANALYTICS_SAMPLE} máº«u cÃ¹ng Ä‘iá»u kiá»‡n.`,
+      },
+    ];
+    const principles = [
+      ["Báº£o vá»‡ vá»‘n", "Rá»§i ro Ä‘Æ°á»£c xÃ¡c Ä‘á»‹nh trÆ°á»›c lá»£i nhuáº­n."],
+      ["Ká»· luáº­t trÆ°á»›c káº¿t quáº£", "Má»™t lá»‡nh tháº¯ng sai quy trÃ¬nh váº«n lÃ  lá»‡nh kÃ©m."],
+      ["Äá»§ máº«u má»›i káº¿t luáº­n", `Ãt nháº¥t ${MIN_ANALYTICS_SAMPLE} lá»‡nh cÃ¹ng Ä‘iá»u kiá»‡n.`],
+      ["Äá»©ng ngoÃ i lÃ  má»™t vá»‹ tháº¿", "KhÃ´ng cÃ³ setup A+ thÃ¬ khÃ´ng cáº§n giao dá»‹ch."],
+    ];
+    return <>
+      <section className="process-hero">
+        <div>
+          <span className="eyebrow">EXECUTION PROTOCOL</span>
+          <h2>Má»™t quyáº¿t Ä‘á»‹nh tá»‘t pháº£i cÃ³ thá»ƒ giáº£i thÃ­ch vÃ  láº·p láº¡i</h2>
+          <p>Äi tá»« dá»¯ kiá»‡n Ä‘áº¿n káº¿ hoáº¡ch, tá»« káº¿ hoáº¡ch Ä‘áº¿n thá»±c thi, rá»“i dÃ¹ng dá»¯ liá»‡u Ä‘á»ƒ cáº£i thiá»‡n â€” khÃ´ng dÃ¹ng cáº£m xÃºc hoáº·c má»™t káº¿t quáº£ Ä‘Æ¡n láº» Ä‘á»ƒ thay Ä‘á»•i há»‡ thá»‘ng.</p>
+        </div>
+        <div className="process-priority"><small>THá»¨ Tá»° Æ¯U TIÃŠN</small><strong>Báº£o vá»‡ vá»‘n <i>â†’</i> TuÃ¢n thá»§ <i>â†’</i> Káº¿t quáº£</strong></div>
+      </section>
+      <section className="process-grid">{phases.map((phase) => <article className="process-card" key={phase.number}>
+        <header><span>{phase.number}</span><div><small>{phase.phase}</small><h3>{phase.title}</h3><p>{phase.copy}</p></div></header>
+        <div className="process-checklist">{phase.checks.map(([label, copy]) => <div key={label}><i>âœ“</i><p><strong>{label}</strong><span>{copy}</span></p></div>)}</div>
+        <footer><ShieldCheck size={15} /><span><small>Cá»”NG KIá»‚M TRA</small><strong>{phase.gate}</strong></span></footer>
+      </article>)}</section>
+      <section className="process-principles"><div><span className="eyebrow">NGUYÃŠN Táº®C Báº¤T BIáº¾N</span><h3>Giá»¯ Ä‘Ãºng há»‡ thá»‘ng trÆ°á»›c khi tá»‘i Æ°u káº¿t quáº£</h3></div><div className="process-principle-grid">{principles.map(([title, copy], index) => <article key={title}><span>{String(index + 1).padStart(2, "0")}</span><div><strong>{title}</strong><p>{copy}</p></div></article>)}</div></section>
+    </>;
+  };
+
+  const renderNotes = () => <>
+    <section className="note-template-panel">
+      <div className="note-template-heading"><div><span className="eyebrow">MáºªU GHI CHUYÃŠN NGHIá»†P</span><h3>Báº¯t Ä‘áº§u báº±ng Ä‘Ãºng cáº¥u trÃºc</h3></div><p>Máº«u má»›i Ä‘Æ°á»£c chÃ¨n ná»‘i tiáº¿p, khÃ´ng ghi Ä‘Ã¨ ná»™i dung hiá»‡n cÃ³.</p></div>
+      <div className="note-template-grid">{NOTE_TEMPLATES.map((template) => <button type="button" key={template.id} onClick={() => insertNoteTemplate(template)} aria-label={`ChÃ¨n máº«u ${template.label}`}><span>{template.code}</span><div><strong>{template.label}</strong><small>{template.description}</small></div><Copy size={15} /></button>)}</div>
+    </section>
+    <section className="notes-layout">
+      <article className="panel note-editor">
+        <div className="panel-title"><div><span className="eyebrow">DECISION JOURNAL</span><h3>Káº¿ hoáº¡ch, báº±ng chá»©ng & bÃ i há»c</h3></div><span className="auto-save">LÆ°u trÃªn thiáº¿t bá»‹</span></div>
+        <div className="note-writing-rule"><ShieldCheck size={16} /><p><strong>Quy táº¯c viáº¿t:</strong> ghi sá»± tháº­t trÆ°á»›c nháº­n Ä‘á»‹nh, mÃ´ táº£ quyáº¿t Ä‘á»‹nh trÆ°á»›c káº¿t quáº£ vÃ  luÃ´n káº¿t thÃºc báº±ng má»™t hÃ nh Ä‘á»™ng cá»¥ thá»ƒ.</p></div>
+        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} aria-label="Ghi chÃº vÃ  review giao dá»‹ch" spellCheck="false" />
+        <div className="note-editor-footer"><small>{notes.length.toLocaleString("vi-VN")} kÃ½ tá»± Â· Ná»™i dung chá»‰ Ä‘Æ°á»£c lÆ°u khi báº¡n báº¥m nÃºt</small><button type="button" className="gold-button compact" onClick={saveNotes}>LÆ°u ghi chÃº</button></div>
+      </article>
+      <aside className="note-review-column">
+        <section className="panel review-framework"><span className="eyebrow">REVIEW FRAMEWORK</span><h3>4 lá»›p Ä‘Ã¡nh giÃ¡</h3><div>{[
+          ["01", "Sá»± tháº­t", "Äiá»u gÃ¬ Ä‘Ã£ xáº£y ra, cÃ³ báº±ng chá»©ng nÃ o?"],
+          ["02", "Quyáº¿t Ä‘á»‹nh", "Táº¡i sao vÃ o lá»‡nh vÃ  Ä‘iá»u kiá»‡n nÃ o bá»‹ vi pháº¡m?"],
+          ["03", "Quy trÃ¬nh", "Káº¿t quáº£ Ä‘áº¿n tá»« lá»£i tháº¿ hay tá»« may máº¯n?"],
+          ["04", "HÃ nh Ä‘á»™ng", "Má»™t thay Ä‘á»•i nhá» nÃ o sáº½ Ä‘Æ°á»£c Ä‘o á»Ÿ láº§n tá»›i?"],
+        ].map(([number, title, copy]) => <article key={number}><span>{number}</span><p><strong>{title}</strong><small>{copy}</small></p></article>)}</div></section>
+        <section className="panel weekly-card"><span className="eyebrow">REVIEW TUáº¦N</span><h3>CÃ¢u há»i ra quyáº¿t Ä‘á»‹nh</h3><ol><li><strong>Lá»£i tháº¿ nÃ o Ä‘Ã£ Ä‘á»§ máº«u?</strong><span>So sÃ¡nh setup, phiÃªn vÃ  sáº£n pháº©m trÃªn cÃ¹ng Ä‘iá»u kiá»‡n.</span></li><li><strong>Sai lá»‡ch nÃ o Ä‘ang láº·p láº¡i?</strong><span>Äo táº§n suáº¥t vÃ  tÃ¡c Ä‘á»™ng, khÃ´ng chá»‰ ká»ƒ láº¡i cáº£m xÃºc.</span></li><li><strong>Tuáº§n tá»›i Æ°u tiÃªn Ä‘iá»u gÃ¬?</strong><span>Chá»n má»™t hÃ nh vi cÃ³ thá»ƒ quan sÃ¡t vÃ  Ä‘o lÆ°á»ng.</span></li></ol><div className="mindset"><span>NGUYÃŠN Táº®C</span><strong>ÄÃ¡nh giÃ¡ quy trÃ¬nh báº±ng dá»¯ liá»‡u; khÃ´ng Ä‘Ã¡nh giÃ¡ báº£n thÃ¢n báº±ng má»™t lá»‡nh.</strong></div></section>
+      </aside>
+    </section>
+  </>;
+
+  const renderConnections = () => (
+    <>
+      <section className="security-banner">
+        <div className="security-icon"><ShieldCheck size={20} /></div>
+        <div><span className="eyebrow">Káº¾T Ná»I AN TOÃ€N</span><h3>Má»™t journal cho má»i thá»‹ trÆ°á»ng</h3><p>API key vÃ  bridge token Ä‘Æ°á»£c mÃ£ hÃ³a AES-GCM phÃ­a mÃ¡y chá»§. Máº­t kháº©u, PIN/OTP vÃ  private key Ä‘áº·t lá»‡nh luÃ´n náº±m ngoÃ i journal.</p></div>
+        <span className={`cloud-status ${dataMode}`}><i />{dataMode === "cloud" ? "VÃ¹ng dá»¯ liá»‡u riÃªng Ä‘Ã£ sáºµn sÃ ng" : authRequired ? "ÄÄƒng nháº­p Ä‘á»ƒ káº¿t ná»‘i" : "Cloud chÆ°a sáºµn sÃ ng"}</span>
+      </section>
+      <section className="auto-sync-banner">
+        <span className="auto-sync-icon"><Radio size={19} /></span>
+        <div>
+          <span className="eyebrow">AUTO SYNC</span>
+          <h3>Push 24/7 hoáº·c tá»± kÃ©o dá»¯ liá»‡u má»—i 15 phÃºt</h3>
+          <p>VPS, SSI, TCX, MT5 vÃ  CQG cÃ³ thá»ƒ nháº­n push liÃªn tá»¥c; cháº¿ Ä‘á»™ Pull cÃ¹ng Binance/Bybit Ä‘Æ°á»£c kiá»ƒm tra khi má»Ÿ app vÃ  má»—i 15 phÃºt.</p>
+        </div>
+        <div className="auto-sync-status"><small>{autoSyncStatus}</small><button type="button" className="ghost-button" disabled={autoSyncing || !connections.some(isAutoSyncConnection)} onClick={() => void syncAllConnections()}>{autoSyncing ? <LoaderCircle className="spin" size={15} /> : <RefreshCw size={15} />}{autoSyncing ? "Äang Ä‘á»“ng bá»™â€¦" : "Äá»“ng bá»™ táº¥t cáº£"}</button></div>
+      </section>
+      <section className="broker-grid">
+        {BROKERS.map((broker) => {
+          const connection = connections.find((item) => item.provider === broker.provider);
+          const canSync = connection && isAutoSyncConnection(connection);
+          return <article className={`broker-card broker-${broker.provider}`} key={broker.provider}>
+            <div className="broker-head"><span className="broker-logo">{broker.badge}</span><div><h3>{broker.name}</h3><small>{broker.mode}</small></div><span className={`connection-state ${connection ? "connected" : "idle"}`}><i />{connection ? "ÄÃ£ cáº¥u hÃ¬nh" : "ChÆ°a káº¿t ná»‘i"}</span></div>
+            <p>{broker.copy}</p>
+            {connection && <div className="connection-meta"><span>{connection.label}</span><small>{isBridgeProvider(connection.provider) ? connection.accountType === "push" ? "Push 24/7 Â· tá»± nháº­n lá»‡nh" : "Pull Â· kiá»ƒm tra má»—i 15 phÃºt" : connection.lastSyncAt ? `Äá»“ng bá»™ ${new Intl.DateTimeFormat("vi-VN", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(connection.lastSyncAt))}` : "ChÆ°a Ä‘á»“ng bá»™ láº§n Ä‘áº§u"}</small>{isBridgeProvider(connection.provider) && connection.lastSyncAt && <small>Cáº­p nháº­t {new Intl.DateTimeFormat("vi-VN", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(connection.lastSyncAt))}</small>}</div>}
+            {broker.provider === "vn-broker" ? <div className="vn-import-controls"><select value={connectionDraft.brokerName} onChange={(e) => setConnectionDraft({ ...connectionDraft, brokerName: e.target.value })} aria-label="Chá»n broker chá»©ng khoÃ¡n"><option>VPS</option><option>SSI</option><option>TCBS</option><option>VNDIRECT</option><option>MBS</option><option>HSC</option><option>Broker VN</option></select><label className="gold-button compact file-button">Nháº­p CSV<input type="file" accept=".csv,.txt,text/csv" multiple data-market="Chá»©ng khoÃ¡n" data-broker={connectionDraft.brokerName} onChange={importCsv} /></label></div> : <div className="broker-actions">{canSync && <button type="button" className="gold-button compact" disabled={syncingId === connection.id} onClick={() => void syncConnection(connection)}>{syncingId === connection.id ? "Äang Ä‘á»“ng bá»™â€¦" : "Äá»“ng bá»™ ngay"}</button>}<button type="button" className={`${connection ? "ghost-button" : "gold-button compact"} ${dataMode !== "cloud" ? "requires-cloud" : ""}`} onClick={() => openConnection(broker.provider)}>{connection ? broker.provider === "webhook" || (isBridgeProvider(broker.provider) && connection.accountType === "push") ? "Cáº­p nháº­t / token" : "Cáº­p nháº­t" : dataMode !== "cloud" ? "YÃªu cáº§u Ä‘Äƒng nháº­p" : broker.provider === "tradingview" ? "Xem thiáº¿t láº­p" : "Káº¿t ná»‘i"}</button>{connection && <button type="button" className="icon-button delete" onClick={() => void disconnect(connection)} aria-label={`Ngáº¯t ${broker.name}`}>Ã—</button>}</div>}
+            <div className="broker-foot"><span>{broker.scope}</span><span>KhÃ´ng Ä‘áº·t lá»‡nh</span></div>
+          </article>;
+        })}
+      </section>
+      <section className="quick-import-panel panel">
+        <div><span className="eyebrow">NHáº¬P NHANH ÄA THá»Š TRÆ¯á»œNG</span><h3>Tháº£ nhiá»u statement cÃ¹ng lÃºc</h3><p>Khi broker chÆ°a cÃ³ API trá»±c tiáº¿p, xuáº¥t CSV rá»“i nháº­p má»™t láº§n; há»‡ thá»‘ng tá»± dÃ² cá»™t vÃ  chá»‘ng trÃ¹ng dá»¯ liá»‡u.</p></div>
+        <div className="quick-import-grid">
+          {([
+            { market: "Chá»©ng khoÃ¡n", broker: "Broker chá»©ng khoÃ¡n", icon: "â–¥", copy: "VPS Â· SSI Â· TCBS Â· VNDIRECTâ€¦" },
+            { market: "Forex", broker: "MT5 / Forex", icon: "â†•", copy: "MT5 statement Â· cTrader export" },
+            { market: "Crypto", broker: "SÃ n Crypto", icon: "â‚¿", copy: "Binance Â· Bybit Â· OKXâ€¦" },
+            { market: "HÃ ng hÃ³a", broker: "CQG / MXV", icon: "â—ˆ", copy: "CQG statement Â· broker hÃ ng hÃ³a" },
+          ] as Array<{ market: Market; broker: string; icon: string; copy: string }>).map((item) => <label className="quick-import-card" key={item.market}><input type="file" accept=".csv,.txt,text/csv" multiple data-market={item.market} data-broker={item.broker} onChange={importCsv} /><span>{item.icon}</span><div><strong>{item.market}</strong><small>{item.copy}</small></div><FileUp size={15} /></label>)}
+        </div>
+      </section>
+      <section className="sync-explainer panel"><div><span className="eyebrow">CHIáº¾N LÆ¯á»¢C Äá»’NG Bá»˜</span><h3>Ba táº§ng Ä‘á»ƒ giáº£m tá»‘i Ä‘a nháº­p tay</h3></div><div className="sync-flow"><article><span>01</span><strong>Pull cÃ³ lá»‹ch</strong><p>VPS, SSI, TCX, MT5, CQG, Binance vÃ  Bybit tá»± kiá»ƒm tra khi má»Ÿ trang, sau Ä‘Ã³ láº·p láº¡i má»—i 15 phÃºt.</p></article><article><span>02</span><strong>Push 24/7</strong><p>Bridge cá»§a 5 ná»n táº£ng gá»­i lá»‡nh báº¥t cá»© lÃºc nÃ o báº±ng token riÃªng, khÃ´ng cáº§n má»Ÿ app.</p></article><article><span>03</span><strong>Chá»‰ review pháº§n quan trá»ng</strong><p>Lá»‡nh má»›i Ä‘Æ°á»£c gáº¯n â€œChÆ°a phÃ¢n loáº¡iâ€; báº¡n chá»‰ sá»­a setup, rá»§i ro vÃ  checklist sau giao dá»‹ch.</p></article></div></section>
+    </>
+  );
+
+  const renderSettings = () => <section className="settings-grid">
+    <article className="panel settings-card"><div><span className="eyebrow">NHáº¬N DIá»†N</span><h3>Há»“ sÆ¡ nháº­t kÃ½</h3></div><label>TÃªn hiá»ƒn thá»‹<input defaultValue="Tuan Trader" /></label><label>Kháº©u hiá»‡u<input defaultValue="Ká»· luáº­t Â· KiÃªn Ä‘á»‹nh Â· TÄƒng trÆ°á»Ÿng" /></label><label>Tiá»n tá»‡<select defaultValue="VND"><option>VND</option><option>USD</option></select></label><button className="gold-button compact" onClick={() => setToast("ÄÃ£ lÆ°u cÃ i Ä‘áº·t hiá»ƒn thá»‹.")}>LÆ°u thay Ä‘á»•i</button></article>
+    <article className="panel settings-card"><div><span className="eyebrow">Dá»® LIá»†U & SAO LÆ¯U</span><h3>Quáº£n lÃ½ dá»¯ liá»‡u</h3></div><div className={`data-mode-card ${dataMode}`}><Database size={18} /><div><strong>{isDemo ? "Äang xem dá»¯ liá»‡u minh há»a" : dataMode === "cloud" ? "Äá»“ng bá»™ riÃªng tÆ° Ä‘ang hoáº¡t Ä‘á»™ng" : "Dá»¯ liá»‡u Ä‘ang á»Ÿ thiáº¿t bá»‹ nÃ y"}</strong><p>{isDemo ? "CÃ¡c con sá»‘ hiá»‡n táº¡i chá»‰ Ä‘á»ƒ tráº£i nghiá»‡m tÃ­nh nÄƒng, khÃ´ng pháº£i káº¿t quáº£ giao dá»‹ch tháº­t." : dataMode === "cloud" ? "Giao dá»‹ch Ä‘Æ°á»£c lÆ°u theo tÃ i khoáº£n vÃ  Ä‘á»“ng bá»™ giá»¯a cÃ¡c thiáº¿t bá»‹ Ä‘Ã£ Ä‘Äƒng nháº­p." : "HÃ£y xuáº¥t báº£n sao Ä‘á»‹nh ká»³; xÃ³a dá»¯ liá»‡u trÃ¬nh duyá»‡t cÃ³ thá»ƒ lÃ m máº¥t nháº­t kÃ½ cá»¥c bá»™."}</p></div></div>
+      {accountSession?.user ? <div className="settings-account"><span className="account-avatar">{accountSession.user.image ? <img src={accountSession.user.image} alt="" /> : <UserRound size={15} />}</span><div><strong>{accountSession.user.name}</strong><small>{accountSession.user.email}</small></div><button type="button" onClick={() => void signOutWebsite()}><LogOut size={14} /> ÄÄƒng xuáº¥t</button></div> : <a className="signin-button" href="/dang-nhap?returnTo=%2F%23settings">ÄÄƒng nháº­p tÃ i khoáº£n Ä‘á»ƒ Ä‘á»“ng bá»™</a>}
+      <div className="backup-actions"><button className="ghost-button full" onClick={exportBackup}><FileDown size={16} /> Xuáº¥t báº£n sao JSON</button><label className="ghost-button full file-button backup-file"><FileUp size={16} /> Nháº­p báº£n sao<input type="file" accept="application/json,.json" onChange={importBackup} /></label></div>
+      {!isDemo && <button className="ghost-button full" onClick={restoreDemo}>Xem dá»¯ liá»‡u minh há»a</button>}
+      <button className="danger-button" onClick={clearAll}>{isDemo ? "Báº¯t Ä‘áº§u vá»›i nháº­t kÃ½ trá»‘ng" : "XÃ³a toÃ n bá»™ giao dá»‹ch"}</button>
+      <small className="backup-note">Báº£n sao khÃ´ng chá»©a API key, API secret hoáº·c token broker.</small>
+    </article>
+  </section>;
+
+  const renderContent = () => {
+    switch (view) {
+      case "overview": return renderOverview();
+      case "journal": return renderJournal();
+      case "calendar": return renderCalendar();
+      case "analytics": return renderAnalytics();
+      case "risk": return renderRisk();
+      case "statistics": return <TradingMetrix trades={trades} />;
+      case "system-tracker": return <SystemTracker trades={trades} onOpenJournal={() => navigate("journal")} />;
+      case "valuation": return <CompanyValuation />;
+      case "pair": return renderPerformance("symbol", "LÃ£i / Lá»— theo sáº£n pháº©m");
+      case "setup": return renderPerformance("setup", "LÃ£i / Lá»— theo setup");
+      case "weekday": return renderPerformance("weekday", "LÃ£i / Lá»— theo ngÃ y trong tuáº§n");
+      case "heatmap": return renderHeatmap();
+      case "process": return renderProcess();
+      case "notes": return renderNotes();
+      case "connections": return renderConnections();
+      case "settings": return renderSettings();
+    }
+  };
+
+  const draftRiskValue = Number(draft.risk);
+  const draftPnlValue = draft.pnl === "" ? null : Number(draft.pnl);
+  const draftFeesValue = Number(draft.fees) || 0;
+  const draftEntryValue = Number(draft.entryPrice);
+  const draftStopValue = Number(draft.stopLoss);
+  const draftTargetValue = Number(draft.takeProfit);
+  const draftPriceRisk = draft.side === "Buy" ? draftEntryValue - draftStopValue : draftStopValue - draftEntryValue;
+  const draftPriceReward = draft.side === "Buy" ? draftTargetValue - draftEntryValue : draftEntryValue - draftTargetValue;
+  const draftHasPricePlan = draftEntryValue > 0 && draftStopValue > 0 && draftTargetValue > 0;
+  const draftPlannedRr = draftHasPricePlan && draftPriceRisk > 0 && draftPriceReward > 0 ? draftPriceReward / draftPriceRisk : null;
+  const draftNetPnl = draftPnlValue === null || !Number.isFinite(draftPnlValue) ? null : draftPnlValue - draftFeesValue;
+  const draftActualR = draftNetPnl !== null && draftRiskValue > 0 ? draftNetPnl / draftRiskValue : null;
+  const draftChecks = [draft.plan, draft.noFomo, draft.noRevenge, draft.screenshot];
+  const draftDiscipline = Math.round((draftChecks.filter(Boolean).length / draftChecks.length) * 100);
+  const draftRequired = [
+    Boolean(draft.date),
+    Boolean(draft.symbol.trim()),
+    draft.setup !== UNCLASSIFIED_SETUP,
+    Number.isFinite(draftRiskValue) && draftRiskValue > 0,
+    draftPnlValue !== null && Number.isFinite(draftPnlValue),
+  ];
+  const draftQualitySignals = [...draftRequired, draftHasPricePlan, draft.screenshot || draftImages.length > 0, Boolean(draft.note.trim())];
+  const draftCompleteness = Math.round((draftQualitySignals.filter(Boolean).length / draftQualitySignals.length) * 100);
+  const draftReady = draftRequired.every(Boolean);
+  const meta = VIEW_META[view];
+  return (
+    <div className="app-shell">
+      <a className="skip-link" href="#main-content">Bá» qua Ä‘iá»u hÆ°á»›ng</a>
+      <aside className={`sidebar ${mobileNav ? "open" : ""}`}>
+        <div className="brand">
+          <div className="brand-mark" aria-hidden="true"><i /><i /><i /><i /><b /></div>
+          <strong><span>Tuan</span> Trader</strong>
+          <small>Ká»¶ LUáº¬T Â· KIÃŠN Äá»ŠNH Â· TÄ‚NG TRÆ¯á»NG</small>
+        </div>
+        <nav aria-label="Äiá»u hÆ°á»›ng chÃ­nh">{NAV_GROUPS.map((group) => <section className="nav-group" aria-label={group.label} key={group.label}><span className="nav-group-label">{group.label}</span>{group.items.map((item) => { const Icon = item.icon; return <button type="button" key={item.id} aria-current={view === item.id ? "page" : undefined} className={view === item.id ? "active" : ""} onClick={() => navigate(item.id)}><Icon className="nav-icon" size={17} aria-hidden="true" />{item.label}</button>; })}</section>)}</nav>
+        <div className="sidebar-footer"><button className="gold-button" onClick={openTradeModal}><Plus size={17} /> <span>ThÃªm giao dá»‹ch</span></button><div><span>{trades.length} lá»‡nh</span><small>â€¢</small><span>{isDemo ? "Dá»¯ liá»‡u máº«u" : money(allStats.net, true)}</span></div></div>
+      </aside>
+      {mobileNav && <button className="mobile-backdrop" aria-label="ÄÃ³ng menu" onClick={() => setMobileNav(false)} />}
+      <main className="main-content" id="main-content">
+        <header className="topbar">
+          <button className="mobile-menu" aria-label="Má»Ÿ menu" onClick={() => setMobileNav(true)}><Menu size={18} /></button>
+          <div><h1>{meta.title}</h1><p>{meta.subtitle}</p></div>
+          <div className="top-actions"><span className={`data-state-chip ${isDemo ? "demo" : dataMode}`}><Database size={14} />{isDemo ? "Dá»¯ liá»‡u minh há»a" : dataMode === "cloud" ? "ÄÃ£ Ä‘á»“ng bá»™" : "TrÃªn thiáº¿t bá»‹"}</span>{view === "overview" && <select value={range} onChange={(e) => setRange(e.target.value)} aria-label="Khoáº£ng thá»i gian"><option value="all">ToÃ n bá»™ thá»i gian</option><option value="30">30 ngÃ y qua</option><option value="90">90 ngÃ y qua</option></select>}{accountSession?.user ? <div className="account-chip"><span className="account-avatar">{accountSession.user.image ? <img src={accountSession.user.image} alt="" /> : <UserRound size={14} />}</span><span>{accountSession.user.name || accountSession.user.email}</span><button className="account-signout" type="button" onClick={() => void signOutWebsite()} aria-label="ÄÄƒng xuáº¥t"><LogOut size={14} /></button></div> : <a className="account-login-link" href="/dang-nhap" aria-label="ÄÄƒng nháº­p"><UserRound size={15} /><span>ÄÄƒng nháº­p</span></a>}<button className="quick-add" onClick={openTradeModal}><Plus size={16} /> <span>ThÃªm lá»‡nh</span></button></div>
+        </header>
+        <div className="content-area">
+          {isDemo && <section className="demo-banner" role="status"><div className="demo-icon"><Sparkles size={18} /></div><div><span>CHáº¾ Äá»˜ MINH Há»ŒA</span><strong>ToÃ n bá»™ 20 giao dá»‹ch vÃ  +23,9 triá»‡u Ä‘ang hiá»ƒn thá»‹ lÃ  dá»¯ liá»‡u máº«u</strong><p>Dá»¯ liá»‡u nÃ y dÃ¹ng Ä‘á»ƒ tráº£i nghiá»‡m tÃ­nh nÄƒng, khÃ´ng pháº£i thÃ nh tÃ­ch giao dá»‹ch thá»±c táº¿ hay báº±ng chá»©ng vá» lá»£i nhuáº­n.</p></div><div className="demo-actions"><button type="button" onClick={startRealJournal}>Báº¯t Ä‘áº§u nháº­t kÃ½ tháº­t</button><a href="/phuong-phap">Xem phÆ°Æ¡ng phÃ¡p</a></div></section>}
+          {renderContent()}
+        </div>
+        <footer className="app-footer"><div><span>Tuan Trader Â· Trading Plan Pro</span><small>{isDemo ? "Dá»¯ liá»‡u minh há»a â€” khÃ´ng pháº£i káº¿t quáº£ thá»±c táº¿" : dataMode === "cloud" ? "Dá»¯ liá»‡u riÃªng Ä‘Ã£ Ä‘á»“ng bá»™" : "Dá»¯ liá»‡u Ä‘ang lÆ°u trÃªn thiáº¿t bá»‹"} Â· KhÃ´ng pháº£i khuyáº¿n nghá»‹ Ä‘áº§u tÆ°.</small></div><nav aria-label="ThÃ´ng tin website"><a href="/phuong-phap">PhÆ°Æ¡ng phÃ¡p</a><a href="/bao-mat">Báº£o máº­t dá»¯ liá»‡u</a></nav></footer>
+      </main>
+
+      {modalOpen && <div className="modal-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) { setModalOpen(false); setEditingTradeId(null); } }}><form className="trade-modal professional-trade-modal" role="dialog" aria-modal="true" aria-labelledby="trade-dialog-title" onSubmit={saveTrade}>
+        <div className="modal-head trade-modal-head"><div><span className="eyebrow">TRADE EXECUTION RECORD</span><h2 id="trade-dialog-title">{editingTradeId ? "Cáº­p nháº­t há»“ sÆ¡ giao dá»‹ch" : "Ghi nháº­n giao dá»‹ch má»›i"}</h2><p>{editingTradeId ? "HoÃ n thiá»‡n dá»¯ liá»‡u káº¿ hoáº¡ch, káº¿t quáº£ vÃ  review cho lá»‡nh Ä‘Ã£ cÃ³." : "Ghi dá»¯ kiá»‡n trÆ°á»›c, Ä‘Ã¡nh giÃ¡ quy trÃ¬nh sau â€” káº¿t quáº£ chá»‰ lÃ  má»™t pháº§n cá»§a há»“ sÆ¡."}</p></div><div className="trade-modal-head-actions"><span><i /> TrÆ°á»ng cÃ³ dáº¥u * lÃ  báº¯t buá»™c</span><button type="button" className="modal-close" onClick={() => { setModalOpen(false); setEditingTradeId(null); }} aria-label="ÄÃ³ng">Ã—</button></div></div>
+        <div className="trade-modal-workspace">
+          <div className="trade-form-flow">
+            <section className="form-section"><div className="form-section-title"><span>01</span><div><h3>Bá»‘i cáº£nh & setup</h3><p>XÃ¡c Ä‘á»‹nh chÃ­nh xÃ¡c lá»‡nh nÃ o Ä‘ang Ä‘Æ°á»£c Ä‘Ã¡nh giÃ¡</p></div></div>
+              <div className="form-grid three">
+                <label>NgÃ y giao dá»‹ch *<input type="date" value={draft.date} onChange={(e) => setDraft({ ...draft, date: e.target.value })} required /></label>
+                <label>Thá»‹ trÆ°á»ng<select value={draft.market} onChange={(e) => setDraft({ ...draft, market: e.target.value as Market })}><option>HÃ ng hÃ³a</option><option>Chá»©ng khoÃ¡n</option><option>Crypto</option><option>Forex</option></select></label>
+                <label>Sáº£n pháº©m *<input value={draft.symbol} onChange={(e) => setDraft({ ...draft, symbol: e.target.value })} placeholder="FPT, XAUUSD, BTCUSDT..." autoComplete="off" required /></label>
+                <label>PhiÃªn giao dá»‹ch<select value={draft.session} onChange={(e) => setDraft({ ...draft, session: e.target.value as Trade["session"] })}><option>ChÃ¢u Ã</option><option>London</option><option>New York</option></select></label>
+                <label>Khung thá»i gian<select value={draft.timeframe} onChange={(e) => setDraft({ ...draft, timeframe: e.target.value })}>{!["Auto", "M1", "M5", "M15", "M30", "H1", "H4", "Daily", "Weekly"].includes(draft.timeframe) && <option value={draft.timeframe}>{draft.timeframe}</option>}<option>Auto</option><option>M1</option><option>M5</option><option>M15</option><option>M30</option><option>H1</option><option>H4</option><option>Daily</option><option>Weekly</option></select></label>
+                <label>HÆ°á»›ng lá»‡nh<div className="side-switch" role="group" aria-label="HÆ°á»›ng giao dá»‹ch"><button type="button" className={draft.side === "Buy" ? "active buy" : ""} aria-pressed={draft.side === "Buy"} onClick={() => setDraft({ ...draft, side: "Buy" })}>Buy</button><button type="button" className={draft.side === "Sell" ? "active sell" : ""} aria-pressed={draft.side === "Sell"} onClick={() => setDraft({ ...draft, side: "Sell" })}>Sell</button></div></label>
+                <label className="span-two">Setup / Playbook *<select value={draft.setup} onChange={(e) => setDraft({ ...draft, setup: e.target.value })}>{draft.setup !== UNCLASSIFIED_SETUP && !SETUP_OPTIONS.includes(draft.setup) && <option value={draft.setup}>{draft.setup}</option>}<option>{UNCLASSIFIED_SETUP}</option>{SETUP_GROUPS.map((group) => <optgroup label={group.label} key={group.label}>{group.options.map((option) => <option key={option}>{option}</option>)}</optgroup>)}</select><small>Chá»n Ä‘Ãºng tÃªn setup Ä‘á»ƒ dá»¯ liá»‡u phÃ¢n tÃ­ch khÃ´ng bá»‹ pha trá»™n.</small></label>
+                <label>TÃ¢m lÃ½ khi vÃ o lá»‡nh<select value={draft.psychology} onChange={(e) => setDraft({ ...draft, psychology: e.target.value })}><option>ChÆ°a review</option><option>BÃ¬nh tÄ©nh</option><option>Tá»± tin</option><option>Trung láº­p</option><option>HÆ¡i vá»™i</option><option>FOMO</option><option>CÄƒng tháº³ng</option><option>Tráº£ thÃ¹</option></select></label>
+                <label className="span-three">Nguá»“n dá»¯ liá»‡u<select value={draft.source} onChange={(e) => setDraft({ ...draft, source: e.target.value })}>{!["Thá»§ cÃ´ng", "TradingView", "CSV Â· Broker VN", "MetaTrader 5", "Binance", "Bybit", "CQG / MXV", "Webhook tá»± Ä‘á»™ng"].includes(draft.source) && <option value={draft.source}>{draft.source}</option>}<option>Thá»§ cÃ´ng</option><option>TradingView</option><option>CSV Â· Broker VN</option><option>MetaTrader 5</option><option>Binance</option><option>Bybit</option><option>CQG / MXV</option><option>Webhook tá»± Ä‘á»™ng</option></select></label>
+              </div>
+            </section>
+            <section className="form-section"><div className="form-section-title"><span>02</span><div><h3>Káº¿ hoáº¡ch giÃ¡ & rá»§i ro</h3><p>Ghi trÆ°á»›c Ä‘iá»ƒm vÃ´ hiá»‡u vÃ  lá»£i nhuáº­n ká»³ vá»ng</p></div></div>
+              <div className="form-grid three">
+                <label>Rá»§i ro dá»± kiáº¿n (VNÄ) *<input type="number" inputMode="numeric" min="10000" step="10000" value={draft.risk} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, risk: normalizeNumericInput(e.target.value) })} placeholder="VÃ­ dá»¥: 1.000.000" required /><small>Sá»‘ tiá»n cháº¥p nháº­n máº¥t náº¿u SL bá»‹ cháº¡m.</small></label>
+                <label>Khá»‘i lÆ°á»£ng<input type="number" inputMode="decimal" step="any" min="0" value={draft.quantity} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, quantity: normalizeNumericInput(e.target.value) })} placeholder="0.1 / 500" /></label>
+                <label>GiÃ¡ vÃ o<input type="number" inputMode="decimal" step="any" min="0" value={draft.entryPrice} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, entryPrice: normalizeNumericInput(e.target.value) })} placeholder="Entry" /></label>
+                <label>GiÃ¡ cáº¯t lá»— (SL)<input type="number" inputMode="decimal" step="any" min="0" value={draft.stopLoss} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, stopLoss: normalizeNumericInput(e.target.value) })} placeholder="Invalidation" /></label>
+                <label>GiÃ¡ chá»‘t lá»i (TP)<input type="number" inputMode="decimal" step="any" min="0" value={draft.takeProfit} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, takeProfit: normalizeNumericInput(e.target.value) })} placeholder="Target" /></label>
+                <div className={`planned-rr-card ${draftPlannedRr !== null && draftPlannedRr >= 2 ? "ready" : ""}`}><span>R:R Káº¾ HOáº CH</span><strong>{draftPlannedRr === null ? "â€”" : `1:${draftPlannedRr.toFixed(2)}`}</strong><small>{!draftHasPricePlan ? "Nháº­p Entry, SL vÃ  TP" : draftPlannedRr === null ? `Kiá»ƒm tra vá»‹ trÃ­ giÃ¡ cho lá»‡nh ${draft.side}` : draftPlannedRr >= 2 ? "Äáº¡t ngÆ°á»¡ng ká»³ vá»ng" : "DÆ°á»›i ngÆ°á»¡ng 1:2"}</small></div>
+              </div>
+            </section>
+            <section className="form-section"><div className="form-section-title"><span>03</span><div><h3>Káº¿t quáº£ thá»±c táº¿</h3><p>TÃ¡ch P&L trÆ°á»›c phÃ­ vÃ  chi phÃ­ Ä‘á»ƒ giá»¯ sá»‘ liá»‡u nháº¥t quÃ¡n</p></div></div>
+              <div className="form-grid four">
+                <label>P&L trÆ°á»›c phÃ­ (VNÄ) *<input type="number" inputMode="numeric" step="10000" value={draft.pnl} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, pnl: normalizeNumericInput(e.target.value) })} placeholder="LÃ£i dÆ°Æ¡ng, lá»— Ã¢m" required /></label>
+                <label>PhÃ­ giao dá»‹ch (VNÄ)<input type="number" inputMode="numeric" min="0" step="1000" value={draft.fees} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, fees: normalizeNumericInput(e.target.value) })} placeholder="0" /></label>
+                <label>GiÃ¡ thoÃ¡t<input type="number" inputMode="decimal" step="any" min="0" value={draft.exitPrice} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, exitPrice: normalizeNumericInput(e.target.value) })} placeholder="Exit" /></label>
+                <label>Thá»i gian giá»¯ (phÃºt)<input type="number" inputMode="numeric" min="0" value={draft.durationMin} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, durationMin: normalizeNumericInput(e.target.value) })} placeholder="VÃ­ dá»¥: 90" /></label>
+              </div>
+              <div className="trade-result-preview"><article><span>P&L RÃ’NG SAU PHÃ</span><strong className={draftNetPnl === null ? "" : draftNetPnl >= 0 ? "positive-text" : "negative-text"}>{draftNetPnl === null ? "â€”" : money(draftNetPnl)}</strong></article><article><span>Káº¾T QUáº¢ THEO R</span><strong className={draftActualR === null ? "" : draftActualR >= 0 ? "positive-text" : "negative-text"}>{draftActualR === null ? "â€”" : `${draftActualR >= 0 ? "+" : ""}${draftActualR.toFixed(2)}R`}</strong></article><article><span>PHÃ‚N LOáº I</span><strong>{draftNetPnl === null ? "ChÆ°a cÃ³ káº¿t quáº£" : draftNetPnl > 0 ? "Lá»‡nh tháº¯ng" : draftNetPnl < 0 ? "Lá»‡nh thua" : "HÃ²a vá»‘n"}</strong></article></div>
+            </section>
+            <section className="form-section"><div className="form-section-title"><span>04</span><div><h3>Checklist ká»· luáº­t</h3><p>Cháº¥m cháº¥t lÆ°á»£ng quyáº¿t Ä‘á»‹nh Ä‘á»™c láº­p vá»›i lá»i hoáº·c lá»—</p></div><strong className="discipline-live-score">{draftDiscipline}%</strong></div>
+              <div className="check-grid professional-check-grid">{([
+                ["plan", "ÄÃºng setup & káº¿ hoáº¡ch", "CÃ³ luáº­n Ä‘iá»ƒm, entry, invalidation vÃ  target rÃµ rÃ ng"],
+                ["noFomo", "Chá» Ä‘Ãºng tÃ­n hiá»‡u", "KhÃ´ng Ä‘uá»•i giÃ¡, khÃ´ng vÃ o sá»›m vÃ¬ FOMO"],
+                ["noRevenge", "ÄÃºng rá»§i ro & quáº£n lÃ½", "KhÃ´ng ná»›i SL, gá»“ng lá»— hoáº·c tráº£ thÃ¹ thá»‹ trÆ°á»ng"],
+                ["screenshot", "Äá»§ báº±ng chá»©ng", "CÃ³ áº£nh trÆ°á»›c vÃ  sau lá»‡nh Ä‘á»ƒ review"],
+              ] as const).map(([key, label, description]) => <label key={key}><input type="checkbox" checked={draft[key]} onChange={(e) => setDraft({ ...draft, [key]: e.target.checked })} /><span>âœ“</span><p><strong>{label}</strong><small>{description}</small></p></label>)}</div>
+            </section>
+            <section className="form-section"><div className="form-section-title"><span>05</span><div><h3>Báº±ng chá»©ng & review</h3><p>LÆ°u áº£nh, Ä‘á»‘i chiáº¿u káº¿ hoáº¡ch vÃ  chá»‘t má»™t hÃ nh Ä‘á»™ng cáº£i thiá»‡n</p></div></div>
+              <div className="evidence-review-grid"><div><label className="trade-image-drop"><input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={selectDraftImages} /><ImagePlus size={22} /><strong>{draftImages.length ? `ÄÃ£ chá»n ${draftImages.length}/4 áº£nh` : "ThÃªm áº£nh trÆ°á»›c / sau lá»‡nh"}</strong><span>JPG, PNG, WEBP Â· tá»‘i Ä‘a 6 MB/áº£nh</span></label>{draftImagePreviews.length > 0 && <div className="draft-image-grid">{draftImagePreviews.map((preview, index) => <figure key={`${preview.file.name}-${preview.file.lastModified}-${index}`}><img src={preview.url} alt={`áº¢nh xem trÆ°á»›c ${index + 1}`} /><figcaption><span>{preview.file.name}</span><button type="button" onClick={() => setDraftImages((current) => current.filter((_, itemIndex) => itemIndex !== index))} aria-label={`Bá» áº£nh ${preview.file.name}`}>Ã—</button></figcaption></figure>)}</div>}</div>
+                <div className="trade-review-field"><div><label htmlFor="trade-review-note">Review giao dá»‹ch</label><button type="button" onClick={insertTradeReviewTemplate}><BookOpen size={14} /> ChÃ¨n khung review</button></div><textarea id="trade-review-note" value={draft.note} onChange={(e) => setDraft({ ...draft, note: e.target.value })} placeholder="Ghi dá»¯ kiá»‡n, sai lá»‡ch, bÃ i há»c vÃ  má»™t hÃ nh Ä‘á»™ng cá»¥ thá»ƒ..." /><small>KhÃ´ng thay Ä‘á»•i há»‡ thá»‘ng chá»‰ vÃ¬ má»™t lá»‡nh; hÃ£y ghi Ä‘iá»u cÃ³ thá»ƒ kiá»ƒm chá»©ng.</small></div>
+              </div>
+            </section>
+          </div>
+          <aside className="trade-form-summary" aria-label="TÃ³m táº¯t giao dá»‹ch">
+            <div className="trade-summary-head"><span className="eyebrow">TRADE SNAPSHOT</span><strong>{draft.symbol.trim().toUpperCase() || "CHÆ¯A NHáº¬P MÃƒ"}</strong><small>{draft.market} Â· {draft.side} Â· {draft.timeframe}</small></div>
+            <span className={`trade-ready-state ${draftReady ? "ready" : "pending"}`}><i />{draftReady ? "Äá»§ dá»¯ liá»‡u báº¯t buá»™c" : "Cáº§n hoÃ n thiá»‡n dá»¯ liá»‡u"}</span>
+            <div className="trade-summary-metrics"><article><span>R:R káº¿ hoáº¡ch</span><strong>{draftPlannedRr === null ? "â€”" : `1:${draftPlannedRr.toFixed(2)}`}</strong></article><article><span>Káº¿t quáº£</span><strong>{draftActualR === null ? "â€”" : `${draftActualR >= 0 ? "+" : ""}${draftActualR.toFixed(2)}R`}</strong></article><article><span>Ká»· luáº­t</span><strong>{draftDiscipline}%</strong></article><article><span>Há»“ sÆ¡</span><strong>{draftCompleteness}%</strong></article></div>
+            <div className="trade-summary-checks"><span>KIá»‚M TRA TRÆ¯á»šC KHI LÆ¯U</span>{[
+              [Boolean(draft.date && draft.symbol.trim()), "NgÃ y vÃ  sáº£n pháº©m"],
+              [draft.setup !== UNCLASSIFIED_SETUP, "Setup Ä‘Ã£ phÃ¢n loáº¡i"],
+              [Number.isFinite(draftRiskValue) && draftRiskValue > 0, "Rá»§i ro dá»± kiáº¿n há»£p lá»‡"],
+              [draftPnlValue !== null && Number.isFinite(draftPnlValue), "P&L trÆ°á»›c phÃ­"],
+              [draftHasPricePlan && draftPlannedRr !== null, "Entry Â· SL Â· TP há»£p lá»‡"],
+              [draft.screenshot || draftImages.length > 0, "áº¢nh trÆ°á»›c / sau lá»‡nh"],
+              [Boolean(draft.note.trim()), "Review cÃ³ hÃ nh Ä‘á»™ng"],
+            ].map(([done, label]) => <div className={done ? "done" : ""} key={String(label)}><i>{done ? "âœ“" : "Â·"}</i><span>{label}</span></div>)}</div>
+            <div className="trade-summary-principle"><ShieldCheck size={16} /><p><span>NGUYÃŠN Táº®C</span><strong>Cháº¥t lÆ°á»£ng há»“ sÆ¡ quan trá»ng hÆ¡n viá»‡c cá»‘ lÃ m Ä‘áº¹p káº¿t quáº£.</strong></p></div>
+          </aside>
+        </div>
+        <div className="modal-actions professional-modal-actions"><div><span className={draftReady ? "ready" : ""}><i />{draftReady ? "Sáºµn sÃ ng lÆ°u" : "CÃ²n thiáº¿u trÆ°á»ng báº¯t buá»™c"}</span><small>{draftCompleteness}% Ä‘á»™ hoÃ n thiá»‡n há»“ sÆ¡</small></div><button type="button" className="ghost-button" onClick={() => { setModalOpen(false); setEditingTradeId(null); }}>Há»§y</button><button type="submit" className="gold-button compact">{editingTradeId ? "LÆ°u thay Ä‘á»•i" : "LÆ°u giao dá»‹ch"}</button></div>
+      </form></div>}
+      {connectProvider && <div className="modal-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) { setConnectProvider(null); setWebhookToken(""); } }}><form className="connection-modal" role="dialog" aria-modal="true" aria-labelledby="connection-dialog-title" onSubmit={saveConnection}>
+        <div className="modal-head"><div><span className="eyebrow">BROKER CONNECTION</span><h2 id="connection-dialog-title">{BROKERS.find((broker) => broker.provider === connectProvider)?.name}</h2><p>{BROKERS.find((broker) => broker.provider === connectProvider)?.mode}</p></div><button type="button" className="modal-close" onClick={() => { setConnectProvider(null); setWebhookToken(""); }} aria-label="ÄÃ³ng">Ã—</button></div>
+        {connectProvider === "webhook" ? <div className="connection-body">
+          {webhookToken ? <>
+            <div className="connection-notice amber"><KeyRound size={18} /><div><strong>LÆ°u token ngay â€” chá»‰ hiá»ƒn thá»‹ má»™t láº§n</strong><p>Náº¿u máº¥t token, hÃ£y táº¡o token má»›i; token cÅ© sáº½ ngá»«ng hoáº¡t Ä‘á»™ng.</p></div></div>
+            <div className="webhook-token-box"><span>BEARER TOKEN</span><code>{webhookToken}</code><button type="button" onClick={() => void copyWebhookToken()}><Copy size={15} /> Sao chÃ©p token</button></div>
+            <label className="code-label">Endpoint nháº­n lá»‡nh<pre>POST {WEBHOOK_ENDPOINT}</pre></label>
+            <p className="connection-help">Bridge gá»­i header <b>Authorization: Bearer TOKEN</b>. Má»—i lá»‡nh cáº§n externalId, market vÃ  symbol; há»‡ thá»‘ng chá»‘ng nháº­p trÃ¹ng theo mÃ£ lá»‡nh.</p>
+          </> : <>
+            <div className="connection-notice"><KeyRound size={18} /><div><strong>Má»™t token riÃªng cho bridge giao dá»‹ch</strong><p>Token chá»‰ dÃ¹ng Ä‘á»ƒ ghi lá»‡nh vÃ o journal, khÃ´ng cÃ³ quyá»n Ä‘á»c dá»¯ liá»‡u hoáº·c Ä‘áº·t lá»‡nh broker.</p></div></div>
+            <label>TÃªn káº¿t ná»‘i<input value={connectionDraft.label} onChange={(e) => setConnectionDraft({ ...connectionDraft, label: e.target.value })} placeholder="VÃ­ dá»¥: Bridge broker riÃªng" required /></label>
+            <div className="webhook-flow"><div><b>Broker / sÃ n</b><span>Khá»›p hoáº·c Ä‘Ã³ng lá»‡nh</span></div><i>â†’</i><div><b>Bridge</b><span>Chuáº©n hÃ³a JSON</span></div><i>â†’</i><div><b>Journal</b><span>Tá»± chá»‘ng trÃ¹ng</span></div></div>
+            <label className="code-label">Máº«u payload<pre>{`{
+  "externalId": "deal-123456",
+  "market": "Forex",
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "closedAt": "2026-08-08T09:30:00Z",
+  "pnl": 1250000,
+  "fees": 45000,
+  "quantity": 0.2,
+  "entryPrice": 1.1625,
+  "exitPrice": 1.1649
+}`}</pre></label>
+            <p className="connection-help">Market nháº­n: Chá»©ng khoÃ¡n, Forex, Crypto vÃ  HÃ ng hÃ³a. CÃ³ thá»ƒ gá»­i má»™t lá»‡nh, má»™t máº£ng hoáº·c {`{"trades": [...]}`} tá»‘i Ä‘a 500 lá»‡nh/láº§n.</p>
+          </>}
+        </div> : isBridgeProvider(connectProvider) ? <div className="connection-body">
+          {webhookToken ? <>
+            <div className="connection-notice amber"><KeyRound size={18} /><div><strong>LÆ°u token {BRIDGE_DETAILS[connectProvider].source} ngay</strong><p>Token chá»‰ hiá»ƒn thá»‹ láº§n nÃ y. Táº¡o token má»›i sáº½ vÃ´ hiá»‡u token cÅ©.</p></div></div>
+            <div className="webhook-token-box"><span>BEARER TOKEN</span><code>{webhookToken}</code><button type="button" onClick={() => void copyWebhookToken()}><Copy size={15} /> Sao chÃ©p token</button></div>
+            <label className="code-label">Endpoint Push 24/7<pre>POST {WEBHOOK_ENDPOINT}</pre></label>
+            <p className="connection-help">Gá»­i header <b>Authorization: Bearer TOKEN</b>. Vá»›i {BRIDGE_DETAILS[connectProvider].source}, market máº·c Ä‘á»‹nh lÃ  <b>{BRIDGE_DETAILS[connectProvider].market}</b>; chá»‰ cáº§n externalId vÃ  symbol Ä‘á»ƒ Ä‘á»‹nh danh lá»‡nh.</p>
+          </> : <>
+            <div className="connection-notice"><ShieldCheck size={18} /><div><strong>Bridge tÃ¡ch biá»‡t khá»i tÃ i khoáº£n giao dá»‹ch</strong><p>{BRIDGE_DETAILS[connectProvider].notice}</p></div></div>
+            <label>TÃªn káº¿t ná»‘i<input value={connectionDraft.label} onChange={(e) => setConnectionDraft({ ...connectionDraft, label: e.target.value })} required /></label>
+            <div className="sync-mode-options" role="group" aria-label="Chá»n cháº¿ Ä‘á»™ Ä‘á»“ng bá»™">
+              <button type="button" className={connectionDraft.accountType === "push" ? "active" : ""} onClick={() => setConnectionDraft({ ...connectionDraft, accountType: "push" })}><strong>Push 24/7</strong><span>KhuyÃªn dÃ¹ng Â· bridge chá»§ Ä‘á»™ng gá»­i</span></button>
+              <button type="button" className={connectionDraft.accountType === "pull" ? "active" : ""} onClick={() => setConnectionDraft({ ...connectionDraft, accountType: "pull" })}><strong>Pull bridge</strong><span>Kiá»ƒm tra khi má»Ÿ app + má»—i 15 phÃºt</span></button>
+            </div>
+            {connectionDraft.accountType === "push" ? <>
+              {BRIDGE_DETAILS[connectProvider].foreignCurrency && <label>Tá»· giÃ¡ tiá»n tÃ i khoáº£n â†’ VNÄ<input type="number" min="1" value={connectionDraft.fxRate} onFocus={selectNumericInput} onChange={(e) => setConnectionDraft({ ...connectionDraft, fxRate: normalizeNumericInput(e.target.value) })} /><small>P/L, risk vÃ  phÃ­ tá»« bridge sáº½ Ä‘Æ°á»£c nhÃ¢n vá»›i tá»· giÃ¡ nÃ y.</small></label>}
+              <div className="webhook-flow"><div><b>{BRIDGE_DETAILS[connectProvider].source}</b><span>Lá»‡nh Ä‘Ã£ khá»›p/Ä‘Ã³ng</span></div><i>â†’</i><div><b>Bridge 24/7</b><span>Gá»­i JSON báº£o máº­t</span></div><i>â†’</i><div><b>Journal</b><span>Chá»‘ng trÃ¹ng tá»± Ä‘á»™ng</span></div></div>
+              <label className="code-label">Payload tá»‘i thiá»ƒu má»Ÿ rá»™ng<pre>{bridgePayloadExample(connectProvider)}</pre></label>
+              <p className="connection-help">Sau khi lÆ°u, app cáº¥p má»™t token ghi dá»¯ liá»‡u riÃªng. Bridge cÃ³ thá»ƒ gá»­i má»™t object, má»™t máº£ng hoáº·c {`{"trades": [...]}`} tá»‘i Ä‘a 500 lá»‡nh/láº§n.</p>
+            </> : <>
+              <div className="form-grid two"><label>Bridge HTTPS<input type="url" value={connectionDraft.bridgeUrl} onChange={(e) => setConnectionDraft({ ...connectionDraft, bridgeUrl: e.target.value })} placeholder="https://bridge-cua-ban.example/trades" required /></label><label>Bridge token<input type="password" autoComplete="new-password" value={connectionDraft.bridgeToken} onChange={(e) => setConnectionDraft({ ...connectionDraft, bridgeToken: e.target.value })} required /></label></div>
+              {BRIDGE_DETAILS[connectProvider].foreignCurrency && <label>Tá»· giÃ¡ tiá»n tÃ i khoáº£n â†’ VNÄ<input type="number" min="1" value={connectionDraft.fxRate} onFocus={selectNumericInput} onChange={(e) => setConnectionDraft({ ...connectionDraft, fxRate: normalizeNumericInput(e.target.value) })} /><small>P/L, risk vÃ  phÃ­ tá»« bridge sáº½ Ä‘Æ°á»£c nhÃ¢n vá»›i tá»· giÃ¡ nÃ y.</small></label>}
+              <label className="code-label">Response bridge Ä‘Æ°á»£c cháº¥p nháº­n<pre>{`[{ ...trade }]
+hoáº·c
+{ "trades": [{ ...trade }] }`}</pre></label>
+              <p className="connection-help">Journal gá»i endpoint HTTPS vá»›i header Bearer, nháº­n tá»‘i Ä‘a 1.000 lá»‡nh/láº§n vÃ  tá»± chá»‘ng trÃ¹ng báº±ng externalId.</p>
+            </>}
+          </>}
+        </div> : connectProvider === "tradingview" ? <div className="connection-body"><div className="connection-notice amber"><span>!</span><div><strong>TradingView gá»­i alert báº±ng webhook</strong><p>DÃ¹ng Auto Import Hub lÃ m endpoint báº£o máº­t. KhÃ´ng Ä‘Æ°a máº­t kháº©u broker vÃ o ná»™i dung alert.</p></div></div><div className="webhook-flow"><div><b>TradingView</b><span>Alert JSON</span></div><i>â†’</i><div><b>Bridge</b><span>GhÃ©p káº¿t quáº£ lá»‡nh</span></div><i>â†’</i><div><b>Tuan Trader</b><span>Gáº¯n vÃ o journal</span></div></div><label className="code-label">Máº«u JSON alert<pre>{`{
+  "symbol": "{{ticker}}",
+  "side": "BUY",
+  "price": "{{close}}",
+  "time": "{{timenow}}",
+  "market": "Crypto"
+}`}</pre></label><p className="connection-help">Alert lÃ  tÃ­n hiá»‡u; káº¿t quáº£ P/L nÃªn láº¥y tá»« execution cá»§a Binance, Bybit, MT5 hoáº·c bridge broker Ä‘á»ƒ trÃ¡nh ghi nháº­n sai.</p></div> : connectProvider === "vn-broker" ? <div className="connection-body"><div className="connection-notice"><span>CSV</span><div><strong>Äá»‹nh dáº¡ng Ä‘Æ°á»£c nháº­n tá»± Ä‘á»™ng</strong><p>App dÃ² cÃ¡c cá»™t tÆ°Æ¡ng Ä‘Æ°Æ¡ng: ngÃ y, mÃ£, mua/bÃ¡n, khá»‘i lÆ°á»£ng, giÃ¡, phÃ­ vÃ  lÃ£i/lá»—.</p></div></div><label>Broker<select value={connectionDraft.brokerName} onChange={(e) => setConnectionDraft({ ...connectionDraft, brokerName: e.target.value })}><option>VPS</option><option>SSI</option><option>TCBS</option><option>VNDIRECT</option><option>MBS</option><option>HSC</option><option>Broker VN</option></select></label><label className="gold-button compact file-button large">Chá»n file CSV<input type="file" accept=".csv,.txt,text/csv" multiple data-market="Chá»©ng khoÃ¡n" data-broker={connectionDraft.brokerName} onChange={(event) => { void importCsv(event); setConnectProvider(null); }} /></label></div> : <div className="connection-body">
+          <div className="connection-notice"><span>â—‡</span><div><strong>Chá»‰ cáº¥p quyá»n Ä‘á»c lá»‹ch sá»­</strong><p>Táº¯t quyá»n Trade vÃ  Withdraw. API secret Ä‘Æ°á»£c mÃ£ hÃ³a trÆ°á»›c khi lÆ°u.</p></div></div>
+          <div className="form-grid two"><label>TÃªn káº¿t ná»‘i<input value={connectionDraft.label} onChange={(e) => setConnectionDraft({ ...connectionDraft, label: e.target.value })} required /></label><label>Loáº¡i tÃ i khoáº£n<select value={connectionDraft.accountType} onChange={(e) => setConnectionDraft({ ...connectionDraft, accountType: e.target.value })}><option value={connectProvider === "bybit" ? "linear" : "futures"}>PhÃ¡i sinh / Futures</option><option value="spot">Spot</option></select></label></div>
+          <><div className="form-grid two"><label>API key<input type="password" autoComplete="new-password" value={connectionDraft.apiKey} onChange={(e) => setConnectionDraft({ ...connectionDraft, apiKey: e.target.value })} required /></label><label>API secret<input type="password" autoComplete="new-password" value={connectionDraft.apiSecret} onChange={(e) => setConnectionDraft({ ...connectionDraft, apiSecret: e.target.value })} required /></label></div>{connectProvider === "binance" && <label>Symbols cáº§n Ä‘á»“ng bá»™<input value={connectionDraft.symbols} onChange={(e) => setConnectionDraft({ ...connectionDraft, symbols: e.target.value })} placeholder="BTCUSDT, ETHUSDT" /></label>}</>
+          <label>Tá»· giÃ¡ USD/USDT â†’ VNÄ<input type="number" min="1" value={connectionDraft.fxRate} onFocus={selectNumericInput} onChange={(e) => setConnectionDraft({ ...connectionDraft, fxRate: normalizeNumericInput(e.target.value) })} /><small>DÃ¹ng Ä‘á»ƒ há»£p nháº¥t P/L crypto vÃ  forex vÃ o dashboard VNÄ.</small></label>
+        </div>}
+        <div className="modal-actions"><button type="button" className="ghost-button" onClick={() => { setConnectProvider(null); setWebhookToken(""); }}>{webhookToken ? "ÄÃ³ng" : "Há»§y"}</button>{connectProvider === "tradingview" ? <button type="submit" className="gold-button compact">ÄÃ£ hiá»ƒu</button> : connectProvider === "webhook" || (isBridgeProvider(connectProvider) && connectionDraft.accountType === "push") ? webhookToken ? <button type="button" className="gold-button compact" onClick={() => { setConnectProvider(null); setWebhookToken(""); }}>ÄÃ£ lÆ°u token</button> : <button type="submit" className="gold-button compact">{connectProvider === "webhook" ? "Táº¡o khÃ³a báº£o máº­t" : "Táº¡o káº¿t ná»‘i & token"}</button> : connectProvider !== "vn-broker" && <button type="submit" className="gold-button compact">LÆ°u káº¿t ná»‘i</button>}</div>
+      </form></div>}
+      {activeImage && <div className="image-viewer-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setActiveImage(null); }}><section className="image-viewer" role="dialog" aria-modal="true" aria-labelledby="image-viewer-title"><header><div><span className="eyebrow">áº¢NH GIAO Dá»ŠCH</span><h2 id="image-viewer-title">{activeImageTrade?.symbol ?? "Biá»ƒu Ä‘á»“"} Â· {activeImageTrade?.side ?? ""}</h2><p>{activeImageTrade ? DATE.format(new Date(`${activeImageTrade.date}T12:00:00`)) : ""} Â· {activeImage.filename}</p></div><button type="button" onClick={() => setActiveImage(null)} aria-label="ÄÃ³ng áº£nh">Ã—</button></header><div className="image-viewer-stage"><img src={activeImage.url} alt={`Biá»ƒu Ä‘á»“ ${activeImageTrade?.symbol ?? "giao dá»‹ch"}`} /></div>{activeImageSiblings.length > 1 && <div className="image-viewer-thumbs">{activeImageSiblings.map((image) => <button type="button" className={image.id === activeImage.id ? "active" : ""} key={image.id} onClick={() => setActiveImage(image)}><img src={image.url} alt={image.filename} /></button>)}</div>}<footer><span>{(activeImage.sizeBytes / 1024 / 1024).toFixed(1)} MB Â· lÆ°u riÃªng tÆ°</span><button type="button" className="image-delete-button" onClick={() => void deleteTradeImage(activeImage)}><Trash2 size={15} /> XÃ³a áº£nh</button></footer></section></div>}
+      {toast && <div className="toast" role="status"><span>âœ“</span>{toast}</div>}
+    </div>
+  );
+}

@@ -1,4 +1,4 @@
-≠rá^—f•ñÿ¶{NÏy 'v√Æ∂õ≠const cloudflareWorkersStub = new URL(
+const cloudflareWorkersStub = new URL(
   "./cloudflare-workers-validation-stub.mjs",
   import.meta.url,
 ).href;
