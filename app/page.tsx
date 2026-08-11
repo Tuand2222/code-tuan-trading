@@ -96,6 +96,8 @@ type Trade = {
   fees?: number;
   quantity?: number;
   entryPrice?: number;
+  stopLoss?: number;
+  takeProfit?: number;
   exitPrice?: number;
 };
 
@@ -109,7 +111,7 @@ type TradeImage = {
   url: string;
 };
 
-type DraftTrade = Omit<Trade, "id" | "discipline" | "durationMin" | "market" | "source" | "risk" | "pnl" | "fees" | "quantity" | "entryPrice" | "exitPrice"> & {
+type DraftTrade = Omit<Trade, "id" | "discipline" | "durationMin" | "market" | "source" | "risk" | "pnl" | "fees" | "quantity" | "entryPrice" | "stopLoss" | "takeProfit" | "exitPrice"> & {
   market: Market;
   source: string;
   risk: string;
@@ -118,6 +120,8 @@ type DraftTrade = Omit<Trade, "id" | "discipline" | "durationMin" | "market" | "
   fees: string;
   quantity: string;
   entryPrice: string;
+  stopLoss: string;
+  takeProfit: string;
   exitPrice: string;
   plan: boolean;
   noFomo: boolean;
@@ -325,6 +329,20 @@ const NOTE_TEMPLATES = [
 - Một mục tiêu hành vi có thể đo lường:`,
   },
 ] as const;
+
+const TRADE_REVIEW_TEMPLATE = `BỐI CẢNH & LUẬN ĐIỂM
+- Dữ kiện khách quan trước khi vào lệnh:
+- Vì sao setup này có lợi thế:
+- Điều kiện làm luận điểm mất hiệu lực:
+
+THỰC THI
+- Điều đã làm đúng theo kế hoạch:
+- Sai lệch trong entry / quản lý / thoát lệnh:
+- Tâm lý ảnh hưởng đến quyết định:
+
+KẾT LUẬN
+- Một bài học có thể kiểm chứng:
+- Một hành động cụ thể cho lệnh tiếp theo:`;
 
 const MARKETS: { id: "all" | Market; label: string; icon: string }[] = [
   { id: "all", label: "Tất cả", icon: "◎" },
@@ -570,6 +588,8 @@ function csvToTrades(text: string, brokerName: string, market: Market): Trade[] 
       source: `CSV · ${brokerName}`,
       quantity: parseNumeric(get("quantity")),
       entryPrice: parseNumeric(get("entryPrice")),
+      stopLoss: parseNumeric(get("stopLoss")),
+      takeProfit: parseNumeric(get("takeProfit")),
       exitPrice: parseNumeric(get("exitPrice")) || parseNumeric(get("entryPrice")),
       fees: Math.abs(parseNumeric(get("fees"))),
     } as Trade;
@@ -579,23 +599,25 @@ function csvToTrades(text: string, brokerName: string, market: Market): Trade[] 
 function makeDraft(): DraftTrade {
   return {
     date: new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Ho_Chi_Minh" }).format(new Date()),
-    symbol: "BẠC",
+    symbol: "",
     side: "Buy",
     session: "New York",
-    setup: "Breakout + Retest",
+    setup: UNCLASSIFIED_SETUP,
     timeframe: "H1",
-    risk: "1000000",
+    risk: "",
     pnl: "",
-    psychology: "Bình tĩnh",
+    psychology: "Chưa review",
     note: "",
-    durationMin: "120",
+    durationMin: "",
     fees: "",
     quantity: "",
     entryPrice: "",
+    stopLoss: "",
+    takeProfit: "",
     exitPrice: "",
-    plan: true,
-    noFomo: true,
-    noRevenge: true,
+    plan: false,
+    noFomo: false,
+    noRevenge: false,
     screenshot: false,
     market: "Hàng hóa",
     source: "Thủ công",
@@ -615,11 +637,13 @@ function makeDraftFromTrade(trade: Trade): DraftTrade {
     pnl: String(trade.pnl),
     psychology: trade.psychology,
     note: trade.note,
-    durationMin: String(trade.durationMin),
-    fees: String(trade.fees ?? 0),
-    quantity: String(trade.quantity ?? 0),
-    entryPrice: String(trade.entryPrice ?? 0),
-    exitPrice: String(trade.exitPrice ?? 0),
+    durationMin: trade.durationMin ? String(trade.durationMin) : "",
+    fees: trade.fees ? String(trade.fees) : "",
+    quantity: trade.quantity ? String(trade.quantity) : "",
+    entryPrice: trade.entryPrice ? String(trade.entryPrice) : "",
+    stopLoss: trade.stopLoss ? String(trade.stopLoss) : "",
+    takeProfit: trade.takeProfit ? String(trade.takeProfit) : "",
+    exitPrice: trade.exitPrice ? String(trade.exitPrice) : "",
     plan: checked >= 1,
     noFomo: checked >= 2,
     noRevenge: checked >= 3,
@@ -1054,8 +1078,8 @@ export default function Home() {
     event.preventDefault();
     const risk = Number(draft.risk);
     const pnl = Number(draft.pnl);
-    if (!draft.date || !draft.symbol.trim() || !Number.isFinite(risk) || risk <= 0 || !Number.isFinite(pnl)) {
-      setToast("Vui lòng nhập đủ ngày, sản phẩm, rủi ro và lãi/lỗ.");
+    if (!draft.date || !draft.symbol.trim() || draft.setup === UNCLASSIFIED_SETUP || !Number.isFinite(risk) || risk <= 0 || !Number.isFinite(pnl)) {
+      setToast("Vui lòng nhập ngày, sản phẩm, setup, rủi ro và P&L trước phí.");
       return;
     }
     const checks = [draft.plan, draft.noFomo, draft.noRevenge, draft.screenshot];
@@ -1079,6 +1103,8 @@ export default function Home() {
       fees: Number(draft.fees) || 0,
       quantity: Number(draft.quantity) || 0,
       entryPrice: Number(draft.entryPrice) || 0,
+      stopLoss: Number(draft.stopLoss) || 0,
+      takeProfit: Number(draft.takeProfit) || 0,
       exitPrice: Number(draft.exitPrice) || 0,
       externalId: existing?.externalId,
       accountId: existing?.accountId,
@@ -1165,6 +1191,16 @@ export default function Home() {
       ? `${current.trim()}\n\n────────────────────\n\n${template.content}`
       : template.content);
     setToast(`Đã chèn mẫu “${template.label}”.`);
+  };
+
+  const insertTradeReviewTemplate = () => {
+    setDraft((current) => ({
+      ...current,
+      note: current.note.trim()
+        ? `${current.note.trim()}\n\n────────────────────\n\n${TRADE_REVIEW_TEMPLATE}`
+        : TRADE_REVIEW_TEMPLATE,
+    }));
+    setToast("Đã chèn khung review vào giao dịch.");
   };
 
   const exportBackup = () => {
@@ -1799,6 +1835,30 @@ export default function Home() {
     }
   };
 
+  const draftRiskValue = Number(draft.risk);
+  const draftPnlValue = draft.pnl === "" ? null : Number(draft.pnl);
+  const draftFeesValue = Number(draft.fees) || 0;
+  const draftEntryValue = Number(draft.entryPrice);
+  const draftStopValue = Number(draft.stopLoss);
+  const draftTargetValue = Number(draft.takeProfit);
+  const draftPriceRisk = draft.side === "Buy" ? draftEntryValue - draftStopValue : draftStopValue - draftEntryValue;
+  const draftPriceReward = draft.side === "Buy" ? draftTargetValue - draftEntryValue : draftEntryValue - draftTargetValue;
+  const draftHasPricePlan = draftEntryValue > 0 && draftStopValue > 0 && draftTargetValue > 0;
+  const draftPlannedRr = draftHasPricePlan && draftPriceRisk > 0 && draftPriceReward > 0 ? draftPriceReward / draftPriceRisk : null;
+  const draftNetPnl = draftPnlValue === null || !Number.isFinite(draftPnlValue) ? null : draftPnlValue - draftFeesValue;
+  const draftActualR = draftNetPnl !== null && draftRiskValue > 0 ? draftNetPnl / draftRiskValue : null;
+  const draftChecks = [draft.plan, draft.noFomo, draft.noRevenge, draft.screenshot];
+  const draftDiscipline = Math.round((draftChecks.filter(Boolean).length / draftChecks.length) * 100);
+  const draftRequired = [
+    Boolean(draft.date),
+    Boolean(draft.symbol.trim()),
+    draft.setup !== UNCLASSIFIED_SETUP,
+    Number.isFinite(draftRiskValue) && draftRiskValue > 0,
+    draftPnlValue !== null && Number.isFinite(draftPnlValue),
+  ];
+  const draftQualitySignals = [...draftRequired, draftHasPricePlan, draft.screenshot || draftImages.length > 0, Boolean(draft.note.trim())];
+  const draftCompleteness = Math.round((draftQualitySignals.filter(Boolean).length / draftQualitySignals.length) * 100);
+  const draftReady = draftRequired.every(Boolean);
   const meta = VIEW_META[view];
   return (
     <div className="app-shell">
@@ -1826,25 +1886,73 @@ export default function Home() {
         <footer className="app-footer"><div><span>Tuan Trader · Trading Plan Pro</span><small>{isDemo ? "Dữ liệu minh họa — không phải kết quả thực tế" : dataMode === "cloud" ? "Dữ liệu riêng đã đồng bộ" : "Dữ liệu đang lưu trên thiết bị"} · Không phải khuyến nghị đầu tư.</small></div><nav aria-label="Thông tin website"><a href="/phuong-phap">Phương pháp</a><a href="/bao-mat">Bảo mật dữ liệu</a></nav></footer>
       </main>
 
-      {modalOpen && <div className="modal-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) { setModalOpen(false); setEditingTradeId(null); } }}><form className="trade-modal" role="dialog" aria-modal="true" aria-labelledby="trade-dialog-title" onSubmit={saveTrade}>
-        <div className="modal-head"><div><span className="eyebrow">GHI NHẬT KÝ</span><h2 id="trade-dialog-title">{editingTradeId ? "Cập nhật giao dịch" : "Thêm giao dịch"}</h2><p>{editingTradeId ? "Phân loại setup và hoàn thiện review sau khi lệnh được nhập tự động." : "Ghi đủ dữ liệu để review chính xác hơn."}</p></div><button type="button" className="modal-close" onClick={() => { setModalOpen(false); setEditingTradeId(null); }} aria-label="Đóng">×</button></div>
-        <div className="form-section"><div className="form-section-title"><span>01</span><div><h3>Thông tin chung</h3><p>Sản phẩm, thời gian và bối cảnh giao dịch</p></div></div><div className="form-grid four">
-          <label>Thị trường<select value={draft.market} onChange={(e) => setDraft({ ...draft, market: e.target.value as Market })}><option>Hàng hóa</option><option>Chứng khoán</option><option>Crypto</option><option>Forex</option></select></label>
-          <label>Nguồn dữ liệu<select value={draft.source} onChange={(e) => setDraft({ ...draft, source: e.target.value })}>{!["Thủ công", "TradingView", "CSV · Broker VN", "MetaTrader 5", "Binance", "Bybit", "CQG / MXV", "Webhook tự động"].includes(draft.source) && <option value={draft.source}>{draft.source}</option>}<option>Thủ công</option><option>TradingView</option><option>CSV · Broker VN</option><option>MetaTrader 5</option><option>Binance</option><option>Bybit</option><option>CQG / MXV</option><option>Webhook tự động</option></select></label>
-          <label>Ngày<input type="date" value={draft.date} onChange={(e) => setDraft({ ...draft, date: e.target.value })} required /></label>
-          <label>Sản phẩm<input value={draft.symbol} onChange={(e) => setDraft({ ...draft, symbol: e.target.value })} placeholder="FPT, BTCUSDT, EURUSD..." required /></label>
-          <label>Hướng lệnh<select value={draft.side} onChange={(e) => setDraft({ ...draft, side: e.target.value as Trade["side"] })}><option>Buy</option><option>Sell</option></select></label>
-          <label>Phiên<select value={draft.session} onChange={(e) => setDraft({ ...draft, session: e.target.value as Trade["session"] })}><option>Châu Á</option><option>London</option><option>New York</option></select></label>
-          <label>Setup<select value={draft.setup} onChange={(e) => setDraft({ ...draft, setup: e.target.value })}>{draft.setup !== UNCLASSIFIED_SETUP && !SETUP_OPTIONS.includes(draft.setup) && <option value={draft.setup}>{draft.setup}</option>}<option>{UNCLASSIFIED_SETUP}</option>{SETUP_GROUPS.map((group) => <optgroup label={group.label} key={group.label}>{group.options.map((option) => <option key={option}>{option}</option>)}</optgroup>)}</select></label>
-          <label>Khung thời gian<select value={draft.timeframe} onChange={(e) => setDraft({ ...draft, timeframe: e.target.value })}>{!["Auto", "M1", "M5", "M15", "M30", "H1", "H4", "Daily", "Weekly"].includes(draft.timeframe) && <option value={draft.timeframe}>{draft.timeframe}</option>}<option>Auto</option><option>M1</option><option>M5</option><option>M15</option><option>M30</option><option>H1</option><option>H4</option><option>Daily</option><option>Weekly</option></select></label>
-          <label>Tâm lý<select value={draft.psychology} onChange={(e) => setDraft({ ...draft, psychology: e.target.value })}><option>Chưa review</option><option>Bình tĩnh</option><option>Tự tin</option><option>Trung lập</option><option>Hơi vội</option><option>FOMO</option><option>Căng thẳng</option><option>Trả thù</option></select></label>
-          <label>Thời gian giữ (phút)<input type="number" min="0" value={draft.durationMin} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, durationMin: normalizeNumericInput(e.target.value) })} /></label>
-        </div></div>
-        <div className="form-section"><div className="form-section-title"><span>02</span><div><h3>Rủi ro & Kết quả</h3><p>Mọi số tiền được quy đổi sang VNĐ để phân tích chung</p></div></div><div className="form-grid two"><label>Rủi ro dự kiến (VNĐ)<input type="number" min="10000" step="10000" value={draft.risk} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, risk: normalizeNumericInput(e.target.value) })} required /></label><label>Lãi / Lỗ thực tế (VNĐ)<input type="number" step="10000" value={draft.pnl} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, pnl: normalizeNumericInput(e.target.value) })} placeholder="Ví dụ: 2400000 hoặc -1000000" required /></label></div><div className="form-grid four trade-detail-grid"><label>Khối lượng<input type="number" step="any" min="0" value={draft.quantity} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, quantity: normalizeNumericInput(e.target.value) })} placeholder="0.1 / 500" /></label><label>Giá vào<input type="number" step="any" min="0" value={draft.entryPrice} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, entryPrice: normalizeNumericInput(e.target.value) })} /></label><label>Giá ra<input type="number" step="any" min="0" value={draft.exitPrice} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, exitPrice: normalizeNumericInput(e.target.value) })} /></label><label>Phí (VNĐ)<input type="number" min="0" step="1000" value={draft.fees} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, fees: normalizeNumericInput(e.target.value) })} /></label></div>{Number(draft.risk) > 0 && draft.pnl !== "" && <div className={`rr-preview ${Number(draft.pnl) >= 0 ? "win" : "loss"}`}><span>Kết quả theo R</span><strong>{(Number(draft.pnl) / Number(draft.risk)).toFixed(2)}R</strong></div>}</div>
-        <div className="form-section"><div className="form-section-title"><span>03</span><div><h3>Hình ảnh giao dịch</h3><p>Chọn ảnh trước lệnh, sau lệnh hoặc vùng vào lệnh từ điện thoại</p></div></div><label className="trade-image-drop"><input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={selectDraftImages} /><ImagePlus size={22} /><strong>{draftImages.length ? `Đã chọn ${draftImages.length}/4 ảnh` : "Chạm để chọn hình ảnh"}</strong><span>JPG, PNG, WEBP · tối đa 6 MB/ảnh · lưu riêng tư khi đã đăng nhập</span></label>{draftImagePreviews.length > 0 && <div className="draft-image-grid">{draftImagePreviews.map((preview, index) => <figure key={`${preview.file.name}-${preview.file.lastModified}-${index}`}><img src={preview.url} alt={`Ảnh xem trước ${index + 1}`} /><figcaption><span>{preview.file.name}</span><button type="button" onClick={() => setDraftImages((current) => current.filter((_, itemIndex) => itemIndex !== index))} aria-label={`Bỏ ảnh ${preview.file.name}`}>×</button></figcaption></figure>)}</div>}</div>
-        <div className="form-section"><div className="form-section-title"><span>04</span><div><h3>Checklist kỷ luật</h3><p>Chấm đúng thực tế — dữ liệu này quan trọng hơn kết quả</p></div></div><div className="check-grid">{([['plan','Đúng kế hoạch'],['noFomo','Không FOMO'],['noRevenge','Không revenge trade'],['screenshot','Đã chụp biểu đồ']] as const).map(([key, label]) => <label key={key}><input type="checkbox" checked={draft[key]} onChange={(e) => setDraft({ ...draft, [key]: e.target.checked })} /><span>✓</span>{label}</label>)}</div></div>
-        <div className="form-section"><div className="form-section-title"><span>05</span><div><h3>Review ngắn</h3><p>Viết một điều bạn muốn lặp lại hoặc loại bỏ</p></div></div><label className="full-field">Ghi chú<textarea value={draft.note} onChange={(e) => setDraft({ ...draft, note: e.target.value })} placeholder="Bối cảnh, lý do vào lệnh, điều làm tốt, điều cần sửa..." /></label></div>
-        <div className="modal-actions"><button type="button" className="ghost-button" onClick={() => { setModalOpen(false); setEditingTradeId(null); }}>Hủy</button><button type="submit" className="gold-button compact">{editingTradeId ? "Lưu thay đổi" : "Lưu giao dịch"}</button></div>
+      {modalOpen && <div className="modal-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) { setModalOpen(false); setEditingTradeId(null); } }}><form className="trade-modal professional-trade-modal" role="dialog" aria-modal="true" aria-labelledby="trade-dialog-title" onSubmit={saveTrade}>
+        <div className="modal-head trade-modal-head"><div><span className="eyebrow">TRADE EXECUTION RECORD</span><h2 id="trade-dialog-title">{editingTradeId ? "Cập nhật hồ sơ giao dịch" : "Ghi nhận giao dịch mới"}</h2><p>{editingTradeId ? "Hoàn thiện dữ liệu kế hoạch, kết quả và review cho lệnh đã có." : "Ghi dữ kiện trước, đánh giá quy trình sau — kết quả chỉ là một phần của hồ sơ."}</p></div><div className="trade-modal-head-actions"><span><i /> Trường có dấu * là bắt buộc</span><button type="button" className="modal-close" onClick={() => { setModalOpen(false); setEditingTradeId(null); }} aria-label="Đóng">×</button></div></div>
+        <div className="trade-modal-workspace">
+          <div className="trade-form-flow">
+            <section className="form-section"><div className="form-section-title"><span>01</span><div><h3>Bối cảnh & setup</h3><p>Xác định chính xác lệnh nào đang được đánh giá</p></div></div>
+              <div className="form-grid three">
+                <label>Ngày giao dịch *<input type="date" value={draft.date} onChange={(e) => setDraft({ ...draft, date: e.target.value })} required /></label>
+                <label>Thị trường<select value={draft.market} onChange={(e) => setDraft({ ...draft, market: e.target.value as Market })}><option>Hàng hóa</option><option>Chứng khoán</option><option>Crypto</option><option>Forex</option></select></label>
+                <label>Sản phẩm *<input value={draft.symbol} onChange={(e) => setDraft({ ...draft, symbol: e.target.value })} placeholder="FPT, XAUUSD, BTCUSDT..." autoComplete="off" required /></label>
+                <label>Phiên giao dịch<select value={draft.session} onChange={(e) => setDraft({ ...draft, session: e.target.value as Trade["session"] })}><option>Châu Á</option><option>London</option><option>New York</option></select></label>
+                <label>Khung thời gian<select value={draft.timeframe} onChange={(e) => setDraft({ ...draft, timeframe: e.target.value })}>{!["Auto", "M1", "M5", "M15", "M30", "H1", "H4", "Daily", "Weekly"].includes(draft.timeframe) && <option value={draft.timeframe}>{draft.timeframe}</option>}<option>Auto</option><option>M1</option><option>M5</option><option>M15</option><option>M30</option><option>H1</option><option>H4</option><option>Daily</option><option>Weekly</option></select></label>
+                <label>Hướng lệnh<div className="side-switch" role="group" aria-label="Hướng giao dịch"><button type="button" className={draft.side === "Buy" ? "active buy" : ""} aria-pressed={draft.side === "Buy"} onClick={() => setDraft({ ...draft, side: "Buy" })}>Buy</button><button type="button" className={draft.side === "Sell" ? "active sell" : ""} aria-pressed={draft.side === "Sell"} onClick={() => setDraft({ ...draft, side: "Sell" })}>Sell</button></div></label>
+                <label className="span-two">Setup / Playbook *<select value={draft.setup} onChange={(e) => setDraft({ ...draft, setup: e.target.value })}>{draft.setup !== UNCLASSIFIED_SETUP && !SETUP_OPTIONS.includes(draft.setup) && <option value={draft.setup}>{draft.setup}</option>}<option>{UNCLASSIFIED_SETUP}</option>{SETUP_GROUPS.map((group) => <optgroup label={group.label} key={group.label}>{group.options.map((option) => <option key={option}>{option}</option>)}</optgroup>)}</select><small>Chọn đúng tên setup để dữ liệu phân tích không bị pha trộn.</small></label>
+                <label>Tâm lý khi vào lệnh<select value={draft.psychology} onChange={(e) => setDraft({ ...draft, psychology: e.target.value })}><option>Chưa review</option><option>Bình tĩnh</option><option>Tự tin</option><option>Trung lập</option><option>Hơi vội</option><option>FOMO</option><option>Căng thẳng</option><option>Trả thù</option></select></label>
+                <label className="span-three">Nguồn dữ liệu<select value={draft.source} onChange={(e) => setDraft({ ...draft, source: e.target.value })}>{!["Thủ công", "TradingView", "CSV · Broker VN", "MetaTrader 5", "Binance", "Bybit", "CQG / MXV", "Webhook tự động"].includes(draft.source) && <option value={draft.source}>{draft.source}</option>}<option>Thủ công</option><option>TradingView</option><option>CSV · Broker VN</option><option>MetaTrader 5</option><option>Binance</option><option>Bybit</option><option>CQG / MXV</option><option>Webhook tự động</option></select></label>
+              </div>
+            </section>
+            <section className="form-section"><div className="form-section-title"><span>02</span><div><h3>Kế hoạch giá & rủi ro</h3><p>Ghi trước điểm vô hiệu và lợi nhuận kỳ vọng</p></div></div>
+              <div className="form-grid three">
+                <label>Rủi ro dự kiến (VNĐ) *<input type="number" inputMode="numeric" min="10000" step="10000" value={draft.risk} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, risk: normalizeNumericInput(e.target.value) })} placeholder="Ví dụ: 1.000.000" required /><small>Số tiền chấp nhận mất nếu SL bị chạm.</small></label>
+                <label>Khối lượng<input type="number" inputMode="decimal" step="any" min="0" value={draft.quantity} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, quantity: normalizeNumericInput(e.target.value) })} placeholder="0.1 / 500" /></label>
+                <label>Giá vào<input type="number" inputMode="decimal" step="any" min="0" value={draft.entryPrice} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, entryPrice: normalizeNumericInput(e.target.value) })} placeholder="Entry" /></label>
+                <label>Giá cắt lỗ (SL)<input type="number" inputMode="decimal" step="any" min="0" value={draft.stopLoss} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, stopLoss: normalizeNumericInput(e.target.value) })} placeholder="Invalidation" /></label>
+                <label>Giá chốt lời (TP)<input type="number" inputMode="decimal" step="any" min="0" value={draft.takeProfit} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, takeProfit: normalizeNumericInput(e.target.value) })} placeholder="Target" /></label>
+                <div className={`planned-rr-card ${draftPlannedRr !== null && draftPlannedRr >= 2 ? "ready" : ""}`}><span>R:R KẾ HOẠCH</span><strong>{draftPlannedRr === null ? "—" : `1:${draftPlannedRr.toFixed(2)}`}</strong><small>{!draftHasPricePlan ? "Nhập Entry, SL và TP" : draftPlannedRr === null ? `Kiểm tra vị trí giá cho lệnh ${draft.side}` : draftPlannedRr >= 2 ? "Đạt ngưỡng kỳ vọng" : "Dưới ngưỡng 1:2"}</small></div>
+              </div>
+            </section>
+            <section className="form-section"><div className="form-section-title"><span>03</span><div><h3>Kết quả thực tế</h3><p>Tách P&L trước phí và chi phí để giữ số liệu nhất quán</p></div></div>
+              <div className="form-grid four">
+                <label>P&L trước phí (VNĐ) *<input type="number" inputMode="numeric" step="10000" value={draft.pnl} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, pnl: normalizeNumericInput(e.target.value) })} placeholder="Lãi dương, lỗ âm" required /></label>
+                <label>Phí giao dịch (VNĐ)<input type="number" inputMode="numeric" min="0" step="1000" value={draft.fees} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, fees: normalizeNumericInput(e.target.value) })} placeholder="0" /></label>
+                <label>Giá thoát<input type="number" inputMode="decimal" step="any" min="0" value={draft.exitPrice} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, exitPrice: normalizeNumericInput(e.target.value) })} placeholder="Exit" /></label>
+                <label>Thời gian giữ (phút)<input type="number" inputMode="numeric" min="0" value={draft.durationMin} onFocus={selectNumericInput} onChange={(e) => setDraft({ ...draft, durationMin: normalizeNumericInput(e.target.value) })} placeholder="Ví dụ: 90" /></label>
+              </div>
+              <div className="trade-result-preview"><article><span>P&L RÒNG SAU PHÍ</span><strong className={draftNetPnl === null ? "" : draftNetPnl >= 0 ? "positive-text" : "negative-text"}>{draftNetPnl === null ? "—" : money(draftNetPnl)}</strong></article><article><span>KẾT QUẢ THEO R</span><strong className={draftActualR === null ? "" : draftActualR >= 0 ? "positive-text" : "negative-text"}>{draftActualR === null ? "—" : `${draftActualR >= 0 ? "+" : ""}${draftActualR.toFixed(2)}R`}</strong></article><article><span>PHÂN LOẠI</span><strong>{draftNetPnl === null ? "Chưa có kết quả" : draftNetPnl > 0 ? "Lệnh thắng" : draftNetPnl < 0 ? "Lệnh thua" : "Hòa vốn"}</strong></article></div>
+            </section>
+            <section className="form-section"><div className="form-section-title"><span>04</span><div><h3>Checklist kỷ luật</h3><p>Chấm chất lượng quyết định độc lập với lời hoặc lỗ</p></div><strong className="discipline-live-score">{draftDiscipline}%</strong></div>
+              <div className="check-grid professional-check-grid">{([
+                ["plan", "Đúng setup & kế hoạch", "Có luận điểm, entry, invalidation và target rõ ràng"],
+                ["noFomo", "Chờ đúng tín hiệu", "Không đuổi giá, không vào sớm vì FOMO"],
+                ["noRevenge", "Đúng rủi ro & quản lý", "Không nới SL, gồng lỗ hoặc trả thù thị trường"],
+                ["screenshot", "Đủ bằng chứng", "Có ảnh trước và sau lệnh để review"],
+              ] as const).map(([key, label, description]) => <label key={key}><input type="checkbox" checked={draft[key]} onChange={(e) => setDraft({ ...draft, [key]: e.target.checked })} /><span>✓</span><p><strong>{label}</strong><small>{description}</small></p></label>)}</div>
+            </section>
+            <section className="form-section"><div className="form-section-title"><span>05</span><div><h3>Bằng chứng & review</h3><p>Lưu ảnh, đối chiếu kế hoạch và chốt một hành động cải thiện</p></div></div>
+              <div className="evidence-review-grid"><div><label className="trade-image-drop"><input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={selectDraftImages} /><ImagePlus size={22} /><strong>{draftImages.length ? `Đã chọn ${draftImages.length}/4 ảnh` : "Thêm ảnh trước / sau lệnh"}</strong><span>JPG, PNG, WEBP · tối đa 6 MB/ảnh</span></label>{draftImagePreviews.length > 0 && <div className="draft-image-grid">{draftImagePreviews.map((preview, index) => <figure key={`${preview.file.name}-${preview.file.lastModified}-${index}`}><img src={preview.url} alt={`Ảnh xem trước ${index + 1}`} /><figcaption><span>{preview.file.name}</span><button type="button" onClick={() => setDraftImages((current) => current.filter((_, itemIndex) => itemIndex !== index))} aria-label={`Bỏ ảnh ${preview.file.name}`}>×</button></figcaption></figure>)}</div>}</div>
+                <div className="trade-review-field"><div><label htmlFor="trade-review-note">Review giao dịch</label><button type="button" onClick={insertTradeReviewTemplate}><BookOpen size={14} /> Chèn khung review</button></div><textarea id="trade-review-note" value={draft.note} onChange={(e) => setDraft({ ...draft, note: e.target.value })} placeholder="Ghi dữ kiện, sai lệch, bài học và một hành động cụ thể..." /><small>Không thay đổi hệ thống chỉ vì một lệnh; hãy ghi điều có thể kiểm chứng.</small></div>
+              </div>
+            </section>
+          </div>
+          <aside className="trade-form-summary" aria-label="Tóm tắt giao dịch">
+            <div className="trade-summary-head"><span className="eyebrow">TRADE SNAPSHOT</span><strong>{draft.symbol.trim().toUpperCase() || "CHƯA NHẬP MÃ"}</strong><small>{draft.market} · {draft.side} · {draft.timeframe}</small></div>
+            <span className={`trade-ready-state ${draftReady ? "ready" : "pending"}`}><i />{draftReady ? "Đủ dữ liệu bắt buộc" : "Cần hoàn thiện dữ liệu"}</span>
+            <div className="trade-summary-metrics"><article><span>R:R kế hoạch</span><strong>{draftPlannedRr === null ? "—" : `1:${draftPlannedRr.toFixed(2)}`}</strong></article><article><span>Kết quả</span><strong>{draftActualR === null ? "—" : `${draftActualR >= 0 ? "+" : ""}${draftActualR.toFixed(2)}R`}</strong></article><article><span>Kỷ luật</span><strong>{draftDiscipline}%</strong></article><article><span>Hồ sơ</span><strong>{draftCompleteness}%</strong></article></div>
+            <div className="trade-summary-checks"><span>KIỂM TRA TRƯỚC KHI LƯU</span>{[
+              [Boolean(draft.date && draft.symbol.trim()), "Ngày và sản phẩm"],
+              [draft.setup !== UNCLASSIFIED_SETUP, "Setup đã phân loại"],
+              [Number.isFinite(draftRiskValue) && draftRiskValue > 0, "Rủi ro dự kiến hợp lệ"],
+              [draftPnlValue !== null && Number.isFinite(draftPnlValue), "P&L trước phí"],
+              [draftHasPricePlan && draftPlannedRr !== null, "Entry · SL · TP hợp lệ"],
+              [draft.screenshot || draftImages.length > 0, "Ảnh trước / sau lệnh"],
+              [Boolean(draft.note.trim()), "Review có hành động"],
+            ].map(([done, label]) => <div className={done ? "done" : ""} key={String(label)}><i>{done ? "✓" : "·"}</i><span>{label}</span></div>)}</div>
+            <div className="trade-summary-principle"><ShieldCheck size={16} /><p><span>NGUYÊN TẮC</span><strong>Chất lượng hồ sơ quan trọng hơn việc cố làm đẹp kết quả.</strong></p></div>
+          </aside>
+        </div>
+        <div className="modal-actions professional-modal-actions"><div><span className={draftReady ? "ready" : ""}><i />{draftReady ? "Sẵn sàng lưu" : "Còn thiếu trường bắt buộc"}</span><small>{draftCompleteness}% độ hoàn thiện hồ sơ</small></div><button type="button" className="ghost-button" onClick={() => { setModalOpen(false); setEditingTradeId(null); }}>Hủy</button><button type="submit" className="gold-button compact">{editingTradeId ? "Lưu thay đổi" : "Lưu giao dịch"}</button></div>
       </form></div>}
       {connectProvider && <div className="modal-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) { setConnectProvider(null); setWebhookToken(""); } }}><form className="connection-modal" role="dialog" aria-modal="true" aria-labelledby="connection-dialog-title" onSubmit={saveConnection}>
         <div className="modal-head"><div><span className="eyebrow">BROKER CONNECTION</span><h2 id="connection-dialog-title">{BROKERS.find((broker) => broker.provider === connectProvider)?.name}</h2><p>{BROKERS.find((broker) => broker.provider === connectProvider)?.mode}</p></div><button type="button" className="modal-close" onClick={() => { setConnectProvider(null); setWebhookToken(""); }} aria-label="Đóng">×</button></div>

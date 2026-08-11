@@ -29,6 +29,8 @@ export const trades = sqliteTable(
     fees: real("fees").notNull().default(0),
     quantity: real("quantity").notNull().default(0),
     entryPrice: real("entry_price").notNull().default(0),
+    stopLoss: real("stop_loss").notNull().default(0),
+    takeProfit: real("take_profit").notNull().default(0),
     exitPrice: real("exit_price").notNull().default(0),
     discipline: integer("discipline").notNull().default(100),
     psychology: text("psychology").notNull().default("Đồng bộ"),
