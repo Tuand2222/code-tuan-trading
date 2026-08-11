@@ -107,7 +107,7 @@ function networkError(provider: string, error: unknown, endpoint: string) {
 }
 
 function canTryNextEndpoint(status: number) {
-  return status === 403 || status === 408 || status === 418 || status === 429 || status >= 500;
+  return status === 403 || status === 408 || status >= 500;
 }
 
 export async function binanceSignedJson<T>(
@@ -119,16 +119,16 @@ export async function binanceSignedJson<T>(
   const futures = access.accountType !== "spot";
   const hosts = futures ? BINANCE_FUTURES_HOSTS : BINANCE_SPOT_HOSTS;
   const path = futures ? paths.futures : paths.spot;
-  const query = new URLSearchParams({
-    ...params,
-    timestamp: String(Date.now()),
-    recvWindow: "5000",
-  }).toString();
-  const signature = await hmacHex(access.apiSecret, query);
   let lastError: Error | undefined;
 
   for (const host of hosts) {
     const endpoint = `${host}${path}`;
+    const query = new URLSearchParams({
+      ...params,
+      timestamp: String(Date.now()),
+      recvWindow: "5000",
+    }).toString();
+    const signature = await hmacHex(access.apiSecret, query);
     try {
       const response = await fetch(`${endpoint}?${query}&signature=${signature}`, {
         headers: { "X-MBX-APIKEY": access.apiKey, Accept: "application/json" },
