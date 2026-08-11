@@ -193,7 +193,7 @@ type NavItem = { id: View; label: string; icon: LucideIcon };
 
 const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
   {
-    label: "Nhật ký",
+    label: "Quy trình cốt lõi",
     items: [
       { id: "overview", label: "Tổng quan", icon: LayoutDashboard },
       { id: "journal", label: "Nhật ký giao dịch", icon: BookOpen },
@@ -203,7 +203,7 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     ],
   },
   {
-    label: "Phân tích",
+    label: "Phân tích nâng cao",
     items: [
       { id: "analytics", label: "Lợi thế thống kê", icon: BarChart3 },
       { id: "risk", label: "Lợi nhuận & rủi ro", icon: ShieldCheck },
@@ -212,7 +212,7 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     ],
   },
   {
-    label: "Công cụ",
+    label: "Công cụ & dữ liệu",
     items: [
       { id: "valuation", label: "Định giá doanh nghiệp", icon: Building2 },
       { id: "connections", label: "Kết nối dữ liệu", icon: PlugZap },
@@ -830,6 +830,7 @@ export default function Home() {
   const [toast, setToast] = useState("");
   const [notes, setNotes] = useState(NOTE_TEMPLATES[0].content);
   const [calendarMonth, setCalendarMonth] = useState(new Date(2026, 7, 1));
+  const [showAdvancedMetrics, setShowAdvancedMetrics] = useState(false);
 
   const signOutWebsite = async () => {
     await authClient.signOut();
@@ -1498,6 +1499,9 @@ export default function Home() {
       ["ROI / Tổng rủi ro", `${stats.roi.toFixed(1)}%`, tone(stats.roi), "Lợi nhuận ròng chia cho tổng vốn đã mạo hiểm."],
       ["Kỷ luật trung bình", `${stats.discipline.toFixed(0)}%`, stats.discipline >= 85 ? "positive" : "gold", "Tỷ lệ tuân thủ checklist trên tất cả giao dịch."],
     ] as const;
+    const coreMetricIndexes = new Set([0, 1, 2, 6, 14, 23]);
+    const coreMetricCards = metricCards.filter((_, index) => coreMetricIndexes.has(index));
+    const advancedMetricCards = metricCards.filter((_, index) => !coreMetricIndexes.has(index));
     const winDeg = stats.total ? (stats.wins / stats.total) * 360 : 0;
     const lossDeg = stats.total ? (stats.losses / stats.total) * 360 : 0;
     const donutStyle = { "--win": `${winDeg}deg`, "--loss": `${winDeg + lossDeg}deg` } as CSSProperties;
@@ -1509,20 +1513,33 @@ export default function Home() {
     });
     return (
       <>
-        <section className="overview-hero">
+        <section className="overview-hero decision-hero">
           <div className="overview-hero-copy">
-            <span className="product-kicker"><Sparkles size={14} /> TRADING PLAN PRO</span>
-            <h2>Biến mỗi giao dịch thành dữ liệu để ra quyết định tốt hơn</h2>
+            <span className="product-kicker"><Sparkles size={14} /> TRADING PLAN PRO · WORKSPACE HÔM NAY</span>
+            <h2>Tổng quan rõ ràng. Hành động có kỷ luật.</h2>
             <p>Nhật ký đa thị trường dành cho nhà đầu tư Việt Nam: ghi lại bối cảnh, đo kỷ luật, kiểm soát rủi ro và chỉ kết luận lợi thế khi mẫu dữ liệu đủ lớn.</p>
+            <div className="decision-stat-row" aria-label="Ba chỉ số quyết định">
+              <article><span>Lợi nhuận ròng</span><strong className={stats.net >= 0 ? "positive-text" : "negative-text"}>{money(stats.net, true)}</strong><small>Trong khoảng đang lọc</small></article>
+              <article><span>Tỷ lệ thắng</span><strong className={stats.winRate >= 50 ? "positive-text" : "negative-text"}>{stats.winRate.toFixed(1)}%</strong><small>{stats.wins} thắng · {stats.losses} thua</small></article>
+              <article><span>Sụt giảm tối đa</span><strong className="negative-text">{money(-stats.maxDrawdown, true)}</strong><small>Ngưỡng cần theo dõi</small></article>
+            </div>
             <div className="overview-actions">
               <button className="gold-button compact" onClick={openTradeModal}><Plus size={16} /> Ghi giao dịch</button>
               <a className="ghost-link" href="/phuong-phap">Xem phương pháp tính</a>
             </div>
           </div>
-          <div className="overview-principles" aria-label="Ba nguyên tắc của Trading Plan Pro">
-            <article><span>01</span><strong>Ghi đúng kế hoạch</strong><small>Kết quả không thay thế kỷ luật.</small></article>
-            <article><span>02</span><strong>Đủ mẫu mới kết luận</strong><small>Tối thiểu 20 lệnh mỗi nhóm.</small></article>
-            <article><span>03</span><strong>Bảo vệ vốn trước</strong><small>Rủi ro luôn có giới hạn rõ ràng.</small></article>
+          <div className="decision-side">
+            <article className="next-action-card">
+              <div className="next-action-head"><span className="eyebrow">BƯỚC TIẾP THEO</span><span className="status-chip success">{isDemo ? "DEMO" : "LIVE"}</span></div>
+              <strong>{isDemo ? "Chuyển sang nhật ký thật" : "Review giao dịch gần nhất"}</strong>
+              <p>{isDemo ? "Tạo workspace riêng để các chỉ số phản ánh đúng quy trình của bạn." : "Đọc lại bối cảnh, checklist và kết quả trước khi mở lệnh mới."}</p>
+              <button type="button" className="gold-button compact" onClick={isDemo ? startRealJournal : () => navigate("journal")}>{isDemo ? "Bắt đầu nhật ký thật" : "Mở nhật ký"} →</button>
+            </article>
+            <div className="overview-principles" aria-label="Ba nguyên tắc của Trading Plan Pro">
+              <article><span>01</span><strong>Ghi đúng kế hoạch</strong><small>Kết quả không thay thế kỷ luật.</small></article>
+              <article><span>02</span><strong>Đủ mẫu mới kết luận</strong><small>Tối thiểu 20 lệnh mỗi nhóm.</small></article>
+              <article><span>03</span><strong>Bảo vệ vốn trước</strong><small>Rủi ro luôn có giới hạn rõ ràng.</small></article>
+            </div>
           </div>
         </section>
         <div className="market-switcher" role="group" aria-label="Lọc theo thị trường">
@@ -1531,12 +1548,19 @@ export default function Home() {
         <div className="market-overview-grid">
           {marketRollup.map((market) => <article key={market.id}><div><span>{market.icon}</span><div><small>{market.label}</small><strong>{market.stats.total} lệnh</strong></div></div><b className={market.stats.net >= 0 ? "positive-text" : "negative-text"}>{money(market.stats.net, true)}</b></article>)}
         </div>
-        <div className="metric-grid">
-          {metricCards.map(([label, value, toneValue, hint]) => <MetricCard key={label} label={label} value={value} tone={toneValue} hint={hint} />)}
-        </div>
+        <section className="metric-section" aria-labelledby="core-metrics-title">
+          <div className="metric-section-head"><div><span className="eyebrow">CHỈ SỐ CỐT LÕI</span><h3 id="core-metrics-title">Tập trung vào điều có thể hành động</h3><p>Sáu chỉ số quan trọng nhất cho một vòng review nhanh.</p></div><button type="button" className="metric-toggle" aria-expanded={showAdvancedMetrics} onClick={() => setShowAdvancedMetrics((current) => !current)}>{showAdvancedMetrics ? "Thu gọn chỉ số" : `Xem toàn bộ ${metricCards.length} chỉ số`} →</button></div>
+          <div className="metric-grid metric-grid-core">
+            {coreMetricCards.map(([label, value, toneValue, hint]) => <MetricCard key={label} label={label} value={value} tone={toneValue} hint={hint} />)}
+          </div>
+          {showAdvancedMetrics && <div className="metric-grid metric-grid-advanced" aria-label="Các chỉ số nâng cao">
+            {advancedMetricCards.map(([label, value, toneValue, hint]) => <MetricCard key={label} label={label} value={value} tone={toneValue} hint={hint} />)}
+          </div>}
+        </section>
         <div className="dashboard-grid">
           <article className="panel panel-wide">
             <div className="panel-title"><div><span className="eyebrow">HIỆU SUẤT TÍCH LŨY</span><h3>Đường cong vốn</h3></div><span className="status-chip">POC</span></div>
+            <p className="chart-insight"><Sparkles size={14} /><span>{stats.discipline >= 90 ? "Kỷ luật đang là tín hiệu mạnh nhất của workspace." : "Kỷ luật đang cần được review trước khi tăng nhịp giao dịch."} <small>Đây là diễn giải từ nhật ký, không phải khuyến nghị đầu tư.</small></span></p>
             <EquityChart trades={filteredByRange} />
           </article>
           <article className="panel donut-panel">
@@ -1870,17 +1894,17 @@ export default function Home() {
           <small>KỶ LUẬT · KIÊN ĐỊNH · TĂNG TRƯỞNG</small>
         </div>
         <nav aria-label="Điều hướng chính">{NAV_GROUPS.map((group) => <section className="nav-group" aria-label={group.label} key={group.label}><span className="nav-group-label">{group.label}</span>{group.items.map((item) => { const Icon = item.icon; return <button type="button" key={item.id} aria-current={view === item.id ? "page" : undefined} className={view === item.id ? "active" : ""} onClick={() => navigate(item.id)}><Icon className="nav-icon" size={17} aria-hidden="true" />{item.label}</button>; })}</section>)}</nav>
-        <div className="sidebar-footer"><button className="gold-button" onClick={openTradeModal}><Plus size={17} /> <span>Thêm giao dịch</span></button><div><span>{trades.length} lệnh</span><small>•</small><span>{isDemo ? "Dữ liệu mẫu" : money(allStats.net, true)}</span></div></div>
+        <div className="sidebar-footer"><button className="gold-button" onClick={openTradeModal}><Plus size={17} /> <span>Ghi giao dịch</span></button><div><span>{trades.length} lệnh</span><small>•</small><span>{isDemo ? "Dữ liệu mẫu" : money(allStats.net, true)}</span></div></div>
       </aside>
       {mobileNav && <button className="mobile-backdrop" aria-label="Đóng menu" onClick={() => setMobileNav(false)} />}
       <main className="main-content" id="main-content">
         <header className="topbar">
           <button className="mobile-menu" aria-label="Mở menu" onClick={() => setMobileNav(true)}><Menu size={18} /></button>
           <div><h1>{meta.title}</h1><p>{meta.subtitle}</p></div>
-          <div className="top-actions"><span className={`data-state-chip ${isDemo ? "demo" : dataMode}`}><Database size={14} />{isDemo ? "Dữ liệu minh họa" : dataMode === "cloud" ? "Đã đồng bộ" : "Trên thiết bị"}</span>{view === "overview" && <select value={range} onChange={(e) => setRange(e.target.value)} aria-label="Khoảng thời gian"><option value="all">Toàn bộ thời gian</option><option value="30">30 ngày qua</option><option value="90">90 ngày qua</option></select>}{accountSession?.user ? <div className="account-chip"><span className="account-avatar">{accountSession.user.image ? <img src={accountSession.user.image} alt="" /> : <UserRound size={14} />}</span><span>{accountSession.user.name || accountSession.user.email}</span><button className="account-signout" type="button" onClick={() => void signOutWebsite()} aria-label="Đăng xuất"><LogOut size={14} /></button></div> : <a className="account-login-link" href="/dang-nhap" aria-label="Đăng nhập"><UserRound size={15} /><span>Đăng nhập</span></a>}<button className="quick-add" onClick={openTradeModal}><Plus size={16} /> <span>Thêm lệnh</span></button></div>
+          <div className="top-actions"><span className={`data-state-chip ${isDemo ? "demo" : dataMode}`}><Database size={14} />{isDemo ? "Dữ liệu minh họa" : dataMode === "cloud" ? "Đã đồng bộ" : "Trên thiết bị"}</span>{view === "overview" && <select value={range} onChange={(e) => setRange(e.target.value)} aria-label="Khoảng thời gian"><option value="all">Toàn bộ thời gian</option><option value="30">30 ngày qua</option><option value="90">90 ngày qua</option></select>}{accountSession?.user ? <div className="account-chip"><span className="account-avatar">{accountSession.user.image ? <img src={accountSession.user.image} alt="" /> : <UserRound size={14} />}</span><span>{accountSession.user.name || accountSession.user.email}</span><button className="account-signout" type="button" onClick={() => void signOutWebsite()} aria-label="Đăng xuất"><LogOut size={14} /></button></div> : <a className="account-login-link" href="/dang-nhap" aria-label="Đăng nhập"><UserRound size={15} /><span>Đăng nhập</span></a>}<button className="quick-add" onClick={openTradeModal}><Plus size={16} /> <span>Ghi giao dịch</span></button></div>
         </header>
         <div className="content-area">
-          {isDemo && <section className="demo-banner" role="status"><div className="demo-icon"><Sparkles size={18} /></div><div><span>CHẾ ĐỘ MINH HỌA</span><strong>Toàn bộ 20 giao dịch và +23,9 triệu đang hiển thị là dữ liệu mẫu</strong><p>Dữ liệu này dùng để trải nghiệm tính năng, không phải thành tích giao dịch thực tế hay bằng chứng về lợi nhuận.</p></div><div className="demo-actions"><button type="button" onClick={startRealJournal}>Bắt đầu nhật ký thật</button><a href="/phuong-phap">Xem phương pháp</a></div></section>}
+          {isDemo && <section className="demo-banner demo-banner-compact" role="status"><div className="demo-icon"><Sparkles size={18} /></div><div><span>CHẾ ĐỘ MINH HỌA</span><strong>20 giao dịch và +23,9 triệu đang hiển thị là dữ liệu mẫu</strong><p>Dữ liệu này dùng để trải nghiệm tính năng, không phải thành tích giao dịch thực tế hay bằng chứng về lợi nhuận.</p></div><div className="demo-actions"><button type="button" onClick={startRealJournal}>Bắt đầu nhật ký thật</button><a href="/phuong-phap">Xem phương pháp</a></div></section>}
           {renderContent()}
         </div>
         <footer className="app-footer"><div><span>Tuan Trader · Trading Plan Pro</span><small>{isDemo ? "Dữ liệu minh họa — không phải kết quả thực tế" : dataMode === "cloud" ? "Dữ liệu riêng đã đồng bộ" : "Dữ liệu đang lưu trên thiết bị"} · Không phải khuyến nghị đầu tư.</small></div><nav aria-label="Thông tin website"><a href="/phuong-phap">Phương pháp</a><a href="/bao-mat">Bảo mật dữ liệu</a></nav></footer>
