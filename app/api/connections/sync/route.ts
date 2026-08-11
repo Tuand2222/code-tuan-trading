@@ -1,12 +1,13 @@
-�r�^�f��ئ{N�y�'vî���import { and, eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getDb } from "../../../../db";
 import { brokerConnections, trades } from "../../../../db/schema";
-import { hmacHex } from "../../../../lib/broker-api";
+import { binanceSignedJson, bybitSignedJson, fetchBrokerBridgeJson } from "../../../../lib/broker-api";
 import { decryptBrokerSecrets } from "../../../../lib/broker-crypto";
-import { getPublicBridgeUrl } from "../../../../lib/bridge-url";
 import { requireUser, routeError } from "../../../../lib/server-auth";
 
 type NormalizedTrade = typeof trades.$inferInsert;
+type BrokerSecrets = Awaited<ReturnType<typeof decryptBrokerSecrets>>;
+type ConnectionRow = typeof brokerConnections.$inferSelect;
 
 function sessionFor(time: number) {
   const hour = new Date(time).getUTCHours();
@@ -15,33 +16,32 @@ function sessionFor(time: number) {
   return "New York";
 }
 
-async function binanceTrades(
-  connection: typeof brokerConnections.$inferSelect,
-  secrets: Awaited<ReturnType<typeof decryptBrokerSecrets>>,
-  userEmail: string,
-) {
-  if (!secrets.apiKey || !secrets.apiSecret) throw new Error("Binance credentials are missing");
+function brokerAccess(connection: ConnectionRow, secrets: BrokerSecrets) {
+  return {
+    provider: connection.provider,
+    accountType: connection.accountType,
+    apiKey: secrets.apiKey,
+    apiSecret: secrets.apiSecret,
+    bridgeUrl: secrets.bridgeUrl,
+    bridgeToken: secrets.bridgeToken,
+  };
+}
+
+async function binanceTrades(connection: ConnectionRow, secrets: BrokerSecrets, userEmail: string) {
+  if (!secrets.apiKey || !secrets.apiSecret) throw new Error("Binance: thông tin API đã lưu không đầy đủ");
   const symbols = secrets.symbols?.length ? secrets.symbols : ["BTCUSDT", "ETHUSDT"];
   const futures = connection.accountType !== "spot";
-  const host = futures ? "https://fapi.binance.com" : "https://api.binance.com";
-  const path = futures ? "/fapi/v1/userTrades" : "/api/v3/myTrades";
   const fxRate = secrets.fxRate ?? 1;
   const normalized: NormalizedTrade[] = [];
+
   for (const symbol of symbols.slice(0, 20)) {
-    const query = new URLSearchParams({
-      symbol,
-      timestamp: String(Date.now()),
-      recvWindow: "5000",
-      limit: "500",
-    }).toString();
-    const signature = await hmacHex(secrets.apiSecret, query);
-    const response = await fetch(`${host}${path}?${query}&signature=${signature}`, {
-      headers: { "X-MBX-APIKEY": secrets.apiKey },
-    });
-    const payload = (await response.json()) as Array<Record<string, unknown>> | { msg?: string };
-    if (!response.ok || !Array.isArray(payload)) {
-      throw new Error(`Binance: ${Array.isArray(payload) ? response.statusText : payload.msg ?? response.statusText}`);
-    }
+    const { payload } = await binanceSignedJson<Array<Record<string, unknown>>>(
+      brokerAccess(connection, secrets),
+      { spot: "/api/v3/myTrades", futures: "/fapi/v1/userTrades" },
+      { symbol, limit: "500" },
+    );
+    if (!Array.isArray(payload)) throw new Error(`Binance: dữ liệu ${symbol} không đúng định dạng`);
+
     for (const item of payload) {
       const time = Number(item.time);
       const quote = Number(item.quoteQty ?? Number(item.price) * Number(item.qty));
@@ -67,7 +67,9 @@ async function binanceTrades(
         exitPrice: Number(item.price ?? 0),
         discipline: 0,
         psychology: "Chưa review",
-        note: futures ? "Binance Futures · setup và rủi ro dự kiến cần review" : "Binance Spot execution · P/L, setup và rủi ro cần review",
+        note: futures
+          ? "Binance Futures · setup và rủi ro dự kiến cần review"
+          : "Binance Spot execution · P/L, setup và rủi ro cần review",
         durationMin: 0,
       });
     }
@@ -75,40 +77,25 @@ async function binanceTrades(
   return normalized;
 }
 
-async function bybitTrades(
-  connection: typeof brokerConnections.$inferSelect,
-  secrets: Awaited<ReturnType<typeof decryptBrokerSecrets>>,
-  userEmail: string,
-) {
-  if (!secrets.apiKey || !secrets.apiSecret) throw new Error("Bybit credentials are missing");
+async function bybitTrades(connection: ConnectionRow, secrets: BrokerSecrets, userEmail: string) {
+  if (!secrets.apiKey || !secrets.apiSecret) throw new Error("Bybit: thông tin API đã lưu không đầy đủ");
   const category = connection.accountType === "spot" ? "spot" : "linear";
   const path = category === "spot" ? "/v5/execution/list" : "/v5/position/closed-pnl";
-  const query = new URLSearchParams({ category, limit: "100" }).toString();
-  const timestamp = String(Date.now());
-  const receiveWindow = "5000";
-  const signature = await hmacHex(
-    secrets.apiSecret,
-    `${timestamp}${secrets.apiKey}${receiveWindow}${query}`,
-  );
-  const response = await fetch(`https://api.bybit.com${path}?${query}`, {
-    headers: {
-      "X-BAPI-API-KEY": secrets.apiKey,
-      "X-BAPI-TIMESTAMP": timestamp,
-      "X-BAPI-RECV-WINDOW": receiveWindow,
-      "X-BAPI-SIGN": signature,
-    },
-  });
-  const payload = (await response.json()) as {
+  const { payload } = await bybitSignedJson<{
     retCode?: number;
     retMsg?: string;
     result?: { list?: Array<Record<string, unknown>> };
-  };
-  if (!response.ok || payload.retCode !== 0) throw new Error(`Bybit: ${payload.retMsg ?? response.statusText}`);
+  }>(brokerAccess(connection, secrets), path, { category, limit: "100" });
   const fxRate = secrets.fxRate ?? 1;
+
   return (payload.result?.list ?? []).map((item): NormalizedTrade => {
     const time = Number(item.execTime ?? item.updatedTime ?? item.createdTime);
     const pnl = Number(item.closedPnl ?? 0) * fxRate;
-    const quote = Number(item.execValue ?? item.cumExitValue ?? Number(item.execPrice ?? item.avgExitPrice) * Number(item.execQty ?? item.closedSize));
+    const quote = Number(
+      item.execValue
+        ?? item.cumExitValue
+        ?? Number(item.execPrice ?? item.avgExitPrice) * Number(item.execQty ?? item.closedSize),
+    );
     return {
       id: crypto.randomUUID(),
       userEmail,
@@ -130,7 +117,9 @@ async function bybitTrades(
       exitPrice: Number(item.avgExitPrice ?? item.execPrice ?? 0),
       discipline: 0,
       psychology: "Chưa review",
-      note: category === "spot" ? "Bybit Spot execution · P/L, setup và rủi ro cần review" : "Bybit Derivatives closed P/L · setup và rủi ro dự kiến cần review",
+      note: category === "spot"
+        ? "Bybit Spot execution · P/L, setup và rủi ro cần review"
+        : "Bybit Derivatives closed P/L · setup và rủi ro dự kiến cần review",
       durationMin: 0,
     };
   });
@@ -198,22 +187,19 @@ function bridgeNumber(value: unknown) {
   return Number.isFinite(number) ? number : 0;
 }
 
-async function bridgeTrades(
-  connection: typeof brokerConnections.$inferSelect,
-  secrets: Awaited<ReturnType<typeof decryptBrokerSecrets>>,
-  userEmail: string,
-) {
+async function bridgeTrades(connection: ConnectionRow, secrets: BrokerSecrets, userEmail: string) {
   const profile = BRIDGE_PROFILES[connection.provider];
   if (!profile) throw new Error("Unsupported bridge provider");
-  if (!secrets.bridgeUrl || !secrets.bridgeToken) throw new Error(`${profile.source} bridge is not configured`);
-  const url = getPublicBridgeUrl(secrets.bridgeUrl);
-  const response = await fetch(url, {
-    headers: { Authorization: `Bearer ${secrets.bridgeToken}`, Accept: "application/json" },
-  });
-  if (!response.ok) throw new Error(`${profile.source} bridge: ${response.status} ${response.statusText}`);
-  const payload = (await response.json()) as { trades?: Array<Record<string, unknown>> } | Array<Record<string, unknown>>;
-  const rows = Array.isArray(payload) ? payload : payload.trades ?? [];
+  if (!secrets.bridgeUrl || !secrets.bridgeToken) throw new Error(`${profile.source} bridge chưa được cấu hình`);
+
+  const { payload } = await fetchBrokerBridgeJson(brokerAccess(connection, secrets));
+  const rows = Array.isArray(payload)
+    ? payload
+    : typeof payload === "object" && payload !== null && Array.isArray((payload as { trades?: unknown }).trades)
+      ? (payload as { trades: Array<Record<string, unknown>> }).trades
+      : [];
   const fxRate = secrets.fxRate ?? 1;
+
   return rows.slice(0, 1000).map((item): NormalizedTrade => {
     const externalId = String(
       item.externalId
@@ -228,7 +214,8 @@ async function bridgeTrades(
         ?? "",
     ).trim();
     const symbol = String(item.symbol ?? item.ticker ?? item.instrument ?? "").trim().toUpperCase();
-    if (!externalId || !symbol) throw new Error(`${profile.source} bridge row needs externalId and symbol`);
+    if (!externalId || !symbol) throw new Error(`${profile.source} bridge: mỗi dòng cần externalId và symbol`);
+
     const time = bridgeTimestamp(item.closedAt ?? item.closeTime ?? item.time ?? item.date);
     const openedAt = bridgeTimestamp(item.openedAt ?? item.openTime, Number.NaN);
     const closedAt = bridgeTimestamp(item.closedAt ?? item.closeTime, Number.NaN);
@@ -236,7 +223,8 @@ async function bridgeTrades(
     const suppliedRisk = bridgeNumber(item.risk ?? item.plannedRisk) * fxRate;
     const suppliedMarket = item.market ?? item.assetClass;
     const market = suppliedMarket ? BRIDGE_MARKETS.get(normalizeKey(suppliedMarket)) : profile.market;
-    if (!market) throw new Error(`${profile.source} bridge row has an invalid market`);
+    if (!market) throw new Error(`${profile.source} bridge: market không hợp lệ`);
+
     const setup = String(item.setup ?? "").trim() || "Chưa phân loại";
     const durationMin = Number.isFinite(openedAt) && Number.isFinite(closedAt)
       ? Math.max(0, Math.round((closedAt - openedAt) / 60000))
@@ -246,6 +234,7 @@ async function bridgeTrades(
       suppliedRisk > 0 ? "" : "Rủi ro dự kiến cần review",
       setup === "Chưa phân loại" ? "Setup cần phân loại" : "",
     ].filter(Boolean);
+
     return {
       id: crypto.randomUUID(),
       userEmail,
@@ -274,12 +263,13 @@ async function bridgeTrades(
 }
 
 export async function POST(request: Request) {
-  let failedConnection: typeof brokerConnections.$inferSelect | undefined;
+  let failedConnection: ConnectionRow | undefined;
   try {
     const accountUser = await requireUser(request);
     const userEmail = accountUser.email;
     const { connectionId } = (await request.json()) as { connectionId?: string };
     if (!connectionId) throw new Error("Connection id is required");
+
     const [connection] = await getDb()
       .select()
       .from(brokerConnections)
@@ -287,15 +277,20 @@ export async function POST(request: Request) {
       .limit(1);
     if (!connection) throw new Error("Connection not found");
     failedConnection = connection;
+
     const secrets = await decryptBrokerSecrets(connection.credentialsCiphertext);
     let rows: NormalizedTrade[];
     if (connection.provider === "binance") rows = await binanceTrades(connection, secrets, userEmail);
     else if (connection.provider === "bybit") rows = await bybitTrades(connection, secrets, userEmail);
     else if (BRIDGE_PROFILES[connection.provider]) {
-      if (connection.accountType === "push") throw new Error("Push 24/7 receives trades through the secure webhook; manual sync is not needed");
+      if (connection.accountType === "push") {
+        throw new Error("Push 24/7 nhận giao dịch qua secure webhook; không cần đồng bộ thủ công");
+      }
       rows = await bridgeTrades(connection, secrets, userEmail);
+    } else {
+      throw new Error("Kết nối này sử dụng import hoặc webhook thay vì đồng bộ thủ công");
     }
-    else throw new Error("This connection uses import or webhook instead of manual sync");
+
     rows = rows.map((row) => ({
       ...row,
       userId: accountUser.id,
@@ -305,7 +300,10 @@ export async function POST(request: Request) {
       ? await getDb().insert(trades).values(rows).onConflictDoNothing().returning()
       : [];
     const now = new Date().toISOString();
-    await getDb().update(brokerConnections).set({ status: "connected", lastSyncAt: now, updatedAt: now }).where(eq(brokerConnections.id, connection.id));
+    await getDb()
+      .update(brokerConnections)
+      .set({ status: "connected", lastSyncAt: now, updatedAt: now })
+      .where(eq(brokerConnections.id, connection.id));
     return Response.json({ imported: imported.length, scanned: rows.length, trades: imported, lastSyncAt: now });
   } catch (error) {
     if (failedConnection) {
@@ -315,7 +313,9 @@ export async function POST(request: Request) {
           .update(brokerConnections)
           .set({ status: "error", updatedAt: now })
           .where(eq(brokerConnections.id, failedConnection.id));
-      } catch { /* preserve the original provider error */ }
+      } catch {
+        // Preserve the original provider error.
+      }
     }
     return routeError(error);
   }
