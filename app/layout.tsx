@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { getBuildInfo } from "../lib/build-info";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -96,16 +97,43 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const buildInfo = getBuildInfo();
+
   return (
     <html lang="vi">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        data-build-commit={buildInfo.commit}
+        data-build-time={buildInfo.builtAt}
       >
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
         {children}
+        <a
+          href="/api/version"
+          aria-label={`Phiên bản build ${buildInfo.shortCommit}`}
+          title={`Commit ${buildInfo.commit} · Build ${buildInfo.builtAt}`}
+          style={{
+            position: "fixed",
+            right: 8,
+            bottom: 8,
+            zIndex: 9999,
+            padding: "4px 7px",
+            border: "1px solid rgba(148, 163, 184, 0.22)",
+            borderRadius: 6,
+            background: "rgba(9, 12, 17, 0.78)",
+            color: "rgba(203, 213, 225, 0.58)",
+            fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+            fontSize: 9,
+            lineHeight: 1,
+            textDecoration: "none",
+            backdropFilter: "blur(8px)",
+          }}
+        >
+          build {buildInfo.shortCommit}
+        </a>
       </body>
     </html>
   );
