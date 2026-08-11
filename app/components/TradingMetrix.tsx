@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, type CSSProperties } from "react";
+import EquityTimeChart, { type EquityChartPoint, type EquityReferenceLine } from "./EquityTimeChart";
 import { normalizeNumericInput, selectNumericInput } from "./numeric-input";
 
 type MetrixTrade = {
@@ -122,7 +123,6 @@ export default function TradingMetrix({ trades }: { trades: MetrixTrade[] }) {
   const [profitTargetInput, setProfitTargetInput] = useState("10");
   const [maxDailyLossInput, setMaxDailyLossInput] = useState("5");
   const [maxLossInput, setMaxLossInput] = useState("10");
-  const [chartMode, setChartMode] = useState<"money" | "percent">("money");
   const [dailyPage, setDailyPage] = useState(0);
   const initialCapital = Math.max(10_000_000, Number(initialCapitalInput) || 10_000_000);
 
@@ -261,34 +261,17 @@ export default function TradingMetrix({ trades }: { trades: MetrixTrade[] }) {
   const safePage = Math.min(dailyPage, pageCount - 1);
   const pageRows = [...report.rows].reverse().slice(safePage * pageSize, (safePage + 1) * pageSize);
 
-  const chart = useMemo(() => {
-    const rawValues = [initialCapital, ...report.rows.map((row) => row.endBalance)];
-    const transform = (value: number) => chartMode === "percent" ? (value - initialCapital) / Math.max(initialCapital, 1) * 100 : value;
-    const values = rawValues.map(transform);
-    const target = transform(initialCapital + targetAmount);
-    const limit = transform(report.currentMaxLossLimit);
-    const minimum = Math.min(...values, limit);
-    const maximum = Math.max(...values, target);
-    const padding = Math.max((maximum - minimum) * 0.14, chartMode === "percent" ? 1 : initialCapital * .01);
-    const min = minimum - padding;
-    const max = maximum + padding;
-    const span = Math.max(max - min, 1);
-    const y = (value: number) => 88 - ((value - min) / span) * 72;
-    const coords = values.map((value, index) => {
-      const x = 4 + index / Math.max(values.length - 1, 1) * 92;
-      return `${x},${y(value)}`;
-    });
-    return {
-      coords,
-      area: `${coords.join(" ")} 96,92 4,92`,
-      targetY: y(target),
-      limitY: y(limit),
-      zeroY: y(transform(initialCapital)),
-      max,
-      min,
-      format: (value: number) => chartMode === "percent" ? `${value.toFixed(1)}%` : compactCash(value),
-    };
-  }, [chartMode, initialCapital, report.currentMaxLossLimit, report.rows, targetAmount]);
+  const equityPoints = useMemo(() => report.rows.map<EquityChartPoint>((row) => ({
+    date: row.date,
+    money: row.endBalance,
+    percent: (row.endBalance - initialCapital) / Math.max(initialCapital, 1) * 100,
+  })), [initialCapital, report.rows]);
+
+  const equityReferences = useMemo<EquityReferenceLine[]>(() => [
+    { label: "Mục tiêu", money: initialCapital + targetAmount, percent: rules.target, color: "rgba(52,215,139,.72)" },
+    { label: "Vốn đầu", money: initialCapital, percent: 0, color: "rgba(191,202,216,.36)", style: "dotted" },
+    { label: "Giới hạn", money: report.currentMaxLossLimit, percent: -rules.maximum, color: "rgba(255,85,116,.68)" },
+  ], [initialCapital, report.currentMaxLossLimit, rules.maximum, rules.target, targetAmount]);
 
   const advancedStats = [
     ["Tổng số giao dịch", String(report.ordered.length)],
@@ -371,23 +354,16 @@ export default function TradingMetrix({ trades }: { trades: MetrixTrade[] }) {
         <article className="metrix-panel metrix-chart-panel">
           <div className="metrix-panel-head">
             <div><span>ACCOUNT EQUITY</span><h3>Đường cong Balance</h3></div>
-            <div className="metrix-chart-toggle"><button className={chartMode === "money" ? "active" : ""} onClick={() => setChartMode("money")}>Số tiền</button><button className={chartMode === "percent" ? "active" : ""} onClick={() => setChartMode("percent")}>%</button></div>
+            <small>Trục kép · thời gian thực từ journal</small>
           </div>
-          <div className="metrix-chart-summary"><span>Hiện tại <strong>{chartMode === "money" ? cash(report.balance) : percent(returnPercent)}</strong></span><span className="target">Mục tiêu <strong>{chartMode === "money" ? cash(initialCapital + targetAmount) : `${rules.target}%`}</strong></span><span className="limit">Giới hạn <strong>{chartMode === "money" ? cash(report.currentMaxLossLimit) : `−${rules.maximum}%`}</strong></span></div>
-          <div className="metrix-chart" role="img" aria-label="Biểu đồ thay đổi số dư theo ngày">
-            <div className="metrix-chart-grid" />
-            <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-              <defs><linearGradient id="metrixArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5d8cff" stopOpacity=".28" /><stop offset="100%" stopColor="#5d8cff" stopOpacity="0" /></linearGradient></defs>
-              <line x1="4" x2="96" y1={chart.targetY} y2={chart.targetY} className="target-line" vectorEffect="non-scaling-stroke" />
-              <line x1="4" x2="96" y1={chart.limitY} y2={chart.limitY} className="limit-line" vectorEffect="non-scaling-stroke" />
-              <line x1="4" x2="96" y1={chart.zeroY} y2={chart.zeroY} className="baseline" vectorEffect="non-scaling-stroke" />
-              <polygon points={chart.area} fill="url(#metrixArea)" />
-              <polyline points={chart.coords.join(" ")} fill="none" stroke="#6e98ff" strokeWidth="1.8" vectorEffect="non-scaling-stroke" />
-              {chart.coords.map((point, index) => { const [cx, cy] = point.split(","); return <circle key={`${point}-${index}`} cx={cx} cy={cy} r={index === chart.coords.length - 1 ? 1.3 : .62} vectorEffect="non-scaling-stroke" />; })}
-            </svg>
-            <div className="metrix-y-axis"><span>{chart.format(chart.max)}</span><span>{chart.format((chart.max + chart.min) / 2)}</span><span>{chart.format(chart.min)}</span></div>
-            <div className="metrix-x-axis"><span>{firstDate ? DATE.format(new Date(`${firstDate}T12:00:00`)) : "Bắt đầu"}</span><span>{lastDate ? DATE.format(new Date(`${lastDate}T12:00:00`)) : "Hiện tại"}</span></div>
-          </div>
+          <div className="metrix-chart-summary"><span>Hiện tại <strong>{cash(report.balance)} · {percent(returnPercent)}</strong></span><span className="target">Mục tiêu <strong>{cash(initialCapital + targetAmount)} · +{rules.target}%</strong></span><span className="limit">Giới hạn <strong>{cash(report.currentMaxLossLimit)} · −{rules.maximum}%</strong></span></div>
+          <EquityTimeChart
+            points={equityPoints}
+            references={equityReferences}
+            ariaLabel="Account Equity theo thời gian với phần trăm bên trái và số tiền bên phải"
+            percentLabel="Lợi nhuận (%)"
+            moneyLabel="Balance (VND)"
+          />
         </article>
 
         <aside className="metrix-panel metrix-risk-panel">

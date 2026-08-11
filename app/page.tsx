@@ -12,7 +12,6 @@ import {
 } from "react";
 import {
   BarChart3,
-  Bitcoin,
   BookOpen,
   Building2,
   Camera,
@@ -46,8 +45,8 @@ import {
   ZoomIn,
   type LucideIcon,
 } from "lucide-react";
-import BtcRealtime from "./components/BtcRealtime";
 import CompanyValuation from "./components/CompanyValuation";
+import EquityTimeChart, { type EquityChartPoint } from "./components/EquityTimeChart";
 import SystemTracker from "./components/SystemTracker";
 import TradingMetrix from "./components/TradingMetrix";
 import { normalizeNumericInput, selectNumericInput } from "./components/numeric-input";
@@ -55,7 +54,6 @@ import { authClient } from "../lib/auth-client";
 
 type View =
   | "overview"
-  | "btc"
   | "journal"
   | "calendar"
   | "analytics"
@@ -212,7 +210,6 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
   {
     label: "Công cụ",
     items: [
-      { id: "btc", label: "BTC Realtime", icon: Bitcoin },
       { id: "valuation", label: "Định giá doanh nghiệp", icon: Building2 },
       { id: "connections", label: "Kết nối dữ liệu", icon: PlugZap },
     ],
@@ -225,7 +222,6 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
 
 const VIEW_META: Record<View, { title: string; subtitle: string }> = {
   overview: { title: "Nhật ký giao dịch đa thị trường", subtitle: "Tổng quan hiệu suất · Kỷ luật · Quản trị rủi ro" },
-  btc: { title: "BTC Realtime", subtitle: "Biểu đồ · Tín hiệu đa khung · Dòng lệnh · Cảnh báo giá" },
   journal: { title: "Nhật ký giao dịch", subtitle: "Mỗi lệnh là một dữ liệu để bạn tiến bộ" },
   calendar: { title: "Lịch giao dịch", subtitle: "Nhìn lại nhịp độ và kết quả theo ngày" },
   analytics: { title: "Phân tích", subtitle: "Tìm lợi thế thật sự trong dữ liệu giao dịch" },
@@ -651,38 +647,23 @@ function groupTrades(source: Trade[], key: "symbol" | "setup" | "session" | "wee
 
 function EquityChart({ trades }: { trades: Trade[] }) {
   const points = useMemo(() => {
-    return [...trades]
-      .sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id))
-      .reduce<{ date: string; value: number }[]>((current, trade) => current.concat({
-        date: trade.date,
-        value: (current.at(-1)?.value ?? 0) + trade.pnl,
-      }), []);
+    const ordered = [...trades].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+    const daily = new Map<string, number>();
+    for (const trade of ordered) daily.set(trade.date, (daily.get(trade.date) ?? 0) + trade.pnl);
+    const totalRisk = Math.max(ordered.reduce((sum, trade) => sum + Math.max(trade.risk, 0), 0), 1);
+    let cumulative = 0;
+    return [...daily].map<EquityChartPoint>(([date, pnl]) => {
+      cumulative += pnl;
+      return { date, money: cumulative, percent: cumulative / totalRisk * 100 };
+    });
   }, [trades]);
-  const values = [0, ...points.map((point) => point.value)];
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = Math.max(max - min, 1);
-  const coords = points.map((point, index) => {
-    const x = 5 + (index / Math.max(points.length - 1, 1)) * 90;
-    const y = 86 - ((point.value - min) / range) * 68;
-    return `${x},${y}`;
-  });
-  const area = coords.length ? `5,86 ${coords.join(" ")} 95,86` : "5,86 95,86";
   return (
-    <div className="chart-wrap" aria-label="Biểu đồ đường cong vốn">
-      <div className="chart-grid" />
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img">
-        <defs>
-          <linearGradient id="equityFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#35d58b" stopOpacity="0.28" />
-            <stop offset="100%" stopColor="#35d58b" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <polygon points={area} fill="url(#equityFill)" />
-        {coords.length > 1 && <polyline points={coords.join(" ")} fill="none" stroke="#41e69a" strokeWidth="1.35" vectorEffect="non-scaling-stroke" />}
-      </svg>
-      <div className="chart-axis"><span>{money(max, true)}</span><span>{money(min, true)}</span></div>
-    </div>
+    <EquityTimeChart
+      points={points}
+      ariaLabel="Đường cong lợi nhuận tích lũy theo thời gian với trục phần trăm bên trái và số tiền bên phải"
+      percentLabel="ROI / tổng rủi ro (%)"
+      moneyLabel="Lãi lỗ (VND)"
+    />
   );
 }
 
@@ -1633,7 +1614,6 @@ export default function Home() {
   const renderContent = () => {
     switch (view) {
       case "overview": return renderOverview();
-      case "btc": return <BtcRealtime />;
       case "journal": return renderJournal();
       case "calendar": return renderCalendar();
       case "analytics": return renderAnalytics();
