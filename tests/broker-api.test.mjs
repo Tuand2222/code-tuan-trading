@@ -1,4 +1,4 @@
-­r‡^Ñf¥–Ø¦{NìyÊ'vÃ®¶›­import assert from "node:assert/strict";
+import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import test from "node:test";
 import { hmacHex, verifyBrokerAccess } from "../lib/broker-api.ts";
@@ -30,6 +30,46 @@ test("Binance credentials are verified against the selected account API", async 
   assert.match(result.detail, /Futures API Ä‘Ã£ xÃ¡c thá»±c/);
 });
 
+test("Binance Spot retries an official fallback endpoint after a 403", async (context) => {
+  const originalFetch = globalThis.fetch;
+  context.after(() => { globalThis.fetch = originalFetch; });
+  const calls = [];
+  globalThis.fetch = async (input) => {
+    const url = String(input);
+    calls.push(url);
+    if (url.startsWith("https://api.binance.com/")) {
+      return new Response("Forbidden", { status: 403, statusText: "Forbidden" });
+    }
+    return Response.json({ balances: [] });
+  };
+
+  const result = await verifyBrokerAccess({
+    provider: "binance",
+    accountType: "spot",
+    apiKey: "key",
+    apiSecret: "secret",
+  });
+  assert.equal(calls.length, 2);
+  assert.match(calls[1], /^https:\/\/api-gcp\.binance\.com\/api\/v3\/account\?/);
+  assert.match(result.endpoint, /^https:\/\/api-gcp\.binance\.com\/api\/v3\/account$/);
+});
+
+test("Binance 403 diagnostics explain server-side WAF/IP blocking", async (context) => {
+  const originalFetch = globalThis.fetch;
+  context.after(() => { globalThis.fetch = originalFetch; });
+  globalThis.fetch = async () => new Response("Forbidden", { status: 403, statusText: "Forbidden" });
+
+  await assert.rejects(
+    verifyBrokerAccess({
+      provider: "binance",
+      accountType: "futures",
+      apiKey: "key",
+      apiSecret: "secret",
+    }),
+    /HTTP 403 Forbidden.*WAF\/IP\/region\/rate-limit.*fapi\.binance\.com/s,
+  );
+});
+
 test("Bybit rejects API keys that are not read-only", async (context) => {
   const originalFetch = globalThis.fetch;
   context.after(() => { globalThis.fetch = originalFetch; });
@@ -47,6 +87,22 @@ test("Bybit rejects API keys that are not read-only", async (context) => {
       apiSecret: "secret",
     }),
     /Read-Only/,
+  );
+});
+
+test("Bybit 403 diagnostics explain IP/rate/region restrictions", async (context) => {
+  const originalFetch = globalThis.fetch;
+  context.after(() => { globalThis.fetch = originalFetch; });
+  globalThis.fetch = async () => new Response("Forbidden", { status: 403, statusText: "Forbidden" });
+
+  await assert.rejects(
+    verifyBrokerAccess({
+      provider: "bybit",
+      accountType: "linear",
+      apiKey: "key",
+      apiSecret: "secret",
+    }),
+    /HTTP 403 Forbidden.*IP rate-limit.*khu vá»±c/s,
   );
 });
 
