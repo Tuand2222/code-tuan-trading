@@ -112,7 +112,7 @@ export default function RootLayout({
         />
         {children}
         <a
-          href="/api/version"
+          href="/version.json"
           aria-label={`Phiên bản build ${buildInfo.shortCommit}`}
           title={`Commit ${buildInfo.commit} · Build ${buildInfo.builtAt}`}
           style={{
