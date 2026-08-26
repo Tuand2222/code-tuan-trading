@@ -51,6 +51,7 @@ import SystemTracker from "./components/SystemTracker";
 import TradingMetrix from "./components/TradingMetrix";
 import { normalizeNumericInput, selectNumericInput } from "./components/numeric-input";
 import { authClient } from "../lib/auth-client";
+import { parseBinanceCsvText, parseBinanceFuturesText, type BinanceImportedTrade } from "../lib/binance-import";
 
 type View =
   | "overview"
@@ -127,6 +128,13 @@ type DraftTrade = Omit<Trade, "id" | "discipline" | "durationMin" | "market" | "
   noFomo: boolean;
   noRevenge: boolean;
   screenshot: boolean;
+};
+
+type BinancePreview = {
+  fileName: string;
+  detected: number;
+  trades: BinanceImportedTrade[];
+  errors: string[];
 };
 
 type Connection = {
@@ -828,6 +836,8 @@ export default function Home() {
   const [mobileNav, setMobileNav] = useState(false);
   const [draft, setDraft] = useState<DraftTrade>(makeDraft);
   const [toast, setToast] = useState("");
+  const [binancePreview, setBinancePreview] = useState<BinancePreview | null>(null);
+  const [binanceImporting, setBinanceImporting] = useState(false);
   const [notes, setNotes] = useState(NOTE_TEMPLATES[0].content);
   const [calendarMonth, setCalendarMonth] = useState(new Date(2026, 7, 1));
 
@@ -1074,6 +1084,105 @@ export default function Home() {
     }
   };
 
+  const binanceToTrade = (item: BinanceImportedTrade): Trade => ({
+    id: item.externalId,
+    date: item.date,
+    symbol: item.symbol,
+    side: item.side,
+    session: item.session,
+    setup: item.setup,
+    timeframe: item.timeframe,
+    risk: item.risk,
+    pnl: item.pnl,
+    discipline: item.discipline,
+    psychology: item.psychology,
+    note: item.note,
+    durationMin: item.durationMin,
+    market: item.market,
+    source: item.source,
+    quantity: item.quantity,
+    entryPrice: item.entryPrice,
+    exitPrice: item.exitPrice,
+    fees: item.fees,
+    externalId: item.externalId,
+  });
+  const prepareBinanceImport = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    setBinanceImporting(true);
+    try {
+      const isPdf = file.name.toLowerCase().endsWith(".pdf") || file.type === "application/pdf";
+      let result;
+      if (isPdf) {
+        const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+        pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+        const document = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+        let text = "";
+        for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
+          const page = await document.getPage(pageNumber);
+          const content = await page.getTextContent();
+          text += `${content.items.map((item) => "str" in item ? item.str : "").join(" ")}\n`;
+        }
+        result = parseBinanceFuturesText(text);
+      } else if (file.name.toLowerCase().endsWith(".csv")) {
+        result = parseBinanceCsvText(await file.text());
+      } else {
+        throw new Error("File không hợp lệ. Chỉ nhận PDF hoặc CSV Binance.");
+      }
+      if (!result.detected && !result.trades.length) throw new Error(result.errors[0] ?? "Không tìm thấy giao dịch trong file.");
+      setBinancePreview({ fileName: file.name, detected: result.detected, trades: result.trades, errors: result.errors });
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "Không đọc được PDF Binance.");
+    } finally {
+      setBinanceImporting(false);
+    }
+  };
+  const commitBinanceImport = async () => {
+    if (!binancePreview?.trades.length) return;
+    setBinanceImporting(true);
+    try {
+      const imported = binancePreview.trades.map(binanceToTrade);
+      let accepted: Trade[] = [];
+      if (dataMode === "cloud") {
+        for (let index = 0; index < imported.length; index += 500) {
+          const response = await fetch("/api/trades", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ trades: imported.slice(index, index + 500) }) });
+          const payload = await response.json().catch(() => ({})) as { trades?: Trade[]; error?: string };
+          if (!response.ok) throw new Error(payload.error ?? "Database unavailable");
+          accepted = [...accepted, ...(payload.trades ?? [])];
+        }
+      } else {
+        const known = new Set(trades.filter((trade) => !isDemoDataset(trades)).map((trade) => `${trade.source ?? ""}:${trade.externalId ?? trade.id}`));
+        accepted = imported.filter((trade) => {
+          const key = `${trade.source ?? ""}:${trade.externalId ?? trade.id}`;
+          if (known.has(key)) return false;
+          known.add(key);
+          return true;
+        });
+      }
+      setTrades((current) => {
+        const base = isDemoDataset(current) ? [] : current;
+        const known = new Set(base.map((trade) => `${trade.source ?? ""}:${trade.externalId ?? trade.id}`));
+        const unique = accepted.filter((trade) => {
+          const key = `${trade.source ?? ""}:${trade.externalId ?? trade.id}`;
+          if (known.has(key)) return false;
+          known.add(key);
+          return true;
+        });
+        const next = [...unique, ...base];
+        window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
+        return next;
+      });
+      setIsDemo(false);
+      window.localStorage.setItem(demoStorageKey, "false");
+      setBinancePreview(null);
+      setToast(`Import thành công: ${accepted.length}/${imported.length} giao dịch mới · Giao dịch trùng: ${imported.length - accepted.length} · Lỗi: ${binancePreview.errors.length}`);
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "Không thể lưu giao dịch Binance.");
+    } finally {
+      setBinanceImporting(false);
+    }
+  };
   const saveTrade = async (event: FormEvent) => {
     event.preventDefault();
     const risk = Number(draft.risk);
@@ -1565,7 +1674,7 @@ export default function Home() {
       <section className="quote-strip">
         <div><span>NGUYÊN TẮC CỐT LÕI</span><strong>“Giao dịch tốt không phải lệnh thắng — mà là lệnh đúng kế hoạch.”</strong></div>
         <div className="quote-actions">
-          <button type="button" className="ghost-button excel-button" onClick={exportTradeHistory} disabled={!journalTrades.length} title={`Xuất báo cáo chi tiết cho ${journalTrades.length} giao dịch đang hiển thị`}><FileSpreadsheet size={16} /> Xuất báo cáo Excel</button>
+          <button type="button" className="ghost-button excel-button" onClick={exportTradeHistory} disabled={!journalTrades.length} title={`Xuất báo cáo chi tiết cho ${journalTrades.length} giao dịch đang hiển thị`}><FileSpreadsheet size={16} /> Xuất báo cáo Excel</button><label className="gold-button compact file-button" title="Nhập lịch sử vị thế Binance PDF hoặc CSV"><FileUp size={16} /> {binanceImporting ? "Đang đọc…" : "Import Binance"}<input type="file" accept="application/pdf,.pdf,.csv,text/csv" onChange={(event) => { void prepareBinanceImport(event); }} disabled={binanceImporting} /></label>
           <button type="button" className="gold-button compact" onClick={openTradeModal}><Plus size={17} /> Thêm giao dịch</button>
         </div>
       </section>
@@ -1586,6 +1695,7 @@ export default function Home() {
           return <button type="button" className="journal-image-card" key={image.id} onClick={() => setActiveImage(image)} aria-label={`Xem ảnh giao dịch ${trade.symbol}`}><img src={image.url} alt={`Biểu đồ ${trade.symbol} ngày ${trade.date}`} loading="lazy" /><span className="journal-image-shade"><b>{trade.symbol}</b><small>{DATE.format(new Date(`${trade.date}T12:00:00`))} · {trade.side}</small></span><i><ZoomIn size={14} /></i></button>;
         })}</div> : <div className="journal-media-empty"><Camera size={24} /><div><strong>{isDemo ? "Ảnh chỉ lưu trong nhật ký thật" : "Chưa có ảnh biểu đồ"}</strong><p>{isDemo ? "Bắt đầu nhật ký thật rồi tải ảnh trước/sau lệnh từ điện thoại." : "Dùng nút “Tải ảnh nhanh” hoặc đính kèm khi thêm giao dịch."}</p></div></div>}
       </section>
+      {binancePreview && <section className="panel binance-preview-panel" aria-live="polite"><div className="panel-title"><div><span className="eyebrow">BINANCE IMPORT PREVIEW</span><h3>{binancePreview.fileName}</h3></div><span className="status-chip">{binancePreview.detected} detected</span></div><p className="import-summary"><strong>{binancePreview.trades.length} hợp lệ</strong> · {binancePreview.errors.length} lỗi parse · Kiểm tra preview trước khi lưu vào Journal.</p><div className="table-scroll"><table><thead><tr><th>Symbol</th><th>Hướng</th><th>Entry</th><th>Exit</th><th>Quantity</th><th>Closed PNL</th><th>Mở</th></tr></thead><tbody>{binancePreview.trades.slice(0, 20).map((trade) => <tr key={trade.externalId}><td><strong>{trade.symbol}</strong></td><td>{trade.side}</td><td>{trade.entryPrice}</td><td>{trade.exitPrice}</td><td>{trade.quantity}</td><td className={trade.pnl >= 0 ? "positive-text" : "negative-text"}>{trade.pnl}</td><td>{trade.date}</td></tr>)}</tbody></table></div>{binancePreview.errors.length > 0 && <p className="import-errors">{binancePreview.errors.slice(0, 3).join(" · ")}</p>}<div className="preview-actions"><button type="button" className="ghost-button" onClick={() => setBinancePreview(null)} disabled={binanceImporting}>Hủy</button><button type="button" className="gold-button compact" onClick={() => void commitBinanceImport()} disabled={binanceImporting || !binancePreview.trades.length}>{binanceImporting ? "Đang lưu…" : `Import ${binancePreview.trades.length} giao dịch hợp lệ`}</button></div></section>}
       <section className="filter-bar">
         <label className="search"><span>⌕</span><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Tìm sản phẩm, setup, ghi chú..." /></label>
         <select value={journalMarket} onChange={(e) => setJournalMarket(e.target.value as "all" | Market)} aria-label="Lọc theo thị trường"><option value="all">Tất cả thị trường</option>{MARKETS.slice(1).map((market) => <option key={market.id} value={market.id}>{market.label}</option>)}</select>

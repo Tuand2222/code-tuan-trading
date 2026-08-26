@@ -124,6 +124,8 @@ button, select { cursor: pointer; }
 .panel-copy { color: #8f99a5; font-size: 11px; line-height: 1.7; margin: 10px 0 0; text-align: center; }
 .positive-text { color: var(--green) !important; }.negative-text { color: var(--red) !important; }
 
+.binance-preview-panel { margin-top: 14px; border-color: #4e4125; background: linear-gradient(145deg, rgba(235,166,45,.07), #11161c 40%); }.binance-preview-panel .panel-title { margin-bottom: 8px; }.import-summary { color: #8d968f; font-size: 10px; margin: 0 0 12px; }.import-summary strong { color: #aee4c8; }.import-errors { margin: 10px 0 0; color: #ff9696; font-size: 9px; line-height: 1.5; }.preview-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+
 .quote-strip { padding: 17px 18px; border: 1px solid #3c3425; background: linear-gradient(90deg, rgba(231,163,43,.1), rgba(20,25,32,.96) 60%); border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
 .quote-strip div { display: flex; flex-direction: column; gap: 4px; }.quote-strip span { color: #b68734; font-size: 9px; font-weight: 800; letter-spacing: .13em; }.quote-strip strong { font-size: 13px; }
 .quote-strip .quote-actions { flex: 0 0 auto; flex-direction: row; align-items: center; gap: 8px; }

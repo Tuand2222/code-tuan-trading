@@ -21,6 +21,7 @@
     "lightweight-charts": "5.2.0",
     "lucide-react": "^1.29.0",
     "next": "16.2.6",
+    "pdfjs-dist": "^5.7.284",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "xlsx-js-style": "1.2.0"
