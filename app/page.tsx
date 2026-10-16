@@ -29,7 +29,6 @@ import {
   LayoutDashboard,
   ListChecks,
   LoaderCircle,
-  LogOut,
   Menu,
   NotebookPen,
   Pencil,
@@ -41,7 +40,6 @@ import {
   ShieldCheck,
   Sparkles,
   Trash2,
-  UserRound,
   ZoomIn,
   type LucideIcon,
 } from "lucide-react";
@@ -51,7 +49,8 @@ import SystemTracker from "./components/SystemTracker";
 import TradingMetrix from "./components/TradingMetrix";
 import { normalizeNumericInput, selectNumericInput } from "./components/numeric-input";
 import { authClient } from "../lib/auth-client";
-import { parseBinanceCsvText, parseBinanceFuturesText, type BinanceImportedTrade } from "../lib/binance-import";
+import { parseBinanceFuturesText, type BinanceImportedTrade } from "../lib/binance-import";
+import { parseTradeCsv, parseTradeWorkbook } from "../lib/trade-import";
 
 type View =
   | "overview"
@@ -130,10 +129,10 @@ type DraftTrade = Omit<Trade, "id" | "discipline" | "durationMin" | "market" | "
   screenshot: boolean;
 };
 
-type BinancePreview = {
+type TradeImportPreview = {
   fileName: string;
   detected: number;
-  trades: BinanceImportedTrade[];
+  trades: Trade[];
   errors: string[];
 };
 
@@ -810,7 +809,6 @@ export default function Home() {
   const [view, setView] = useState<View>("overview");
   const [trades, setTrades] = useState<Trade[]>(SAMPLE_TRADES);
   const [isDemo, setIsDemo] = useState(true);
-  const [authRequired, setAuthRequired] = useState(false);
   const [analyticsTab, setAnalyticsTab] = useState<AnalyticsTab>("symbol");
   const [range, setRange] = useState("all");
   const [query, setQuery] = useState("");
@@ -836,15 +834,11 @@ export default function Home() {
   const [mobileNav, setMobileNav] = useState(false);
   const [draft, setDraft] = useState<DraftTrade>(makeDraft);
   const [toast, setToast] = useState("");
-  const [binancePreview, setBinancePreview] = useState<BinancePreview | null>(null);
-  const [binanceImporting, setBinanceImporting] = useState(false);
+  const [tradeImportPreview, setTradeImportPreview] = useState<TradeImportPreview | null>(null);
+  const [tradeImportBusy, setTradeImportBusy] = useState(false);
   const [notes, setNotes] = useState(NOTE_TEMPLATES[0].content);
   const [calendarMonth, setCalendarMonth] = useState(new Date(2026, 7, 1));
 
-  const signOutWebsite = async () => {
-    await authClient.signOut();
-    window.location.reload();
-  };
   const syncAllLock = useRef(false);
   const syncAllConnectionsRef = useRef<(silent?: boolean, staleOnly?: boolean) => Promise<void>>(async () => undefined);
 
@@ -875,14 +869,10 @@ export default function Home() {
     void (async () => {
       try {
         const response = await fetch("/api/trades", { cache: "no-store" });
-        if (response.status === 401) {
-          setAuthRequired(true);
-          return;
-        }
+        if (response.status === 401) return;
         if (!response.ok) return;
         const payload = await response.json() as { trades?: Trade[] };
         setDataMode("cloud");
-        setAuthRequired(false);
         const cloudTrades = payload.trades ?? [];
         setTrades(cloudTrades);
         setIsDemo(false);
@@ -1053,7 +1043,7 @@ export default function Home() {
       return;
     }
     if (dataMode !== "cloud") {
-      setToast("Đăng nhập tài khoản Trading Plan Pro để lưu hình ảnh riêng tư trên cloud.");
+      setToast("Lưu ảnh riêng tư lên cloud hiện không khả dụng; giao dịch và ghi chú vẫn được lưu trên thiết bị này.");
       return;
     }
     if (!effectiveImageTradeId) {
@@ -1085,7 +1075,7 @@ export default function Home() {
   };
 
   const binanceToTrade = (item: BinanceImportedTrade): Trade => ({
-    id: item.externalId,
+    id: crypto.randomUUID(),
     date: item.date,
     symbol: item.symbol,
     side: item.side,
@@ -1106,14 +1096,16 @@ export default function Home() {
     fees: item.fees,
     externalId: item.externalId,
   });
-  const prepareBinanceImport = async (event: ChangeEvent<HTMLInputElement>) => {
+  const prepareTradeImport = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
-    setBinanceImporting(true);
+    setTradeImportPreview(null);
+    setTradeImportBusy(true);
     try {
-      const isPdf = file.name.toLowerCase().endsWith(".pdf") || file.type === "application/pdf";
-      let result;
+      const extension = file.name.toLowerCase().split(".").pop();
+      const isPdf = extension === "pdf" || file.type === "application/pdf";
+      let result: { trades: Trade[]; errors: string[]; detected: number };
       if (isPdf) {
         const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
         pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
@@ -1124,25 +1116,28 @@ export default function Home() {
           const content = await page.getTextContent();
           text += `${content.items.map((item) => "str" in item ? item.str : "").join(" ")}\n`;
         }
-        result = parseBinanceFuturesText(text);
-      } else if (file.name.toLowerCase().endsWith(".csv")) {
-        result = parseBinanceCsvText(await file.text());
+        const parsed = parseBinanceFuturesText(text);
+        result = { ...parsed, trades: parsed.trades.map(binanceToTrade) };
+      } else if (extension === "csv") {
+        result = parseTradeCsv(await file.text(), "CSV");
+      } else if (["xlsx", "xls", "xlsm"].includes(extension ?? "")) {
+        result = await parseTradeWorkbook(file);
       } else {
-        throw new Error("File không hợp lệ. Chỉ nhận PDF hoặc CSV Binance.");
+        throw new Error("Định dạng chưa hỗ trợ. Hãy chọn PDF Binance Futures, Excel hoặc CSV.");
       }
       if (!result.detected && !result.trades.length) throw new Error(result.errors[0] ?? "Không tìm thấy giao dịch trong file.");
-      setBinancePreview({ fileName: file.name, detected: result.detected, trades: result.trades, errors: result.errors });
+      setTradeImportPreview({ fileName: file.name, detected: result.detected, trades: result.trades, errors: result.errors });
     } catch (error) {
-      setToast(error instanceof Error ? error.message : "Không đọc được PDF Binance.");
+      setToast(error instanceof Error ? error.message : "Không đọc được file nhật ký.");
     } finally {
-      setBinanceImporting(false);
+      setTradeImportBusy(false);
     }
   };
-  const commitBinanceImport = async () => {
-    if (!binancePreview?.trades.length) return;
-    setBinanceImporting(true);
+  const commitTradeImport = async () => {
+    if (!tradeImportPreview?.trades.length) return;
+    setTradeImportBusy(true);
     try {
-      const imported = binancePreview.trades.map(binanceToTrade);
+      const imported = tradeImportPreview.trades;
       let accepted: Trade[] = [];
       if (dataMode === "cloud") {
         for (let index = 0; index < imported.length; index += 500) {
@@ -1152,9 +1147,9 @@ export default function Home() {
           accepted = [...accepted, ...(payload.trades ?? [])];
         }
       } else {
-        const known = new Set(trades.filter((trade) => !isDemoDataset(trades)).map((trade) => `${trade.source ?? ""}:${trade.externalId ?? trade.id}`));
+        const known = new Set(trades.filter((trade) => !isDemoDataset(trades)).map((trade) => trade.externalId ?? trade.id));
         accepted = imported.filter((trade) => {
-          const key = `${trade.source ?? ""}:${trade.externalId ?? trade.id}`;
+          const key = trade.externalId ?? trade.id;
           if (known.has(key)) return false;
           known.add(key);
           return true;
@@ -1162,9 +1157,9 @@ export default function Home() {
       }
       setTrades((current) => {
         const base = isDemoDataset(current) ? [] : current;
-        const known = new Set(base.map((trade) => `${trade.source ?? ""}:${trade.externalId ?? trade.id}`));
+        const known = new Set(base.map((trade) => trade.externalId ?? trade.id));
         const unique = accepted.filter((trade) => {
-          const key = `${trade.source ?? ""}:${trade.externalId ?? trade.id}`;
+          const key = trade.externalId ?? trade.id;
           if (known.has(key)) return false;
           known.add(key);
           return true;
@@ -1175,12 +1170,12 @@ export default function Home() {
       });
       setIsDemo(false);
       window.localStorage.setItem(demoStorageKey, "false");
-      setBinancePreview(null);
-      setToast(`Import thành công: ${accepted.length}/${imported.length} giao dịch mới · Giao dịch trùng: ${imported.length - accepted.length} · Lỗi: ${binancePreview.errors.length}`);
+      setTradeImportPreview(null);
+      setToast(`Đã thêm ${accepted.length}/${imported.length} giao dịch · Trùng: ${imported.length - accepted.length} · Dòng lỗi: ${tradeImportPreview.errors.length}`);
     } catch (error) {
-      setToast(error instanceof Error ? error.message : "Không thể lưu giao dịch Binance.");
+      setToast(error instanceof Error ? error.message : "Không thể lưu giao dịch đã nhập.");
     } finally {
-      setBinanceImporting(false);
+      setTradeImportBusy(false);
     }
   };
   const saveTrade = async (event: FormEvent) => {
@@ -1238,7 +1233,7 @@ export default function Home() {
         setToast(imageCount ? `Đã lưu giao dịch và ${imageCount} hình ảnh.` : existing ? "Đã cập nhật giao dịch." : "Đã lưu giao dịch mới.");
       } catch { setToast("Đã lưu trên thiết bị; dữ liệu cloud hoặc hình ảnh chưa đồng bộ."); }
     } else {
-      setToast(imagesToUpload.length ? "Đã lưu lệnh trên thiết bị; đăng nhập để lưu hình ảnh." : existing ? "Đã cập nhật giao dịch." : "Đã lưu giao dịch mới.");
+      setToast(imagesToUpload.length ? "Đã lưu lệnh trên thiết bị; ảnh chưa được đồng bộ." : existing ? "Đã cập nhật giao dịch." : "Đã lưu giao dịch mới.");
     }
   };
 
@@ -1375,7 +1370,7 @@ export default function Home() {
 
   const openConnection = (provider: Provider) => {
     if (dataMode !== "cloud") {
-      setToast(authRequired ? "Đăng nhập tài khoản Trading Plan Pro để dùng kết nối broker được mã hóa." : "Đồng bộ riêng tư chưa sẵn sàng; chưa thể lưu thông tin broker.");
+      setToast("Kết nối broker tự động cần kho cloud riêng. Bạn có thể nhập PDF, Excel hoặc CSV trực tiếp trong Nhật ký.");
       return;
     }
     setWebhookToken("");
@@ -1674,10 +1669,11 @@ export default function Home() {
       <section className="quote-strip">
         <div><span>NGUYÊN TẮC CỐT LÕI</span><strong>“Giao dịch tốt không phải lệnh thắng — mà là lệnh đúng kế hoạch.”</strong></div>
         <div className="quote-actions">
-          <button type="button" className="ghost-button excel-button" onClick={exportTradeHistory} disabled={!journalTrades.length} title={`Xuất báo cáo chi tiết cho ${journalTrades.length} giao dịch đang hiển thị`}><FileSpreadsheet size={16} /> Xuất báo cáo Excel</button><label className="gold-button compact file-button" title="Nhập lịch sử vị thế Binance PDF hoặc CSV"><FileUp size={16} /> {binanceImporting ? "Đang đọc…" : "Import Binance"}<input type="file" accept="application/pdf,.pdf,.csv,text/csv" onChange={(event) => { void prepareBinanceImport(event); }} disabled={binanceImporting} /></label>
+          <button type="button" className="ghost-button excel-button" onClick={exportTradeHistory} disabled={!journalTrades.length} title={`Xuất báo cáo chi tiết cho ${journalTrades.length} giao dịch đang hiển thị`}><FileSpreadsheet size={16} /> Xuất báo cáo Excel</button><label className="gold-button compact file-button" title="Nhập giao dịch từ PDF Binance Futures, Excel hoặc CSV"><FileUp size={16} /> {tradeImportBusy ? "Đang đọc…" : "Nhập file nhật ký"}<input type="file" accept="application/pdf,.pdf,.xlsx,.xls,.xlsm,.csv,text/csv" onChange={(event) => { void prepareTradeImport(event); }} disabled={tradeImportBusy} /></label>
           <button type="button" className="gold-button compact" onClick={openTradeModal}><Plus size={17} /> Thêm giao dịch</button>
         </div>
       </section>
+      <p className="journal-import-hint">PDF: lịch sử vị thế Binance Futures. Excel/CSV: cột Ngày, Sản phẩm hoặc Symbol, Lệnh, Lãi/Lỗ hoặc P&amp;L. Dữ liệu được đọc ngay trên trình duyệt và xem trước trước khi lưu.</p>
       <section className="journal-media-panel" aria-labelledby="journal-media-title">
         <div className="journal-media-head">
           <div className="journal-media-title">
@@ -1695,7 +1691,7 @@ export default function Home() {
           return <button type="button" className="journal-image-card" key={image.id} onClick={() => setActiveImage(image)} aria-label={`Xem ảnh giao dịch ${trade.symbol}`}><img src={image.url} alt={`Biểu đồ ${trade.symbol} ngày ${trade.date}`} loading="lazy" /><span className="journal-image-shade"><b>{trade.symbol}</b><small>{DATE.format(new Date(`${trade.date}T12:00:00`))} · {trade.side}</small></span><i><ZoomIn size={14} /></i></button>;
         })}</div> : <div className="journal-media-empty"><Camera size={24} /><div><strong>{isDemo ? "Ảnh chỉ lưu trong nhật ký thật" : "Chưa có ảnh biểu đồ"}</strong><p>{isDemo ? "Bắt đầu nhật ký thật rồi tải ảnh trước/sau lệnh từ điện thoại." : "Dùng nút “Tải ảnh nhanh” hoặc đính kèm khi thêm giao dịch."}</p></div></div>}
       </section>
-      {binancePreview && <section className="panel binance-preview-panel" aria-live="polite"><div className="panel-title"><div><span className="eyebrow">BINANCE IMPORT PREVIEW</span><h3>{binancePreview.fileName}</h3></div><span className="status-chip">{binancePreview.detected} detected</span></div><p className="import-summary"><strong>{binancePreview.trades.length} hợp lệ</strong> · {binancePreview.errors.length} lỗi parse · Kiểm tra preview trước khi lưu vào Journal.</p><div className="table-scroll"><table><thead><tr><th>Symbol</th><th>Hướng</th><th>Entry</th><th>Exit</th><th>Quantity</th><th>Closed PNL</th><th>Mở</th></tr></thead><tbody>{binancePreview.trades.slice(0, 20).map((trade) => <tr key={trade.externalId}><td><strong>{trade.symbol}</strong></td><td>{trade.side}</td><td>{trade.entryPrice}</td><td>{trade.exitPrice}</td><td>{trade.quantity}</td><td className={trade.pnl >= 0 ? "positive-text" : "negative-text"}>{trade.pnl}</td><td>{trade.date}</td></tr>)}</tbody></table></div>{binancePreview.errors.length > 0 && <p className="import-errors">{binancePreview.errors.slice(0, 3).join(" · ")}</p>}<div className="preview-actions"><button type="button" className="ghost-button" onClick={() => setBinancePreview(null)} disabled={binanceImporting}>Hủy</button><button type="button" className="gold-button compact" onClick={() => void commitBinanceImport()} disabled={binanceImporting || !binancePreview.trades.length}>{binanceImporting ? "Đang lưu…" : `Import ${binancePreview.trades.length} giao dịch hợp lệ`}</button></div></section>}
+      {tradeImportPreview && <section className="panel binance-preview-panel" aria-live="polite"><div className="panel-title"><div><span className="eyebrow">XEM TRƯỚC GIAO DỊCH</span><h3>{tradeImportPreview.fileName}</h3></div><span className="status-chip">{tradeImportPreview.detected} dòng nhận diện</span></div><p className="import-summary"><strong>{tradeImportPreview.trades.length} giao dịch hợp lệ</strong> · {tradeImportPreview.errors.length} dòng cần kiểm tra · Chỉ lưu sau khi bạn xác nhận.</p><div className="table-scroll"><table><thead><tr><th>Ngày</th><th>Thị trường</th><th>Sản phẩm</th><th>Hướng</th><th>Khối lượng</th><th>Giá vào</th><th>Giá ra</th><th>Lãi/Lỗ</th></tr></thead><tbody>{tradeImportPreview.trades.slice(0, 20).map((trade) => <tr key={`${trade.id}-${trade.date}`}><td>{trade.date}</td><td>{marketOf(trade)}</td><td><strong>{trade.symbol}</strong></td><td>{trade.side}</td><td>{trade.quantity ?? 0}</td><td>{trade.entryPrice ?? 0}</td><td>{trade.exitPrice ?? 0}</td><td className={trade.pnl >= 0 ? "positive-text" : "negative-text"}>{money(trade.pnl, true)}</td></tr>)}</tbody></table></div>{tradeImportPreview.trades.length > 20 && <p className="import-summary">Hiển thị 20 dòng đầu; sẽ lưu {tradeImportPreview.trades.length} giao dịch hợp lệ.</p>}{tradeImportPreview.errors.length > 0 && <p className="import-errors">{tradeImportPreview.errors.slice(0, 3).join(" · ")}</p>}<div className="preview-actions"><button type="button" className="ghost-button" onClick={() => setTradeImportPreview(null)} disabled={tradeImportBusy}>Hủy</button><button type="button" className="gold-button compact" onClick={() => void commitTradeImport()} disabled={tradeImportBusy || !tradeImportPreview.trades.length}>{tradeImportBusy ? "Đang lưu…" : `Thêm ${tradeImportPreview.trades.length} giao dịch`}</button></div></section>}
       <section className="filter-bar">
         <label className="search"><span>⌕</span><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Tìm sản phẩm, setup, ghi chú..." /></label>
         <select value={journalMarket} onChange={(e) => setJournalMarket(e.target.value as "all" | Market)} aria-label="Lọc theo thị trường"><option value="all">Tất cả thị trường</option>{MARKETS.slice(1).map((market) => <option key={market.id} value={market.id}>{market.label}</option>)}</select>
@@ -1874,7 +1870,7 @@ export default function Home() {
       <section className="security-banner">
         <div className="security-icon"><ShieldCheck size={20} /></div>
         <div><span className="eyebrow">KẾT NỐI AN TOÀN</span><h3>Một journal cho mọi thị trường</h3><p>API key và bridge token được mã hóa AES-GCM phía máy chủ. Mật khẩu, PIN/OTP và private key đặt lệnh luôn nằm ngoài journal.</p></div>
-        <span className={`cloud-status ${dataMode}`}><i />{dataMode === "cloud" ? "Vùng dữ liệu riêng đã sẵn sàng" : authRequired ? "Đăng nhập để kết nối" : "Cloud chưa sẵn sàng"}</span>
+        <span className={`cloud-status ${dataMode}`}><i />{dataMode === "cloud" ? "Vùng dữ liệu riêng đã sẵn sàng" : "Đang lưu trên thiết bị"}</span>
       </section>
       <section className="auto-sync-banner">
         <span className="auto-sync-icon"><Radio size={19} /></span>
@@ -1893,7 +1889,7 @@ export default function Home() {
             <div className="broker-head"><span className="broker-logo">{broker.badge}</span><div><h3>{broker.name}</h3><small>{broker.mode}</small></div><span className={`connection-state ${connection ? "connected" : "idle"}`}><i />{connection ? "Đã cấu hình" : "Chưa kết nối"}</span></div>
             <p>{broker.copy}</p>
             {connection && <div className="connection-meta"><span>{connection.label}</span><small>{isBridgeProvider(connection.provider) ? connection.accountType === "push" ? "Push 24/7 · tự nhận lệnh" : "Pull · kiểm tra mỗi 15 phút" : connection.lastSyncAt ? `Đồng bộ ${new Intl.DateTimeFormat("vi-VN", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(connection.lastSyncAt))}` : "Chưa đồng bộ lần đầu"}</small>{isBridgeProvider(connection.provider) && connection.lastSyncAt && <small>Cập nhật {new Intl.DateTimeFormat("vi-VN", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(connection.lastSyncAt))}</small>}</div>}
-            {broker.provider === "vn-broker" ? <div className="vn-import-controls"><select value={connectionDraft.brokerName} onChange={(e) => setConnectionDraft({ ...connectionDraft, brokerName: e.target.value })} aria-label="Chọn broker chứng khoán"><option>VPS</option><option>SSI</option><option>TCBS</option><option>VNDIRECT</option><option>MBS</option><option>HSC</option><option>Broker VN</option></select><label className="gold-button compact file-button">Nhập CSV<input type="file" accept=".csv,.txt,text/csv" multiple data-market="Chứng khoán" data-broker={connectionDraft.brokerName} onChange={importCsv} /></label></div> : <div className="broker-actions">{canSync && <button type="button" className="gold-button compact" disabled={syncingId === connection.id} onClick={() => void syncConnection(connection)}>{syncingId === connection.id ? "Đang đồng bộ…" : "Đồng bộ ngay"}</button>}<button type="button" className={`${connection ? "ghost-button" : "gold-button compact"} ${dataMode !== "cloud" ? "requires-cloud" : ""}`} onClick={() => openConnection(broker.provider)}>{connection ? broker.provider === "webhook" || (isBridgeProvider(broker.provider) && connection.accountType === "push") ? "Cập nhật / token" : "Cập nhật" : dataMode !== "cloud" ? "Yêu cầu đăng nhập" : broker.provider === "tradingview" ? "Xem thiết lập" : "Kết nối"}</button>{connection && <button type="button" className="icon-button delete" onClick={() => void disconnect(connection)} aria-label={`Ngắt ${broker.name}`}>×</button>}</div>}
+            {broker.provider === "vn-broker" ? <div className="vn-import-controls"><select value={connectionDraft.brokerName} onChange={(e) => setConnectionDraft({ ...connectionDraft, brokerName: e.target.value })} aria-label="Chọn broker chứng khoán"><option>VPS</option><option>SSI</option><option>TCBS</option><option>VNDIRECT</option><option>MBS</option><option>HSC</option><option>Broker VN</option></select><label className="gold-button compact file-button">Nhập CSV<input type="file" accept=".csv,.txt,text/csv" multiple data-market="Chứng khoán" data-broker={connectionDraft.brokerName} onChange={importCsv} /></label></div> : <div className="broker-actions">{canSync && <button type="button" className="gold-button compact" disabled={syncingId === connection.id} onClick={() => void syncConnection(connection)}>{syncingId === connection.id ? "Đang đồng bộ…" : "Đồng bộ ngay"}</button>}<button type="button" className={`${connection ? "ghost-button" : "gold-button compact"} ${dataMode !== "cloud" ? "requires-cloud" : ""}`} onClick={() => openConnection(broker.provider)}>{connection ? broker.provider === "webhook" || (isBridgeProvider(broker.provider) && connection.accountType === "push") ? "Cập nhật / token" : "Cập nhật" : dataMode !== "cloud" ? "Cần cloud riêng" : broker.provider === "tradingview" ? "Xem thiết lập" : "Kết nối"}</button>{connection && <button type="button" className="icon-button delete" onClick={() => void disconnect(connection)} aria-label={`Ngắt ${broker.name}`}>×</button>}</div>}
             <div className="broker-foot"><span>{broker.scope}</span><span>Không đặt lệnh</span></div>
           </article>;
         })}
@@ -1915,8 +1911,7 @@ export default function Home() {
 
   const renderSettings = () => <section className="settings-grid">
     <article className="panel settings-card"><div><span className="eyebrow">NHẬN DIỆN</span><h3>Hồ sơ nhật ký</h3></div><label>Tên hiển thị<input defaultValue="Tuan Trader" /></label><label>Khẩu hiệu<input defaultValue="Kỷ luật · Kiên định · Tăng trưởng" /></label><label>Tiền tệ<select defaultValue="VND"><option>VND</option><option>USD</option></select></label><button className="gold-button compact" onClick={() => setToast("Đã lưu cài đặt hiển thị.")}>Lưu thay đổi</button></article>
-    <article className="panel settings-card"><div><span className="eyebrow">DỮ LIỆU & SAO LƯU</span><h3>Quản lý dữ liệu</h3></div><div className={`data-mode-card ${dataMode}`}><Database size={18} /><div><strong>{isDemo ? "Đang xem dữ liệu minh họa" : dataMode === "cloud" ? "Đồng bộ riêng tư đang hoạt động" : "Dữ liệu đang ở thiết bị này"}</strong><p>{isDemo ? "Các con số hiện tại chỉ để trải nghiệm tính năng, không phải kết quả giao dịch thật." : dataMode === "cloud" ? "Giao dịch được lưu theo tài khoản và đồng bộ giữa các thiết bị đã đăng nhập." : "Hãy xuất bản sao định kỳ; xóa dữ liệu trình duyệt có thể làm mất nhật ký cục bộ."}</p></div></div>
-      {accountSession?.user ? <div className="settings-account"><span className="account-avatar">{accountSession.user.image ? <img src={accountSession.user.image} alt="" /> : <UserRound size={15} />}</span><div><strong>{accountSession.user.name}</strong><small>{accountSession.user.email}</small></div><button type="button" onClick={() => void signOutWebsite()}><LogOut size={14} /> Đăng xuất</button></div> : <a className="signin-button" href="/dang-nhap?returnTo=%2F%23settings">Đăng nhập tài khoản để đồng bộ</a>}
+    <article className="panel settings-card"><div><span className="eyebrow">DỮ LIỆU & SAO LƯU</span><h3>Quản lý dữ liệu</h3></div><div className={`data-mode-card ${dataMode}`}><Database size={18} /><div><strong>{isDemo ? "Đang xem dữ liệu minh họa" : dataMode === "cloud" ? "Đồng bộ riêng tư đang hoạt động" : "Dữ liệu đang ở thiết bị này"}</strong><p>{isDemo ? "Các con số hiện tại chỉ để trải nghiệm tính năng, không phải kết quả giao dịch thật." : dataMode === "cloud" ? "Giao dịch được lưu trong vùng dữ liệu riêng." : "Nhật ký được lưu trong trình duyệt hiện tại; hãy xuất bản sao định kỳ để chuyển dữ liệu sang thiết bị khác."}</p></div></div>
       <div className="backup-actions"><button className="ghost-button full" onClick={exportBackup}><FileDown size={16} /> Xuất bản sao JSON</button><label className="ghost-button full file-button backup-file"><FileUp size={16} /> Nhập bản sao<input type="file" accept="application/json,.json" onChange={importBackup} /></label></div>
       {!isDemo && <button className="ghost-button full" onClick={restoreDemo}>Xem dữ liệu minh họa</button>}
       <button className="danger-button" onClick={clearAll}>{isDemo ? "Bắt đầu với nhật ký trống" : "Xóa toàn bộ giao dịch"}</button>
@@ -1987,7 +1982,7 @@ export default function Home() {
         <header className="topbar">
           <button className="mobile-menu" aria-label="Mở menu" onClick={() => setMobileNav(true)}><Menu size={18} /></button>
           <div><h1>{meta.title}</h1><p>{meta.subtitle}</p></div>
-          <div className="top-actions"><span className={`data-state-chip ${isDemo ? "demo" : dataMode}`}><Database size={14} />{isDemo ? "Dữ liệu minh họa" : dataMode === "cloud" ? "Đã đồng bộ" : "Trên thiết bị"}</span>{view === "overview" && <select value={range} onChange={(e) => setRange(e.target.value)} aria-label="Khoảng thời gian"><option value="all">Toàn bộ thời gian</option><option value="30">30 ngày qua</option><option value="90">90 ngày qua</option></select>}{accountSession?.user ? <div className="account-chip"><span className="account-avatar">{accountSession.user.image ? <img src={accountSession.user.image} alt="" /> : <UserRound size={14} />}</span><span>{accountSession.user.name || accountSession.user.email}</span><button className="account-signout" type="button" onClick={() => void signOutWebsite()} aria-label="Đăng xuất"><LogOut size={14} /></button></div> : <a className="account-login-link" href="/dang-nhap" aria-label="Đăng nhập"><UserRound size={15} /><span>Đăng nhập</span></a>}<button className="quick-add" onClick={openTradeModal}><Plus size={16} /> <span>Thêm lệnh</span></button></div>
+          <div className="top-actions"><span className={`data-state-chip ${isDemo ? "demo" : dataMode}`}><Database size={14} />{isDemo ? "Dữ liệu minh họa" : dataMode === "cloud" ? "Đã đồng bộ" : "Trên thiết bị"}</span>{view === "overview" && <select value={range} onChange={(e) => setRange(e.target.value)} aria-label="Khoảng thời gian"><option value="all">Toàn bộ thời gian</option><option value="30">30 ngày qua</option><option value="90">90 ngày qua</option></select>}<button className="quick-add" onClick={openTradeModal}><Plus size={16} /> <span>Thêm lệnh</span></button></div>
         </header>
         <div className="content-area">
           {isDemo && <section className="demo-banner" role="status"><div className="demo-icon"><Sparkles size={18} /></div><div><span>CHẾ ĐỘ MINH HỌA</span><strong>Toàn bộ 20 giao dịch và +23,9 triệu đang hiển thị là dữ liệu mẫu</strong><p>Dữ liệu này dùng để trải nghiệm tính năng, không phải thành tích giao dịch thực tế hay bằng chứng về lợi nhuận.</p></div><div className="demo-actions"><button type="button" onClick={startRealJournal}>Bắt đầu nhật ký thật</button><a href="/phuong-phap">Xem phương pháp</a></div></section>}
