@@ -32,7 +32,7 @@ export async function cashKey(event: CashEvent, account: Account): Promise<strin
     ...(event.nativeId ? ['native', event.nativeId] : [new Date(event.tsUtc).toISOString(), dec(D(event.amount)), event.ccy])]);
 }
 export function economicSignature(entry: Fill | CashEvent): string {
-  const ignored = new Set(['fillId', 'eventId', 'batchId', 'dedupeKey', 'dedupeOcc', 'active', 'raw']);
+  const ignored = new Set(['fillId', 'eventId', 'batchId', 'dedupeKey', 'dedupeOcc', 'active', 'raw', 'reconcilesFillId']);
   const value: Record<string, unknown> = Object.fromEntries(Object.entries(entry).filter(([k]) => !ignored.has(k)));
   if ('costs' in value) value.costs = (entry as Fill).costs.map(c => Object.fromEntries(Object.entries(c).filter(([key]) => key !== 'rateToVND' && key !== 'batchId')));
   return canonicalJSON(value);

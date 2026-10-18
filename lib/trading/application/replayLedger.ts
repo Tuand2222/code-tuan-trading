@@ -1,9 +1,11 @@
 import { reanchorOverlays } from '../domain/finance';
-import { replayBook } from '../domain/replayBook';
+import { replayBook, type SourcePreference } from '../domain/replayBook';
 import type { LedgerSnapshot, ReplayResult } from '../domain/types';
 
 export async function replayLedger(data: LedgerSnapshot): Promise<ReplayResult> {
-  const results = await Promise.all(data.accounts.map(a => replayBook(data.fills, a, data.batches, data.cashEvents, data.overlays)));
+  const preferences = data.settings.sourcePreferences as Record<string, SourcePreference> | undefined;
+  const results = await Promise.all(data.accounts.map(a => replayBook(data.fills, a, data.batches, data.cashEvents, data.overlays,
+    ['prefer-fills', 'prefer-reports'].includes(preferences?.[a.accountId] ?? '') ? preferences![a.accountId] : 'confirm-overlaps')));
   return { cycles: results.flatMap(r => r.cycles), events: results.flatMap(r => r.events).sort((a, b) => a.tsUtc.localeCompare(b.tsUtc) || a.eventId.localeCompare(b.eventId)), openPositions: results.flatMap(r => r.openPositions), anomalies: results.flatMap(r => r.anomalies) };
 }
 export async function anchorSnapshot(data: LedgerSnapshot): Promise<LedgerSnapshot> {

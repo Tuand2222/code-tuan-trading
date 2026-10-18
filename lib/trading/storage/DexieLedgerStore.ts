@@ -41,6 +41,7 @@ export class DexieLedgerStore extends Dexie implements LedgerStore {
   async commitBatch(input: CommitInput, expected: number): Promise<CommitResult> {
     const snapshot = await this.snapshot(); if (snapshot.version !== expected) throw new Error('STALE_LEDGER_VERSION');
     const batch = batchSchema.parse(input.batch), data = snapshot.data;
+    if (batch.counts.errors || batch.counts.conflicts) throw new Error('IMPORT_HAS_UNRESOLVED_ROWS');
     const already = data.batches.find(b => b.idempotencyKey === batch.idempotencyKey && b.accountId === batch.accountId && b.status === 'committed');
     if (already) return { version: expected, newEntries: 0, duplicates: input.fills.length + input.cashEvents.length, batchId: already.batchId };
     if (data.batches.some(b => b.batchId === batch.batchId)) throw new Error('BATCH_ID_ALREADY_USED');
@@ -77,7 +78,7 @@ export class DexieLedgerStore extends Dexie implements LedgerStore {
     next = await anchorSnapshot(next);
     const version = await this.replace(next, expected);
     if (!data.batches.length) await storageHealth(undefined, true).catch(() => undefined);
-    return { version, newEntries: committed.counts.newEntries, duplicates: committed.counts.duplicates, batchId: committed.batchId };
+    return { version, newEntries: committed.counts.newEntries, duplicates: committed.counts.duplicates, batchId: committed.batchId, fillIdMap: Object.fromEntries(idMap) };
   }
   async rollbackBatch(batchId: string, expected: number): Promise<number> {
     const current = await this.snapshot(); if (current.version !== expected) throw new Error('STALE_LEDGER_VERSION');
@@ -111,6 +112,12 @@ export class DexieLedgerStore extends Dexie implements LedgerStore {
     if (previous.accountKey !== parsed.accountKey || previous.platform !== parsed.platform || previous.bookMode !== parsed.bookMode || previous.baseCcy !== parsed.baseCcy) throw new Error('ACCOUNT_IDENTITY_CHANGE_REQUIRES_MIGRATION');
     const next = { ...current.data, accounts: current.data.accounts.map(a => a.accountId === parsed.accountId ? parsed : a) };
     return this.replace(await anchorSnapshot(next), expected, { kind: 'before-account-update', json: await encodeBackup(current.data) });
+  }
+  async addAccount(account: Account, expected: number): Promise<number> {
+    const current = await this.snapshot(); if (current.version !== expected) throw new Error('STALE_LEDGER_VERSION');
+    const parsed = accountSchema.parse(account);
+    if (current.data.accounts.some(a => a.accountId === parsed.accountId || a.platform === parsed.platform && a.accountKey === parsed.accountKey)) throw new Error('ACCOUNT_ALREADY_EXISTS');
+    return this.replace({ ...current.data, accounts: [...current.data.accounts, parsed] }, expected);
   }
   async markBackupDownloaded(at = new Date().toISOString()) { await this.meta.put({ key: 'lastBackupAt', value: at }); }
 }

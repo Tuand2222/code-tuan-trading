@@ -19,7 +19,8 @@ function cycleFrom(fill: Fill, account: Account, tradeId: string): Cycle {
     pnlBasis: 'gross', costCompleteness: 'complete', reconciliation: 'unverifiable', risk: { origin: 'none' },
     sourceFillIds: [], sourceBatchIds: [], anomalies: [] };
 }
-export async function replayBook(entries: Fill[], account: Account, batches: ImportBatch[], cashEvents: CashEvent[] = [], overlays: TradeOverlay[] = []): Promise<ReplayResult> {
+export type SourcePreference = 'confirm-overlaps' | 'prefer-fills' | 'prefer-reports';
+export async function replayBook(entries: Fill[], account: Account, batches: ImportBatch[], cashEvents: CashEvent[] = [], overlays: TradeOverlay[] = [], sourcePreference: SourcePreference = 'confirm-overlaps'): Promise<ReplayResult> {
   const result: ReplayResult = { cycles: [], events: [], openPositions: [], anomalies: [] };
   const batchMap = new Map(batches.map(b => [b.batchId, b]));
   const active = entries.filter(f => f.active && f.accountId === account.accountId);
@@ -150,8 +151,9 @@ export async function replayBook(entries: Fill[], account: Account, batches: Imp
     const costs = valueCosts(f.costs, batch);
     if (gross === undefined && f.reportedNet !== undefined && batch?.parseConfig.costCompleteness === 'complete' && costs.every(c => c.amount !== undefined && c.ccy === f.ccy)) gross = sum([f.reportedNet, ...costs.map(c => c.amount!)]);
     const exact = active.filter(e => e.role === 'fill' && f.positionId && e.positionId === f.positionId && e.symbol === f.symbol);
-    if (exact.length && result.cycles.some(c => c.granularity === 'fill' && c.status === 'closed' && exact.some(e => c.sourceFillIds.includes(e.fillId)))) cycle.shadowed = true;
-    else if (result.cycles.some(c => c.granularity === 'fill' && c.symbol === f.symbol && c.openTsUtc && c.openTsUtc <= f.closeTsUtc && (!c.closeTsUtc || c.closeTsUtc >= f.closeTsUtc))) flag('POSSIBLE_CROSS_REPORT_OVERLAP', [f.fillId]);
+    const covered = result.cycles.filter(c => c.granularity === 'fill' && c.status === 'closed' && c.bookKey === f.bookKey && c.sourceFillIds.every(id => exact.some(e => e.fillId === id)));
+    // An ID alone is insufficient: a truncated fill export must not hide a complete position.
+    if (sourcePreference !== 'prefer-reports' && f.role === 'reported-position' && covered.length === 1 && covered[0].openTsUtc === f.openTsUtc && covered[0].closeTsUtc === f.closeTsUtc && D(sum(covered[0].legs.filter(l => l.role === 'open').map(l => l.qty))).eq(D(f.qty))) cycle.shadowed = true;
     const event = eventFinance({ eventId: await hash([cycle.tradeId, f.fillId, 'reported']), tradeId: cycle.tradeId, fillId: f.fillId, accountId: account.accountId, symbol: f.symbol, batchId: f.batchId,
       tsUtc: f.closeTsUtc, qtyClosed: f.qty, gross, costs, ccy: f.ccy, fx: rate ? { rateToVND: rate } : undefined, kind: 'close', shadowed: cycle.shadowed,
       costCompleteness: batch?.parseConfig.costCompleteness ?? 'unknown' }, f.reportedNet);
@@ -159,12 +161,40 @@ export async function replayBook(entries: Fill[], account: Account, batches: Imp
     cycle.reconciliation = reconcile(f.reportedNet, eventFinance({ ...event }).net);
     result.events.push(event); result.cycles.push(cycle);
   }
+  const localDay = (ts: string) => new Intl.DateTimeFormat('en-CA', { timeZone: account.sourceTimezone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ts));
+  const rank = (c: Cycle) => ({ fill: 4, position: 3, 'closing-order': 2, 'day-symbol': 1 })[c.granularity];
+  const overlaps = (a: Cycle, b: Cycle) => {
+    if (a.bookKey !== b.bookKey || a.granularity === b.granularity) return false;
+    const [higher, lower] = rank(a) > rank(b) ? [a, b] : [b, a];
+    if (!lower.closeTsUtc) return false;
+    if (lower.granularity === 'position') return !!higher.openTsUtc && higher.openTsUtc <= lower.closeTsUtc && (!higher.closeTsUtc || higher.closeTsUtc >= lower.openTsUtc!);
+    return result.events.some(e => e.tradeId === higher.tradeId && localDay(e.tsUtc) === localDay(lower.closeTsUtc!));
+  };
+  // Resolve the entire graph, not insertion order. Source choices are explicit settings;
+  // raw rows remain active so another choice can replay the original evidence.
+  const excluded = new Set(result.cycles.filter(c => c.shadowed).map(c => c.tradeId));
+  for (let i = 0; i < result.cycles.length; i++) for (let j = i + 1; j < result.cycles.length; j++) {
+    const a = result.cycles[i], b = result.cycles[j];
+    if (a.shadowed || b.shadowed || !overlaps(a, b)) continue;
+    if (sourcePreference === 'confirm-overlaps') flag('POSSIBLE_CROSS_REPORT_OVERLAP', [...a.sourceFillIds, ...b.sourceFillIds], 'blocker');
+    else {
+      const useReports = sourcePreference === 'prefer-reports' && (a.granularity === 'fill' || b.granularity === 'fill');
+      const lower = useReports ? a.granularity === 'fill' ? a : b : rank(a) < rank(b) ? a : b;
+      excluded.add(lower.tradeId);
+    }
+  }
+  for (const cycle of result.cycles) if (excluded.has(cycle.tradeId)) { cycle.shadowed = true; cycle.anomalies.push('CROSS_REPORT_COMPARISON_ONLY'); }
+  for (const event of result.events) if (event.tradeId && excluded.has(event.tradeId)) event.shadowed = true;
+  result.openPositions = result.openPositions.filter(lot => !excluded.has(lot.tradeId));
   for (const cash of cashEvents.filter(e => e.active && e.accountId === account.accountId)) {
     if (['deposit', 'withdrawal', 'reported-realized'].includes(cash.kind)) continue;
     if (cash.reconcilesFillId) {
-      if (!active.some(f => f.fillId === cash.reconcilesFillId)) flag('INVALID_CASH_LINK', [cash.eventId], 'blocker');
+      if (!active.some(f => f.fillId === cash.reconcilesFillId && (!cash.symbol || f.symbol === cash.symbol) && f.costs.some(c => c.kind === cash.kind && c.ccy === cash.ccy && c.amount !== undefined && D(c.amount).eq(D(cash.amount))))) flag('INVALID_CASH_LINK', [cash.eventId], 'blocker');
       continue;
     }
+    const possibleCostCopies = active.filter(f => f.batchId !== cash.batchId && (!cash.symbol || f.symbol === cash.symbol) &&
+      (f.role === 'fill' ? f.tsUtc === cash.tsUtc : f.closeTsUtc === cash.tsUtc) && f.costs.some(c => c.kind === cash.kind && c.ccy === cash.ccy && c.amount !== undefined && D(c.amount).eq(D(cash.amount))));
+    if (possibleCostCopies.length) flag('POSSIBLE_DUPLICATE_CASH_COST', [cash.eventId, ...possibleCostCopies.map(f => f.fillId)], 'blocker');
     const matches = result.cycles.filter(c => !c.shadowed && c.symbol === cash.symbol && c.openTsUtc && c.openTsUtc <= cash.tsUtc && (!c.closeTsUtc || c.closeTsUtc >= cash.tsUtc)
       && (!cash.positionId || c.sourceFillIds.some(id => active.some(f => f.fillId === id && f.positionId === cash.positionId))));
     const cycle = matches.length === 1 ? matches[0] : undefined;

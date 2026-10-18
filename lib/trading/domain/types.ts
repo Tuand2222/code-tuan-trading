@@ -75,6 +75,10 @@ export const parseConfigSchema = z.object({
   priceUnit: z.object({ multiplierToCcy: decSchema, confirmedBy: z.enum(['report', 'template', 'user']), crossCheck: z.enum(['passed', 'failed', 'n/a']) }),
   qtyUnit: z.object({ multiplier: decSchema }).optional(), contractMultiplier: decSchema.optional(),
   pnlBasis: z.enum(['gross', 'net', 'unknown']), costCompleteness: z.enum(['complete', 'partial', 'unknown']), openingPositionsConfirmed: z.boolean(),
+  costSigns: z.record(z.string(), z.enum(['positive-is-paid', 'negative-is-paid'])).optional(),
+  symbolSuffixes: z.array(z.string()).optional(), symbolRoots: z.record(z.string(), z.string()).optional(),
+  feeFx: z.array(z.object({ ccy: z.string(), rateToVND: decSchema, source: z.literal('user') })).optional(),
+  tableName: z.string().optional(),
 });
 export type ParseConfig = z.infer<typeof parseConfigSchema>;
 export const batchSchema = z.object({

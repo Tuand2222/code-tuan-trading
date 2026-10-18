@@ -1,6 +1,6 @@
 import type { Account, CashEvent, Fill, ImportBatch, LedgerSnapshot, TradeOverlay } from '../domain/types';
 export interface CommitInput { batch: ImportBatch; fills: Fill[]; cashEvents: CashEvent[]; accounts?: Account[]; overlays?: TradeOverlay[]; confirmedWarnings?: string[] }
-export interface CommitResult { version: number; newEntries: number; duplicates: number; batchId: string }
+export interface CommitResult { version: number; newEntries: number; duplicates: number; batchId: string; fillIdMap?: Record<string, string> }
 export interface LedgerStore {
   getLedgerVersion(): Promise<number>;
   listEntries(scope?: { bookKey?: string; active?: boolean; accountId?: string }): Promise<Fill[]>;

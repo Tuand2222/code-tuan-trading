@@ -23,7 +23,7 @@ export function eventFinance(event: RealizedEvent, reportedNet?: Dec): RealizedE
   return { ...event, grossVND, netVND, net, costCompleteness: event.costCompleteness === 'complete' && cost !== undefined && event.costs.every(c => c.origin === 'reported') ? 'complete' : 'partial' };
 }
 export function aggregateCycle(cycle: Cycle, events: RealizedEvent[]): Cycle {
-  const own = events.filter(e => e.tradeId === cycle.tradeId && !e.shadowed);
+  const own = events.filter(e => e.tradeId === cycle.tradeId && (!e.shadowed || cycle.shadowed));
   const aggregate = (key: 'gross' | 'net' | 'grossVND' | 'netVND') => own.length && own.every(e => e[key] !== undefined) ? sum(own.map(e => e[key]!)) : undefined;
   return { ...cycle, gross: aggregate('gross'), net: aggregate('net'), grossVND: aggregate('grossVND'), netVND: aggregate('netVND'), costs: own.flatMap(e => e.costs),
     costCompleteness: own.length && own.every(e => e.costCompleteness === 'complete') ? 'complete' : 'partial' };
