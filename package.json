@@ -6,6 +6,8 @@
     "node": ">=22.13.0"
   },
   "scripts": {
+    "test:trading": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc --noEmit",
     "install:ci": "bash scripts/install-ci.sh",
     "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vite",
     "build": "bash scripts/build-verified.sh",
@@ -17,6 +19,8 @@
   },
   "dependencies": {
     "better-auth": "1.6.23",
+    "decimal.js": "^10.6.0",
+    "dexie": "^4.4.6",
     "drizzle-orm": "0.45.2",
     "lightweight-charts": "5.2.0",
     "lucide-react": "^1.29.0",
@@ -24,7 +28,8 @@
     "pdfjs-dist": "^5.7.284",
     "react": "19.2.6",
     "react-dom": "19.2.6",
-    "xlsx-js-style": "1.2.0"
+    "xlsx-js-style": "1.2.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",
@@ -37,11 +42,14 @@
     "drizzle-kit": "0.31.10",
     "eslint": "9.39.4",
     "eslint-config-next": "16.2.6",
+    "fake-indexeddb": "^6.2.6",
+    "fast-check": "^4.10.2",
     "react-server-dom-webpack": "19.2.6",
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
     "vinext": "0.0.50",
     "vite": "8.0.13",
+    "vitest": "^5.0.5",
     "wrangler": "4.92.0"
   },
   "type": "module",
