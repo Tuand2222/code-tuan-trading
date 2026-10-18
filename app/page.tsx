@@ -1,5 +1,7 @@
 "use client";
 
+import DataConnections from './components/DataConnections';
+
 import {
   Fragment,
   useEffect,
@@ -1948,7 +1950,7 @@ export default function Home() {
       case "heatmap": return renderHeatmap();
       case "process": return renderProcess();
       case "notes": return renderNotes();
-      case "connections": return renderConnections();
+      case "connections": return <details><summary>Kết nối của nhật ký cũ</summary>{renderConnections()}</details>;
       case "settings": return renderSettings();
     }
   };
@@ -1999,6 +2001,7 @@ export default function Home() {
         </header>
         <div className="content-area">
           {isDemo && <section className="demo-banner" role="status"><div className="demo-icon"><Sparkles size={18} /></div><div><span>CHẾ ĐỘ MINH HỌA</span><strong>Toàn bộ 20 giao dịch và +23,9 triệu đang hiển thị là dữ liệu mẫu</strong><p>Dữ liệu này dùng để trải nghiệm tính năng, không phải thành tích giao dịch thực tế hay bằng chứng về lợi nhuận.</p></div><div className="demo-actions"><button type="button" onClick={startRealJournal}>Bắt đầu nhật ký thật</button><a href="/phuong-phap">Xem phương pháp</a></div></section>}
+          <DataConnections active={view === 'connections'} />
           {renderContent()}
         </div>
         <footer className="app-footer"><div><span>Tuan Trader · Trading Plan Pro</span><small>{isDemo ? "Dữ liệu minh họa — không phải kết quả thực tế" : dataMode === "cloud" ? "Dữ liệu riêng đã đồng bộ" : "Dữ liệu đang lưu trên thiết bị"} · Không phải khuyến nghị đầu tư.</small></div><nav aria-label="Thông tin website"><a href="/phuong-phap">Phương pháp</a><a href="/bao-mat">Bảo mật dữ liệu</a></nav></footer>

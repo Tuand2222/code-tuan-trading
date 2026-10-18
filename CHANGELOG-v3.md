@@ -1,4 +1,4 @@
-# Thay đổi nghiệp vụ v3 (R1/R2 — chưa kích hoạt trên giao diện)
+# Thay đổi nghiệp vụ v3 (R1–R4 — trung tâm import đã kích hoạt, 12 trang chờ R5)
 
 Các quyết định dưới đây được duyệt sau Round 0. Giữ đủ 24 thẻ, ghi rõ những thay
 đổi có thể làm kết quả khác bản cũ:
@@ -18,3 +18,11 @@ Các quyết định dưới đây được duyệt sau Round 0. Giữ đủ 24 
    cho báo cáo chỉ có phía bán. Legacy có thời gian quy ước được đánh dấu rõ.
 9. Không dùng khoảng phủ thời gian như bằng chứng đủ để tự loại báo cáo chéo.
 10. Không tự bật migration, không xóa localStorage, không sửa dữ liệu cloud cũ.
+
+11. R3/R4 thêm tám adapter chạy trong Web Worker, Wizard/Preview và lưu theo batch.
+    Adapter mới chỉ được kiểm chứng bằng fixture giả lập, chưa bằng file thật.
+12. Chồng lấn chéo báo cáo chưa đủ bằng chứng bị chặn đến khi người dùng chọn
+    nguồn ưu tiên và xem tác động. Dữ liệu bị shadow vẫn giữ làm bằng chứng đối chiếu.
+13. Funding/commission trong Transaction History không được tự đếm thêm nếu
+    có khả năng đã nằm trong file fill; liên kết đối chiếu phải được xác minh.
+14. Trang Kết nối dùng sổ Dexie v3; Dashboard và các trang cũ chuyển sang sổ này ở R5.
