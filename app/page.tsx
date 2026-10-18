@@ -1,6 +1,9 @@
 "use client";
 
 import DataConnections from './components/DataConnections';
+import { LedgerProvider, useLedger } from './components/LedgerContext';
+import LedgerPages, { LedgerFilters } from './components/LedgerPages';
+import ManualTrade from './components/ManualTrade';
 
 import {
   Fragment,
@@ -800,7 +803,11 @@ function EmptyState({ title, copy }: { title: string; copy: string }) {
   return <div className="empty-state"><span>◇</span><strong>{title}</strong><p>{copy}</p></div>;
 }
 
-export default function Home() {
+export default function Home() { return <LedgerProvider><HomeContent /></LedgerProvider>; }
+function HomeContent() {
+  const ledger = useLedger();
+  const [ledgerMode, setLedgerMode] = useState(true);
+  const [manualV3, setManualV3] = useState(false);
   const [accountSession, setAccountSession] = useState<{ user: { id: string } } | null>(null);
   const [accountSessionPending, setAccountSessionPending] = useState(true);
   useEffect(() => {
@@ -915,7 +922,7 @@ export default function Home() {
 
   useEffect(() => {
     const syncViewFromUrl = () => {
-      const requested = window.location.hash.slice(1) as View;
+      const requested = window.location.hash.slice(1).split("?")[0] as View;
       if (requested && Object.prototype.hasOwnProperty.call(VIEW_META, requested)) setView(requested);
       else if (!requested) setView("overview");
     };
@@ -1634,7 +1641,7 @@ export default function Home() {
             <h2>Biến mỗi giao dịch thành dữ liệu để ra quyết định tốt hơn</h2>
             <p>Nhật ký đa thị trường dành cho nhà đầu tư Việt Nam: ghi lại bối cảnh, đo kỷ luật, kiểm soát rủi ro và chỉ kết luận lợi thế khi mẫu dữ liệu đủ lớn.</p>
             <div className="overview-actions">
-              <button className="gold-button compact" onClick={openTradeModal}><Plus size={16} /> Ghi giao dịch</button>
+              <button className="gold-button compact" onClick={() => ledgerMode ? setManualV3(true) : openTradeModal()}><Plus size={16} /> Ghi giao dịch</button>
               <a className="ghost-link" href="/phuong-phap">Xem phương pháp tính</a>
             </div>
           </div>
@@ -1685,7 +1692,7 @@ export default function Home() {
         <div><span>NGUYÊN TẮC CỐT LÕI</span><strong>“Giao dịch tốt không phải lệnh thắng — mà là lệnh đúng kế hoạch.”</strong></div>
         <div className="quote-actions">
           <button type="button" className="ghost-button excel-button" onClick={exportTradeHistory} disabled={!journalTrades.length} title={`Xuất báo cáo chi tiết cho ${journalTrades.length} giao dịch đang hiển thị`}><FileSpreadsheet size={16} /> Xuất báo cáo Excel</button><label className="gold-button compact file-button" title="Nhập giao dịch từ PDF Binance Futures, Excel hoặc CSV"><FileUp size={16} /> {tradeImportBusy ? "Đang đọc…" : "Nhập file nhật ký"}<input type="file" accept="application/pdf,.pdf,.xlsx,.xls,.xlsm,.csv,text/csv" onChange={(event) => { void prepareTradeImport(event); }} disabled={tradeImportBusy} /></label>
-          <button type="button" className="gold-button compact" onClick={openTradeModal}><Plus size={17} /> Thêm giao dịch</button>
+          <button type="button" className="gold-button compact" onClick={() => ledgerMode ? setManualV3(true) : openTradeModal()}><Plus size={17} /> Thêm giao dịch</button>
         </div>
       </section>
       <p className="journal-import-hint">PDF: lịch sử vị thế Binance Futures. Excel/CSV: cột Ngày, Sản phẩm hoặc Symbol, Lệnh, Lãi/Lỗ hoặc P&amp;L. Dữ liệu được đọc ngay trên trình duyệt và xem trước trước khi lưu.</p>
@@ -1935,6 +1942,7 @@ export default function Home() {
   </section>;
 
   const renderContent = () => {
+    if (ledgerMode && !["valuation", "connections"].includes(view)) return <LedgerPages view={view} legacyTrades={trades} legacyIsDemo={isDemo} />;
     switch (view) {
       case "overview": return renderOverview();
       case "journal": return renderJournal();
@@ -1990,23 +1998,26 @@ export default function Home() {
           <small>KỶ LUẬT · KIÊN ĐỊNH · TĂNG TRƯỞNG</small>
         </div>
         <nav aria-label="Điều hướng chính">{NAV_GROUPS.map((group) => <section className="nav-group" aria-label={group.label} key={group.label}><span className="nav-group-label">{group.label}</span>{group.items.map((item) => { const Icon = item.icon; return <button type="button" key={item.id} aria-current={view === item.id ? "page" : undefined} className={view === item.id ? "active" : ""} onClick={() => navigate(item.id)}><Icon className="nav-icon" size={17} aria-hidden="true" />{item.label}</button>; })}</section>)}</nav>
-        <div className="sidebar-footer"><button className="gold-button" onClick={openTradeModal}><Plus size={17} /> <span>Thêm giao dịch</span></button><div><span>{trades.length} lệnh</span><small>•</small><span>{isDemo ? "Dữ liệu mẫu" : money(allStats.net, true)}</span></div></div>
+        <div className="sidebar-footer"><button className="gold-button" onClick={() => ledgerMode ? setManualV3(true) : openTradeModal()}><Plus size={17} /> <span>Thêm giao dịch</span></button><div><span>{ledgerMode ? ledger.derived?.result.cycles.filter(c => !c.shadowed && c.status === "closed").length ?? 0 : trades.length} lệnh</span><small>•</small><span>{ledgerMode ? "Sổ dữ liệu v3" : isDemo ? "Dữ liệu mẫu" : money(allStats.net, true)}</span></div></div>
       </aside>
       {mobileNav && <button className="mobile-backdrop" aria-label="Đóng menu" onClick={() => setMobileNav(false)} />}
       <main className="main-content" id="main-content">
         <header className="topbar">
           <button className="mobile-menu" aria-label="Mở menu" onClick={() => setMobileNav(true)}><Menu size={18} /></button>
           <div><h1>{meta.title}</h1><p>{meta.subtitle}</p></div>
-          <div className="top-actions"><span className={`data-state-chip ${isDemo ? "demo" : dataMode}`}><Database size={14} />{isDemo ? "Dữ liệu minh họa" : dataMode === "cloud" ? "Đã đồng bộ" : "Trên thiết bị"}</span>{view === "overview" && <select value={range} onChange={(e) => setRange(e.target.value)} aria-label="Khoảng thời gian"><option value="all">Toàn bộ thời gian</option><option value="30">30 ngày qua</option><option value="90">90 ngày qua</option></select>}<button className="quick-add" onClick={openTradeModal}><Plus size={16} /> <span>Thêm lệnh</span></button></div>
+          <div className="top-actions"><span className={`data-state-chip ${isDemo ? "demo" : dataMode}`}><Database size={14} />{ledgerMode ? "Sổ v3 · Trên thiết bị" : isDemo ? "Dữ liệu minh họa" : dataMode === "cloud" ? "Đã đồng bộ" : "Trên thiết bị"}</span>{!ledgerMode && view === "overview" && <select value={range} onChange={(e) => setRange(e.target.value)} aria-label="Khoảng thời gian"><option value="all">Toàn bộ thời gian</option><option value="30">30 ngày qua</option><option value="90">90 ngày qua</option></select>}<button className="quick-add" onClick={() => ledgerMode ? setManualV3(true) : openTradeModal()}><Plus size={16} /> <span>Thêm lệnh</span></button></div>
         </header>
         <div className="content-area">
-          {isDemo && <section className="demo-banner" role="status"><div className="demo-icon"><Sparkles size={18} /></div><div><span>CHẾ ĐỘ MINH HỌA</span><strong>Toàn bộ 20 giao dịch và +23,9 triệu đang hiển thị là dữ liệu mẫu</strong><p>Dữ liệu này dùng để trải nghiệm tính năng, không phải thành tích giao dịch thực tế hay bằng chứng về lợi nhuận.</p></div><div className="demo-actions"><button type="button" onClick={startRealJournal}>Bắt đầu nhật ký thật</button><a href="/phuong-phap">Xem phương pháp</a></div></section>}
+          {!ledgerMode && isDemo && <section className="demo-banner" role="status"><div className="demo-icon"><Sparkles size={18} /></div><div><span>CHẾ ĐỘ MINH HỌA</span><strong>Toàn bộ 20 giao dịch và +23,9 triệu đang hiển thị là dữ liệu mẫu</strong><p>Dữ liệu này dùng để trải nghiệm tính năng, không phải thành tích giao dịch thực tế hay bằng chứng về lợi nhuận.</p></div><div className="demo-actions"><button type="button" onClick={startRealJournal}>Bắt đầu nhật ký thật</button><a href="/phuong-phap">Xem phương pháp</a></div></section>}
+          <section className="ledger-mode-switch"><button type="button" aria-pressed={ledgerMode} onClick={() => setLedgerMode(true)}>Nhật ký v3</button><button type="button" aria-pressed={!ledgerMode} onClick={() => setLedgerMode(false)}>{isDemo ? "Xem bản minh họa cũ" : "Xem nhật ký cũ"}</button><small>{ledgerMode ? "Dữ liệu thực được lưu riêng trên trình duyệt này. Sao lưu trong Cài đặt." : "Nhật ký cũ được giữ nguyên. Chuyển sang v3 qua Cài đặt → Xem trước chuyển dữ liệu."}</small></section>
+          {ledgerMode && !["valuation", "connections"].includes(view) && <div className="data-hub"><LedgerFilters /></div>}
           <DataConnections active={view === 'connections'} />
           {renderContent()}
         </div>
-        <footer className="app-footer"><div><span>Tuan Trader · Trading Plan Pro</span><small>{isDemo ? "Dữ liệu minh họa — không phải kết quả thực tế" : dataMode === "cloud" ? "Dữ liệu riêng đã đồng bộ" : "Dữ liệu đang lưu trên thiết bị"} · Không phải khuyến nghị đầu tư.</small></div><nav aria-label="Thông tin website"><a href="/phuong-phap">Phương pháp</a><a href="/bao-mat">Bảo mật dữ liệu</a></nav></footer>
+        <footer className="app-footer"><div><span>Tuan Trader · Trading Plan Pro</span><small>{ledgerMode ? "Sổ v3 — dữ liệu trên thiết bị" : isDemo ? "Dữ liệu minh họa — không phải kết quả thực tế" : dataMode === "cloud" ? "Dữ liệu riêng đã đồng bộ" : "Dữ liệu đang lưu trên thiết bị"} · Không phải khuyến nghị đầu tư.</small></div><nav aria-label="Thông tin website"><a href="/phuong-phap">Phương pháp</a><a href="/bao-mat">Bảo mật dữ liệu</a></nav></footer>
       </main>
 
+      {manualV3 && <ManualTrade close={() => setManualV3(false)} />}
       {modalOpen && <div className="modal-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) { setModalOpen(false); setEditingTradeId(null); } }}><form className="trade-modal professional-trade-modal" role="dialog" aria-modal="true" aria-labelledby="trade-dialog-title" onSubmit={saveTrade}>
         <div className="modal-head trade-modal-head"><div><span className="eyebrow">TRADE EXECUTION RECORD</span><h2 id="trade-dialog-title">{editingTradeId ? "Cập nhật hồ sơ giao dịch" : "Ghi nhận giao dịch mới"}</h2><p>{editingTradeId ? "Hoàn thiện dữ liệu kế hoạch, kết quả và review cho lệnh đã có." : "Ghi dữ kiện trước, đánh giá quy trình sau — kết quả chỉ là một phần của hồ sơ."}</p></div><div className="trade-modal-head-actions"><span><i /> Trường có dấu * là bắt buộc</span><button type="button" className="modal-close" onClick={() => { setModalOpen(false); setEditingTradeId(null); }} aria-label="Đóng">×</button></div></div>
         <div className="trade-modal-workspace">

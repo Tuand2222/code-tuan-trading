@@ -17,6 +17,7 @@ import { batchComparison, displayAmount, importSummary, riskOverlay, sourceImpac
 import { groupWarnings } from '../../lib/trading/import/warnings';
 import type { SourcePreference } from '../../lib/trading/domain/replayBook';
 import { readImportTemplates, type ImportTemplate } from '../../lib/trading/import/templates';
+import { useLedger } from './LedgerContext';
 
 type Template = ImportTemplate;
 const empty: LedgerSnapshot = { accounts: [], batches: [], fills: [], cashEvents: [], overlays: [], settings: {} };
@@ -33,6 +34,7 @@ function defaultAccount(connector: ConnectorId): Account {
   return { accountId: crypto.randomUUID(), accountKey: '', label: '', platform: a.platform, market: a.platform === 'VN_STOCK' || a.platform === 'GENERIC' ? 'stock' : a.platform === 'MT5' ? 'forex' : 'crypto', baseCcy: ccy, quoteCcy: ccy, costBasis: 'fifo', allowsShort: a.platform !== 'VN_STOCK' && a.platform !== 'GENERIC', bookMode: 'netting', sourceTimezone: a.declare.defaultTimezone ?? '', pnlModel: a.platform === 'MT5' ? 'reported' : 'linear', contractMultiplier: '1', openingBalances: [] };
 }
 export default function DataConnections({ active }: { active: boolean }) {
+  const sharedLedger = useLedger();
   const storeRef = useRef<DexieLedgerStore | null>(null);
   const [ledger, setLedger] = useState({ version: 0, data: empty });
   const [health, setHealth] = useState<ReplayResult>();
@@ -47,11 +49,15 @@ export default function DataConnections({ active }: { active: boolean }) {
   const [mappingEdit, setMappingEdit] = useState<Template>(), [stopConfirmed, setStopConfirmed] = useState(false);
   const [queue, setQueue] = useState<StagedImport[]>([]), [saving, setSaving] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null), dialog = useRef<HTMLDialogElement>(null), controller = useRef<AbortController | null>(null);
+  useEffect(()=>{if(active&&new URLSearchParams(window.location.hash.split('?')[1]).get('tab')==='history')setTab(2);},[active]);
   const sample = sheets[sheetIndex];
   const templates = readImportTemplates(ledger.data.settings.importTemplates);
   const availableAccounts = [...new Map([...ledger.data.accounts, ...queue.map(s => s.account)].map(a => [a.accountId, a])).values()];
   async function refresh() { const current = await storeRef.current!.snapshot(); setLedger(current); setHealth(await replayLedger(current.data)); return current; }
   useEffect(() => { const store = new DexieLedgerStore(); storeRef.current = store; void refresh().catch(e => setError(String(e))); return () => { controller.current?.abort(); store.close(); }; }, []);
+  useEffect(() => { if (sharedLedger.snapshot) setLedger(sharedLedger.snapshot); }, [sharedLedger.snapshot]);
+  useEffect(() => { if (sharedLedger.derived) setHealth(sharedLedger.derived.result); }, [sharedLedger.derived]);
+  useEffect(() => { const fx = sharedLedger.snapshot?.data.settings.defaultFX; if (typeof fx === 'string') setRate(fx); }, [sharedLedger.snapshot?.data.settings.defaultFX]);
   useEffect(() => { if (modal && dialog.current && !dialog.current.open) dialog.current.showModal(); }, [modal]);
   useEffect(() => {
     const drag = (e: DragEvent) => { if (e.dataTransfer?.types.includes('Files')) e.preventDefault(); };

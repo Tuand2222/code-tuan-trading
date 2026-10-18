@@ -1,8 +1,10 @@
 import { D } from '../domain/decimal';
 import type { Cycle, Dec } from '../domain/types';
 import { dateInZone, rMultiple } from './index';
+const timeFormatters = new Map<string, Intl.DateTimeFormat>();
+export type SessionRule = { name: string; market: string; start: string; end: string; timezone: string };
 
-export function tradeDims(cycle: Cycle, timezone = 'Asia/Ho_Chi_Minh', breakevenBand: Dec = '0') {
+export function tradeDims(cycle: Cycle, timezone = 'Asia/Ho_Chi_Minh', breakevenBand: Dec = '0', sessions: SessionRule[] = []) {
   const closeDate = cycle.closeTsUtc ? dateInZone(cycle.closeTsUtc, timezone) : undefined;
   let week: string | undefined, weekday: number | undefined;
   if (closeDate) {
@@ -15,9 +17,19 @@ export function tradeDims(cycle: Cycle, timezone = 'Asia/Ho_Chi_Minh', breakeven
   let session: string | undefined;
   if (ts) {
     const zone = cycle.market === 'stock' ? 'Asia/Ho_Chi_Minh' : 'UTC';
-    const parts = new Intl.DateTimeFormat('en-GB', { timeZone: zone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(ts));
+    if (!timeFormatters.has(zone)) timeFormatters.set(zone, new Intl.DateTimeFormat('en-GB', { timeZone: zone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }));
+    const parts = timeFormatters.get(zone)!.formatToParts(new Date(ts));
     const minutes = Number(parts.find(p => p.type === 'hour')!.value) * 60 + Number(parts.find(p => p.type === 'minute')!.value);
     session = cycle.market === 'stock' ? minutes >= 540 && minutes < 690 ? 'VN_AM' : minutes >= 780 && minutes < 900 ? 'VN_PM' : 'VN_OTHER' : minutes < 420 ? 'ASIA' : minutes < 780 ? 'EUROPE' : minutes < 1260 ? 'US' : 'OFF';
+    const configured = sessions.filter(s => s.market === cycle.market || s.market === 'all');
+    if (configured.length) {
+      session = 'Ngoài phiên cấu hình';
+      for (const rule of configured) {
+        if (!timeFormatters.has(rule.timezone)) timeFormatters.set(rule.timezone, new Intl.DateTimeFormat('en-GB', {timeZone:rule.timezone,hour:'2-digit',minute:'2-digit',hourCycle:'h23'}));
+        const time=timeFormatters.get(rule.timezone)!.format(new Date(ts)),inside=rule.start<rule.end ? time>=rule.start&&time<rule.end : time>=rule.start||time<rule.end;
+        if (inside) {session=rule.name;break;}
+      }
+    }
   }
   const h = cycle.holdMinutes, r = rMultiple(cycle);
   return { market: cycle.market, rootSymbol: cycle.rootSymbol, accountId: cycle.accountId, platform: cycle.platform, direction: cycle.direction,

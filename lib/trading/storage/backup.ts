@@ -2,11 +2,13 @@ import { z } from 'zod';
 import { D, positive } from '../domain/decimal';
 import { canonicalJSON, hash } from '../domain/identity';
 import { snapshotSchema, type LedgerSnapshot } from '../domain/types';
+import { settingsSchema } from './settings';
 
 export const SCHEMA_VERSION = 3;
 const envelopeSchema = z.object({ schemaVersion: z.literal(SCHEMA_VERSION), exportedAt: z.string().datetime(), data: snapshotSchema, checksum: z.string().regex(/^[a-f0-9]{64}$/) }).strict();
 export function validateSnapshot(input: unknown): LedgerSnapshot {
   const data = snapshotSchema.parse(input);
+  data.settings = settingsSchema.parse(data.settings);
   const unique = (ids: string[], name: string) => { if (new Set(ids).size !== ids.length) throw new Error(`DUPLICATE_${name}`); };
   unique(data.accounts.map(a => a.accountId), 'ACCOUNT'); unique(data.accounts.map(a => JSON.stringify([a.platform, a.accountKey])), 'ACCOUNT_KEY');
   unique(data.batches.map(b => b.batchId), 'BATCH'); unique(data.fills.map(f => f.fillId), 'FILL'); unique(data.cashEvents.map(e => e.eventId), 'CASH'); unique(data.overlays.map(o => o.overlayId), 'OVERLAY');

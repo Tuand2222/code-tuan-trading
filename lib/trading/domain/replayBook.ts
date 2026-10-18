@@ -32,7 +32,7 @@ export async function replayBook(entries: Fill[], account: Account, batches: Imp
     positive(fill.qty, 'quantity'); positive(fill.price, 'price');
     const key = bookKey(account, fill);
     if (fill.bookKey !== key) throw new Error('INVALID_BOOK_KEY');
-    groups.set(key, [...(groups.get(key) ?? []), fill]);
+    if (!groups.has(key)) groups.set(key, []); groups.get(key)!.push(fill);
   }
   for (const [index, opening] of account.openingBalances.entries()) {
     const qty = D(opening.qty); if (qty.isZero()) continue;
@@ -49,14 +49,14 @@ export async function replayBook(entries: Fill[], account: Account, batches: Imp
         positionSide: opening.positionSide, dedupeKey: id, dedupeOcc: 1, normVersion: 1, active: true, synthetic: 'opening-balance', raw: {}, role: 'fill',
         tsUtc: opening.asOfUtc, seq: String(lotIndex), side: qty.gt(0) ? 'buy' : 'sell', qty: positive(lot.qty), price: positive(lot.price),
         costs: [{ kind: 'commission', ccy: account.baseCcy, origin: 'missing' }] };
-      groups.set(key, [...(groups.get(key) ?? []), fill]);
+      if (!groups.has(key)) groups.set(key, []); groups.get(key)!.push(fill);
     }
   }
   for (const [key, rows] of [...groups.entries()].sort(([a], [b]) => a.localeCompare(b))) {
     const sorted = [...rows].sort(compareFills), lots: OpenLot[] = [];
     let cycle: Cycle | undefined;
     const timeGroups = new Map<string, TradeFill[]>();
-    for (const f of sorted) { const ts = new Date(f.tsUtc).toISOString(); timeGroups.set(ts, [...(timeGroups.get(ts) ?? []), f]); }
+    for (const f of sorted) { const ts = new Date(f.tsUtc).toISOString(); if (!timeGroups.has(ts)) timeGroups.set(ts, []); timeGroups.get(ts)!.push(f); }
     const ambiguous = new Set<string>();
     for (const group of timeGroups.values()) if (new Set(group.map(f => f.side)).size > 1 && (group.some(f => f.seq === undefined) || new Set(group.map(f => f.seq)).size !== group.length)) {
       group.forEach(f => ambiguous.add(f.fillId)); flag('AMBIGUOUS_ORDER', group.map(f => f.fillId));
@@ -173,8 +173,10 @@ export async function replayBook(entries: Fill[], account: Account, batches: Imp
   // Resolve the entire graph, not insertion order. Source choices are explicit settings;
   // raw rows remain active so another choice can replay the original evidence.
   const excluded = new Set(result.cycles.filter(c => c.shadowed).map(c => c.tradeId));
-  for (let i = 0; i < result.cycles.length; i++) for (let j = i + 1; j < result.cycles.length; j++) {
-    const a = result.cycles[i], b = result.cycles[j];
+  const crossGroups = new Map<string, Map<string, Cycle[]>>();
+  for (const c of result.cycles) { if (!crossGroups.has(c.bookKey)) crossGroups.set(c.bookKey, new Map()); const g = crossGroups.get(c.bookKey)!; if (!g.has(c.granularity)) g.set(c.granularity, []); g.get(c.granularity)!.push(c); }
+  const pairs = function* () { for (const groups of crossGroups.values()) { const kinds = [...groups.values()]; for (let i = 0; i < kinds.length; i++) for (let j = i + 1; j < kinds.length; j++) for (const a of kinds[i]) for (const b of kinds[j]) yield [a, b]; } };
+  for (const [a, b] of pairs()) {
     if (a.shadowed || b.shadowed || !overlaps(a, b)) continue;
     if (sourcePreference === 'confirm-overlaps') flag('POSSIBLE_CROSS_REPORT_OVERLAP', [...a.sourceFillIds, ...b.sourceFillIds], 'blocker');
     else {
@@ -205,6 +207,9 @@ export async function replayBook(entries: Fill[], account: Account, batches: Imp
     result.events.push(eventFinance({ eventId: await hash(['cash', cash.eventId]), tradeId: cycle?.tradeId, fillId: cash.eventId, accountId: account.accountId, symbol: cash.symbol, batchId: cash.batchId,
       tsUtc: cash.tsUtc, qtyClosed: '0', gross: '0', costs: [cost], ccy, fx: rate ? { rateToVND: rate } : undefined, costCompleteness: 'complete', kind: 'cash' }));
   }
+  const eventsByTrade = new Map<string, typeof result.events>();
+  for (const e of result.events) if (e.tradeId) { if (!eventsByTrade.has(e.tradeId)) eventsByTrade.set(e.tradeId, []); eventsByTrade.get(e.tradeId)!.push(e); }
+  const fillById = new Map(active.map(f => [f.fillId, f]));
   result.cycles = result.cycles.map(c => {
     const terminalUnits = c.legs.map((leg, index) => {
       const factor = (c.adjustments ?? []).filter(a => a.afterLegCount > index).reduce((v, a) => v.mul(D(a.quantityFactor)), D('1'));
@@ -216,11 +221,11 @@ export async function replayBook(entries: Fill[], account: Account, batches: Imp
     const adjustedEntry = opens.length ? dec(D(avg(opens)).plus(D(sum((c.adjustments ?? []).map(a => a.basisDelta))).div(D(qtyOpened)))) : c.avgEntry;
     const aggregated = aggregateCycle({ ...c, qtyOpened, avgEntry: adjustedEntry, avgExit: closes.length ? avg(closes) : c.avgExit,
       holdMinutes: c.openTsUtc && c.closeTsUtc ? (Date.parse(c.closeTsUtc) - Date.parse(c.openTsUtc)) / 60000 : undefined,
-      sourceFillIds: [...new Set(c.sourceFillIds)], sourceBatchIds: [...new Set(c.sourceBatchIds)], anomalies: [...new Set(c.anomalies)] }, result.events);
+      sourceFillIds: [...new Set(c.sourceFillIds)], sourceBatchIds: [...new Set(c.sourceBatchIds)], anomalies: [...new Set(c.anomalies)] }, eventsByTrade.get(c.tradeId) ?? []);
     const closingIds = new Set(closes.map(l => l.fillId));
-    const reported = active.filter((f): f is TradeFill => f.role === 'fill' && closingIds.has(f.fillId));
+    const reported = [...closingIds].map(id => fillById.get(id)).filter((f): f is TradeFill => f?.role === 'fill');
     if (c.status === 'closed' && reported.length && reported.every(f => f.reportedRealized?.gross !== undefined && f.reportedRealized.ccy === account.baseCcy)) {
-      aggregated.reconciliation = reconcile(sum(reported.map(f => f.reportedRealized!.gross!)), sum(result.events.filter(e => e.tradeId === c.tradeId && e.kind === 'close' && e.gross !== undefined).map(e => e.gross!)));
+      aggregated.reconciliation = reconcile(sum(reported.map(f => f.reportedRealized!.gross!)), sum((eventsByTrade.get(c.tradeId) ?? []).filter(e => e.kind === 'close' && e.gross !== undefined).map(e => e.gross!)));
       if (aggregated.reconciliation === 'mismatch') flag('REPORTED_PNL_MISMATCH', [...closingIds]);
     }
     return aggregated;
@@ -231,7 +236,7 @@ export async function replayBook(entries: Fill[], account: Account, batches: Imp
     // Never silently overwrite two user journals that merge into a single cycle.
     const overlay = candidates.length === 1 ? candidates[0] : undefined;
     if (candidates.length > 1) flag('OVERLAY_MERGE_CONFLICT', c.sourceFillIds);
-    const source = active.find(f => c.sourceFillIds.includes(f.fillId) && f.role === 'reported-position');
+    const source = c.sourceFillIds.map(id => fillById.get(id)).find(f => f?.role === 'reported-position');
     const risk = resolveRisk(c, account, batches, overlay, source?.role === 'reported-position' ? { price: source.stopLossPrice, origin: source.stopOrigin } : undefined);
     return { ...c, overlay, risk: risk.risk, anomalies: [...c.anomalies, ...risk.warnings] };
   });

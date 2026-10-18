@@ -30,7 +30,7 @@ export function importSummary(data: LedgerSnapshot, replay: ReplayResult, batchI
   const knownEvents = events.filter(e => e.netVND !== undefined);
   const dates = events.map(e => e.tsUtc).sort();
   return {
-    batches: batches.length, newEntries: batches.reduce((n, b) => n + b.counts.newEntries, 0), duplicates: batches.reduce((n, b) => n + b.counts.duplicates, 0),
+    batchIds, batches: batches.length, newEntries: batches.reduce((n, b) => n + b.counts.newEntries, 0), duplicates: batches.reduce((n, b) => n + b.counts.duplicates, 0),
     conflicts: batches.reduce((n, b) => n + b.counts.conflicts, 0), errors: batches.reduce((n, b) => n + b.counts.errors, 0),
     closed: cycles.filter(c => c.status === 'closed').length, open: cycles.filter(c => c.status === 'open').length, incomplete: cycles.filter(c => c.status === 'incomplete').length,
     approx: cycles.filter(c => ['closing-order', 'day-symbol'].includes(c.granularity)).length,

@@ -4,8 +4,10 @@ import type { Cycle, Dec, MetricResult, RealizedEvent, ReplayResult } from '../d
 import { metricRegistry } from './metricRegistry';
 
 export interface Filters { from?: string; to?: string; accountIds?: string[]; markets?: string[]; platforms?: string[]; exactOnly?: boolean; includeEstimatedRisk?: boolean; timezone?: string; breakevenBandVND?: Dec }
+const dateFormatters = new Map<string, Intl.DateTimeFormat>();
 export function dateInZone(ts: string, timezone = 'Asia/Ho_Chi_Minh'): string {
-  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date(ts));
+  if (!dateFormatters.has(timezone)) dateFormatters.set(timezone, new Intl.DateTimeFormat('en-CA', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit' }));
+  const parts = dateFormatters.get(timezone)!.formatToParts(new Date(ts));
   return ['year', 'month', 'day'].map(type => parts.find(p => p.type === type)!.value).join('-');
 }
 const inRange = (date: string, f: Filters) => (!f.from || date >= f.from) && (!f.to || date <= f.to);
@@ -67,9 +69,14 @@ export function metricsVM(result: ReplayResult, filters: Filters = {}): Record<s
 }
 export function calendarVM(result: ReplayResult, filters: Filters = {}) {
   const { events, cycles } = selectScope(result, filters), groups = new Map<string, RealizedEvent[]>();
-  for (const event of events) { const day = dateInZone(event.tsUtc, filters.timezone); groups.set(day, [...(groups.get(day) ?? []), event]); }
+  const closedByDate = new Map<string, Cycle[]>();
+  for (const cycle of cycles) { const day = dateInZone(cycle.closeTsUtc!, filters.timezone); if (!closedByDate.has(day)) closedByDate.set(day, []); closedByDate.get(day)!.push(cycle); }
+  for (const event of events) { const day = dateInZone(event.tsUtc, filters.timezone); if (!groups.has(day)) groups.set(day, []); groups.get(day)!.push(event); }
   return [...groups].sort(([a], [b]) => a.localeCompare(b)).map(([date, es]) => ({ date, events: es, netVND: es.every(e => e.netVND !== undefined) ? sum(es.map(e => e.netVND!)) : undefined,
-    closedCycles: cycles.filter(c => dateInZone(c.closeTsUtc!, filters.timezone) === date).length, partial: es.some(e => e.costCompleteness !== 'complete') }));
+    closedCycles: (closedByDate.get(date) ?? []).length,
+    wins: (closedByDate.get(date) ?? []).filter(c => c.netVND !== undefined && D(c.netVND).gt(filters.breakevenBandVND ?? '0')).length,
+    losses: (closedByDate.get(date) ?? []).filter(c => c.netVND !== undefined && D(c.netVND).lt(D(filters.breakevenBandVND ?? '0').neg())).length,
+    partial: es.some(e => e.costCompleteness !== 'complete') }));
 }
 export function shadowCurve(result: ReplayResult, filters: Filters = {}, threshold = 80) {
   const { events, cycles } = selectScope(result, filters);

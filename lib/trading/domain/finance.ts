@@ -63,8 +63,12 @@ export function resolveRisk(cycle: Cycle, account: Account, batches: ImportBatch
   return { risk: { origin: 'none' }, warnings };
 }
 export function reanchorOverlays(cycles: Cycle[], overlays: TradeOverlay[]): TradeOverlay[] {
+  const byFill = new Map<string, Cycle[]>();
+  for (const cycle of cycles) for (const id of cycle.sourceFillIds) { if (!byFill.has(id)) byFill.set(id, []); byFill.get(id)!.push(cycle); }
   return overlays.map(overlay => {
-    const matches = cycles.map(c => ({ cycle: c, count: overlay.anchorFillIds.filter(id => c.sourceFillIds.includes(id)).length })).filter(m => m.count > 0)
+    const counts = new Map<Cycle, number>();
+    for (const id of overlay.anchorFillIds) for (const c of byFill.get(id) ?? []) counts.set(c, (counts.get(c) ?? 0) + 1);
+    const matches = [...counts].map(([cycle, count]) => ({ cycle, count }))
       .sort((a, b) => b.count - a.count || a.cycle.tradeId.localeCompare(b.cycle.tradeId));
     if (!matches.length) return { ...overlay, state: 'detached', attachedTradeId: undefined };
     // Retain original anchors during ambiguous splits, so later replay can recover the full intent.

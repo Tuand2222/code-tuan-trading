@@ -86,11 +86,23 @@ export class DexieLedgerStore extends Dexie implements LedgerStore {
     return this.replace(preview.data, expected);
   }
   async saveOverlay(overlay: TradeOverlay, expected: number): Promise<number> {
+    return this.saveOverlays([overlay], expected);
+  }
+  async saveOverlays(overlays: TradeOverlay[], expected: number): Promise<number> {
     const current = await this.snapshot(); if (current.version !== expected) throw new Error('STALE_LEDGER_VERSION');
-    const parsed = overlaySchema.parse(overlay), next = { ...current.data, overlays: [...current.data.overlays.filter(o => o.overlayId !== parsed.overlayId), parsed] };
+    const parsed = overlays.map(o => overlaySchema.parse(o)), ids = new Set(parsed.map(o => o.overlayId));
+    if (ids.size !== parsed.length) throw new Error('DUPLICATE_OVERLAY');
+    const next = { ...current.data, overlays: [...current.data.overlays.filter(o => !ids.has(o.overlayId)), ...parsed] };
     return this.replace(await anchorSnapshot(next), expected);
   }
   async exportAll(): Promise<string> { return encodeBackup((await this.snapshot()).data); }
+  async relinkOverlay(overlayId: string, tradeId: string, expected: number): Promise<number> {
+    const current = await this.snapshot(); if (current.version !== expected) throw new Error('STALE_LEDGER_VERSION');
+    const old = current.data.overlays.find(o => o.overlayId === overlayId), cycle = (await replayLedger(current.data)).cycles.find(c => c.tradeId === tradeId && !c.shadowed);
+    if (!old || !cycle || !cycle.sourceFillIds.length) throw new Error('OVERLAY_OR_CYCLE_NOT_FOUND');
+    const overlay = { ...old, anchorFillIds: cycle.sourceFillIds, attachedTradeId: tradeId, state: 'attached' as const, updatedAt: new Date().toISOString() };
+    return this.replace(await anchorSnapshot({ ...current.data, overlays: current.data.overlays.map(o => o.overlayId === overlayId ? overlay : o) }), expected, {kind:'before-overlay-relink',json:await encodeBackup(current.data)});
+  }
   async dryRunRestore(json: string) { return restoreDryRun(json, (await this.snapshot()).data); }
   async importAll(json: string, expected: number): Promise<number> {
     const data = await decodeBackup(json), current = await this.snapshot(); if (current.version !== expected) throw new Error('STALE_LEDGER_VERSION');

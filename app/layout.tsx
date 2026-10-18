@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = "https://trading-plan-pro.tuann7260.chatgpt.site";
+const siteUrl = "https://tuannhatky.fabledcoot2.chatgpt.site";
 const siteDescription = "Trading Plan Pro giúp nhà đầu tư Việt Nam ghi nhật ký giao dịch, đo hiệu suất, quản trị rủi ro và định giá doanh nghiệp minh bạch theo dữ liệu.";
 
 export const metadata: Metadata = {
