@@ -99,6 +99,11 @@ Trên máy Windows dùng Node 24.19 và gọi trực tiếp `vinext/dist/cli.js 
 wrapper shell của dự án dành cho môi trường Sites. Worker production đã build,
 bài test rendered HTML kiểm tra `default.fetch` hoạt động.
 
+Lockfile được tạo với `legacy-peer-deps`; `.npmrc` ghi rõ tùy chọn này để `npm ci`
+trên Linux dùng cùng cách giải phụ thuộc. Nếu bỏ tùy chọn, npm 10.9.2 gặp lỗi nội bộ
+`edgesOut` khi dựng lại cây peer dependency. Các dependency trực tiếp vẫn được
+khóa bằng version/integrity và kiểm bằng build/test; không dùng `--force`.
+
 33 tests R1/R2 đã qua: gồm 60 lượt property FIFO/bình quân/bảo toàn phí, 100 lượt
 fuzz chỉ số và 30 lượt hoán vị thứ tự replay (seed cố định). 20 tests cũ đã qua.
 TypeScript không lỗi. Fixture `legacy-baseline.json` chụp 20 lệnh minh họa và 24
