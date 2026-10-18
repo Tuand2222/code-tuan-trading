@@ -48,7 +48,6 @@ import EquityTimeChart, { type EquityChartPoint } from "./components/EquityTimeC
 import SystemTracker from "./components/SystemTracker";
 import TradingMetrix from "./components/TradingMetrix";
 import { normalizeNumericInput, selectNumericInput } from "./components/numeric-input";
-import { authClient } from "../lib/auth-client";
 import { parseBinanceFuturesText, type BinanceImportedTrade } from "../lib/binance-import";
 import { parseTradeCsv, parseTradeWorkbook } from "../lib/trade-import";
 
@@ -800,7 +799,21 @@ function EmptyState({ title, copy }: { title: string; copy: string }) {
 }
 
 export default function Home() {
-  const { data: accountSession, isPending: accountSessionPending } = authClient.useSession();
+  const [accountSession, setAccountSession] = useState<{ user: { id: string } } | null>(null);
+  const [accountSessionPending, setAccountSessionPending] = useState(true);
+  useEffect(() => {
+    let active = true;
+    void fetch("/api/site-session", { cache: "no-store" })
+      .then(async (response) => response.ok ? response.json() : null)
+      .then((session) => {
+        if (active && session && typeof session === "object" && "user" in session
+          && session.user && typeof session.user === "object" && "id" in session.user
+          && typeof session.user.id === "string") setAccountSession({ user: { id: session.user.id } });
+      })
+      .catch(() => {})
+      .finally(() => { if (active) setAccountSessionPending(false); });
+    return () => { active = false; };
+  }, []);
   const accountId = accountSession?.user.id ?? "device";
   const storageSuffix = accountId === "device" ? "" : `:${accountId}`;
   const tradesStorageKey = `tuan-trader-trades${storageSuffix}`;
@@ -836,7 +849,7 @@ export default function Home() {
   const [toast, setToast] = useState("");
   const [tradeImportPreview, setTradeImportPreview] = useState<TradeImportPreview | null>(null);
   const [tradeImportBusy, setTradeImportBusy] = useState(false);
-  const [notes, setNotes] = useState(NOTE_TEMPLATES[0].content);
+  const [notes, setNotes] = useState<string>(NOTE_TEMPLATES[0].content);
   const [calendarMonth, setCalendarMonth] = useState(new Date(2026, 7, 1));
 
   const syncAllLock = useRef(false);

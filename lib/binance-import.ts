@@ -13,7 +13,7 @@ export type BinanceImportedTrade = {
   note: string;
   durationMin: number;
   market: "Crypto";
-  source: "Binance Futures PDF";
+  source: "Binance Futures PDF" | "Binance Futures CSV";
   quantity: number;
   entryPrice: number;
   exitPrice: number;

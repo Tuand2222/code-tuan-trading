@@ -57,7 +57,6 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
   other: {
-    "codex-preview": "development",
     "theme-color": "#090c11",
   },
   icons: {

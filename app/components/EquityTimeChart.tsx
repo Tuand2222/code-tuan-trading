@@ -148,11 +148,11 @@ export default function EquityTimeChart({
         fixRightEdge: true,
         timeVisible: false,
         secondsVisible: false,
-        tickMarkFormatter: (time) => SHORT_DATE.format(dateFromTime(time)),
+        tickMarkFormatter: (time: Time) => SHORT_DATE.format(dateFromTime(time)),
       },
       localization: {
         locale: "vi-VN",
-        timeFormatter: (time) => DATE.format(dateFromTime(time)),
+        timeFormatter: (time: Time) => DATE.format(dateFromTime(time)),
       },
       crosshair: {
         mode: CrosshairMode.Normal,
