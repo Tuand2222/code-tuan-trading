@@ -178,7 +178,7 @@ export default function DataConnections({ active }: { active: boolean }) {
     <input ref={fileInput} hidden type="file" accept=".csv,.tsv,.txt,.xlsx,.xls,.html,.htm" multiple onChange={e => { void readFiles([...e.target.files ?? []]); e.target.value = ''; }} />
     {active && <section className="data-hub">
       <header><div><span className="eyebrow">KẾT NỐI DỮ LIỆU · V3</span><h2>Nhập một lần. Đối chiếu rõ ràng.</h2><p>File được xử lý và lưu trên trình duyệt này. Không cần đăng nhập.</p></div><button className="gold-button compact" disabled={busy} onClick={() => fileInput.current?.click()}>Nhập file</button></header>
-      <p className="hub-notice">Bản xem trước Chặng 2: dữ liệu v3 ở trung tâm này. Dashboard và 12 trang sẽ nối vào sổ v3 ở Chặng 3; dữ liệu nhật ký cũ vẫn được giữ riêng.</p>
+      <p className="hub-notice">Dữ liệu sau khi lưu được cập nhật vào Nhật ký, Lịch và các trang phân tích. Tải bản sao JSON trong Cài đặt để bảo vệ lịch sử giao dịch.</p>
       {summaryVM && <ImportSummaryCard value={summaryVM} />}
       {summary && <p className="hub-success" role="status">{summary}</p>}
       {error && <p role="alert" className="hub-error">{error}</p>}
