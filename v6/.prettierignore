@@ -1,0 +1,3 @@
+tests/golden/*.json
+docs/
+package-lock.json
