@@ -80,3 +80,7 @@ Create an issue or discussion for questions!
 **Language:** TypeScript  
 **License:** MIT  
 **Status:** Active Development
+
+## Bản v6 đang dựng song song
+
+Nền v6 theo Master Spec nằm tại [v6/README.md](v6/README.md), tách riêng dependencies/build với website v3. Sprint S0 chưa có UI sản phẩm và không thay production. Xem checkpoint, fixture gốc và quy trình trong `v6/docs/`.

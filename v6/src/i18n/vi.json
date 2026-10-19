@@ -1,0 +1,11 @@
+{
+  "app": {
+    "name": "Trading Plan Pro",
+    "brand": "Tuan Trader",
+    "motto": "Kỷ luật · Kiên định · Tăng trưởng"
+  },
+  "status": {
+    "demo": "DỮ LIỆU MINH HỌA — không phản ánh hiệu suất thật.",
+    "hypothetical": "GIẢ ĐỊNH — không phải kết quả thực."
+  }
+}
