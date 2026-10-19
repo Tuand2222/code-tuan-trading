@@ -36,3 +36,11 @@ Không tuyên bố “100% Master Spec” khi chưa có file CSV/XLSX/HTML thậ
 Mode L lưu riêng theo origin và trình duyệt. Preview, production và Render không tự chia sẻ IndexedDB; chuyển dữ liệu bằng JSON. API/cloud cũ được giữ, có kiểm quyền; việc mở website không công khai dữ liệu tài khoản. Không triển khai R6/Mode S trong chặng này.
 
 P2 sau chặng này: tự gắn quy tắc có dry-run, gộp/tách chu kỳ thủ công, xuất review PDF/ảnh, PWA, liên kết định giá và Local Bridge. Cache chi tiết từng book, đồ thị sụt giảm chuyên dụng và các lựa chọn cảnh báo nâng cao có thể tiếp tục cải tiến sau đo đạc dữ liệu thực.
+
+## Khôi phục giao diện theo yêu cầu 19/10/2026
+
+Tổng quan sử dụng lại bố cục gốc: hero, bốn thị trường, 24 thẻ chỉ số, đường cong vốn hai trục, donut kết quả, tổng hợp theo thứ và vòng kỷ luật. Nội dung Tổng quan v3 mới đã bỏ khỏi LedgerPages. Trading MetriX và Theo dõi hệ thống có hai chế độ chọn riêng, mặc định Giao diện gốc, nhớ lựa chọn trên thiết bị; không có sổ dữ liệu cũ riêng.
+
+MetriX giữ vốn mô phỏng, mục tiêu, daily/max loss, Balance hai trục có zoom/pan, phân tích sản phẩm và bảng ngày phân trang. Theo dõi hệ thống giữ khoảng năm, vốn tham chiếu, biểu đồ năm và bảng 14 chỉ số. Các phép tính lấy cùng selectScope/metricsVM như v3. Balance dùng RealizedEvent kể cả chốt một phần; số lệnh dùng Cycle đã đóng. R chỉ dùng lệnh đủ rủi ro; điểm kỷ luật chỉ dùng lệnh review. Giá trị không xác định hiển thị —; Profit Factor không dùng sentinel 99. Trục % Tổng quan chỉ lấy Net của các lệnh đủ R chia tổng rủi ro của chính tập này, có hiển thị phạm vi; đường VNĐ giữ mọi sự kiện.
+
+Xác minh: 88 Vitest + 20 test nền, TypeScript và build Worker đạt. Bổ sung test chốt từng phần qua năm/múi giờ, bộ lọc, thiếu Net/R/review và ROI với tập trộn lệnh đủ/thiếu rủi ro. Browser QA mở cả hai chế độ, kiểm tra lựa chọn độc lập giữa hai trang. Không sửa hay xóa lịch sử giao dịch khi đổi giao diện.

@@ -4,6 +4,7 @@ import { BarChart3, BookOpen, Building2, CalendarDays, Database, Gauge, History,
 import DataConnections from './components/DataConnections';
 import { LedgerProvider, useLedger } from './components/LedgerContext';
 import LedgerPages, { LedgerFilters } from './components/LedgerPages';
+import { ClassicOverview, AnalysisModes } from './components/ClassicViews';
 import ManualTrade from './components/ManualTrade';
 import CompanyValuation from './components/CompanyValuation';
 import { readLegacySource } from '../lib/trading/storage/legacySource';
@@ -120,7 +121,7 @@ function HomeContent() {
         {demoVisible&&!['valuation','connections'].includes(view)&&<section className="hub-notice" role="status"><strong>DỮ LIỆU MINH HỌA</strong><p>Phạm vi hiện tại có lệnh giả lập để trải nghiệm nhật ký; không phải giao dịch hoặc thành tích thực tế. Chọn tài khoản ở bộ lọc để tách dữ liệu. Có thể hoàn tác cả đợt tại <a href="#connections?tab=history">Lịch sử nhập</a>.</p></section>}
         {!['valuation','connections'].includes(view)&&<div className="data-hub"><LedgerFilters/></div>}
         <DataConnections active={view==='connections'}/>
-        {view==='valuation'?<CompanyValuation/>:view==='connections'?null:<LedgerPages view={view} legacyTrades={legacy.trades} legacyIsDemo={legacy.isDemo}/>}
+        {view==='valuation'?<CompanyValuation/>:view==='connections'?null:view==='overview'?<ClassicOverview onAdd={()=>setManualOpen(true)}/>:view==='statistics'||view==='system-tracker'?<AnalysisModes view={view} onOpenJournal={()=>navigate('journal')}/>:<LedgerPages view={view} legacyTrades={legacy.trades} legacyIsDemo={legacy.isDemo}/>}
         {view==='settings'&&legacyError&&<p role="alert" className="hub-error">{legacyError}</p>}
       </div>
       <footer className="app-footer"><div><span>Tuan Trader · Trading Plan Pro</span><small>Sổ v3 — dữ liệu trên thiết bị · Không phải khuyến nghị đầu tư.</small></div><nav aria-label="Thông tin website"><a href="/phuong-phap">Phương pháp</a><a href="/bao-mat">Bảo mật dữ liệu</a></nav></footer>
