@@ -75,6 +75,7 @@ function percent(value: number) {
 
 export default function EquityTimeChart({
   points,
+  percentEnabled = true,
   references = EMPTY_REFERENCES,
   ariaLabel,
   percentLabel = "Tỷ lệ (%)",
@@ -82,6 +83,7 @@ export default function EquityTimeChart({
   emptyMessage = "Chưa có dữ liệu trong khoảng thời gian này.",
 }: {
   points: EquityChartPoint[];
+  percentEnabled?: boolean;
   references?: EquityReferenceLine[];
   ariaLabel: string;
   percentLabel?: string;
@@ -92,7 +94,7 @@ export default function EquityTimeChart({
   const chartRef = useRef<IChartApi | null>(null);
   const percentSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const moneySeriesRef = useRef<ISeriesApi<"Area"> | null>(null);
-  const showPercentRef = useRef(true);
+  const showPercentRef = useRef(percentEnabled);
   const showMoneyRef = useRef(true);
   const [showPercent, setShowPercent] = useState(true);
   const [showMoney, setShowMoney] = useState(true);
@@ -148,11 +150,11 @@ export default function EquityTimeChart({
         fixRightEdge: true,
         timeVisible: false,
         secondsVisible: false,
-        tickMarkFormatter: (time) => SHORT_DATE.format(dateFromTime(time)),
+        tickMarkFormatter: (time: Time) => SHORT_DATE.format(dateFromTime(time)),
       },
       localization: {
         locale: "vi-VN",
-        timeFormatter: (time) => DATE.format(dateFromTime(time)),
+        timeFormatter: (time: Time) => DATE.format(dateFromTime(time)),
       },
       crosshair: {
         mode: CrosshairMode.Normal,
@@ -238,13 +240,13 @@ export default function EquityTimeChart({
   }, [normalizedPoints, references]);
 
   useEffect(() => {
-    showPercentRef.current = showPercent;
+    showPercentRef.current = percentEnabled && showPercent;
     showMoneyRef.current = showMoney;
-    percentSeriesRef.current?.applyOptions({ visible: showPercent });
+    percentSeriesRef.current?.applyOptions({ visible: percentEnabled && showPercent });
     moneySeriesRef.current?.applyOptions({ visible: showMoney });
-    chartRef.current?.priceScale("left").applyOptions({ visible: showPercent });
+    chartRef.current?.priceScale("left").applyOptions({ visible: percentEnabled && showPercent });
     chartRef.current?.priceScale("right").applyOptions({ visible: showMoney });
-  }, [showMoney, showPercent]);
+  }, [showMoney, showPercent, percentEnabled]);
 
   function zoom(scale: number) {
     const timeScale = chartRef.current?.timeScale();
@@ -265,7 +267,7 @@ export default function EquityTimeChart({
     <div className="dual-axis-chart">
       <div className="dual-axis-chart-toolbar">
         <div className="dual-axis-switches" role="group" aria-label="Bật hoặc tắt đơn vị trên biểu đồ">
-          <button type="button" className={showPercent ? "active percent" : "percent"} aria-pressed={showPercent} onClick={() => setShowPercent((value) => !value)}><i /> % bên trái</button>
+          {percentEnabled&&<button type="button" className={showPercent ? "active percent" : "percent"} aria-pressed={showPercent} onClick={() => setShowPercent((value) => !value)}><i /> % bên trái</button>}
           <button type="button" className={showMoney ? "active money" : "money"} aria-pressed={showMoney} onClick={() => setShowMoney((value) => !value)}><i /> VND bên phải</button>
         </div>
         <div className="dual-axis-zoom" role="group" aria-label="Thu phóng khung thời gian">
@@ -277,13 +279,13 @@ export default function EquityTimeChart({
 
       <div className="dual-axis-readout" aria-live="polite">
         <span>{displayedPoint ? DATE.format(new Date(`${displayedPoint.date}T00:00:00Z`)) : "Thời gian"}</span>
-        <strong className="percent">{displayedPoint ? percent(displayedPoint.percent) : "—"}</strong>
+        {percentEnabled&&<strong className="percent">{displayedPoint ? percent(displayedPoint.percent) : "—"}</strong>}
         <strong className="money">{displayedPoint ? VND.format(Math.round(displayedPoint.money)) : "—"}</strong>
         <small>Kéo để pan · Cuộn hoặc chụm để zoom</small>
       </div>
 
       <div className="dual-axis-chart-frame">
-        <span className={`dual-axis-label left ${showPercent ? "" : "hidden"}`}>{percentLabel}</span>
+        <span className={`dual-axis-label left ${percentEnabled && showPercent ? "" : "hidden"}`}>{percentLabel}</span>
         <span className={`dual-axis-label right ${showMoney ? "" : "hidden"}`}>{moneyLabel}</span>
         <div ref={containerRef} className="dual-axis-chart-canvas" role="img" aria-label={ariaLabel} onDoubleClick={reset} />
         {!normalizedPoints.length && <div className="dual-axis-chart-empty"><span>⌁</span><strong>Chưa có dữ liệu</strong><p>{emptyMessage}</p></div>}
