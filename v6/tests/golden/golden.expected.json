@@ -263,7 +263,7 @@
   "holding": {
     "specNumericValue": 234.33,
     "specUnit": "hours",
-    "status": "TODO-VERIFY_SPEC_CONFLICT",
+    "status": "RESOLVED_SOURCE_MINUTES",
     "observedUnit": "minutes",
     "observedMeanMinutes": 234.33333333333334,
     "evidence": "v3 timestamps and replayBook.ts divide elapsed milliseconds by 60000; never multiply fixture times to satisfy an incorrect hours assumption"
@@ -291,11 +291,13 @@
     }
   ],
   "verification": {
-    "v6Core": "S1_PENDING",
+    "v6Core": "S1_GOLDEN_VERIFIED",
     "v3Reference": "tests/trading/v6-baseline.test.ts",
-    "unresolved": [
-      "HOLDING_UNIT_SPEC_CONFLICT",
-      "WINRATE_BREAKEVEN_DENOMINATOR_POLICY"
-    ]
+    "unresolved": [],
+    "decisions": {
+      "holding": "Original timestamps: 234.333333 minutes; display hours divides by 60",
+      "winrate": "User confirmed wins / (wins + losses) on 2026-10-19",
+      "closedAt": "Derived repository index metadata, never a persisted Trade fact"
+    }
   }
 }

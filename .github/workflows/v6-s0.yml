@@ -34,7 +34,7 @@ jobs:
       - run: npm run e2e
       - uses: actions/upload-artifact@v4
         with:
-          name: v6-s0-static-build-no-product-ui
+          name: v6-s1-debug-build
           path: v6/dist/
   v3-reference:
     runs-on: ubuntu-latest

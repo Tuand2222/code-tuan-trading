@@ -42,11 +42,6 @@ it('locks the specification values and preserves unresolved unit differences exp
   expect(expected.months.reduce((s, m) => s + m.net, 0)).toBe(expected.summary.net);
   expect(expected.octoberWeeks.reduce((s, w) => s + w.net, 0)).toBe(expected.months[1].net);
   expect(expected.rBuckets.reduce((s, b) => s + b.count, 0)).toBe(30);
-  expect(expected.holding.status).toBe('TODO-VERIFY_SPEC_CONFLICT');
-  expect(expected.verification.v6Core).toBe('S1_PENDING');
+  expect(expected.holding.status).toBe('RESOLVED_SOURCE_MINUTES');
+  expect(expected.verification.v6Core).toBe('S1_GOLDEN_VERIFIED');
 });
-it.todo('S1: validate all section 4.1–4.9 values against the new pure v6 core');
-it.todo('TODO-VERIFY: resolve 234.33 hours in spec versus 234.33 minutes in original timestamps');
-it.todo(
-  'TODO-VERIFY: choose winrate denominator with breakeven trades before adopting changed v6 formula',
-);
