@@ -1,50 +1,50 @@
-# Trading Plan Pro v6 — Sprint S0
+# Trading Plan Pro v6 — S1
 
-Ứng dụng nhật ký đa thị trường, 100% trên thiết bị, không đăng nhập. Bản v6 được dựng **song song** trong `v6/`; website v3 đang hoạt động vẫn là https://tuannhatky.fabledcoot2.chatgpt.site/.
+V6 chạy song song với nhật ký v3. S1 cung cấp lõi tính toán, lưu trữ và trang kiểm chứng; chưa thay giao diện sản phẩm. Giữ Tổng quan cũ và lựa chọn giao diện MetriX/Theo dõi hệ thống theo yêu cầu chủ dự án.
 
-## Phạm vi S0 đã duyệt
+## Chạy và kiểm tra
 
-Vite + React **18.3.1** + TypeScript strict, HashRouter (react-router-dom), Dexie/dexie-react-hooks, Zustand, ECharts, TanStack Table/Virtual, React Hook Form/Zod, decimal.js, date-fns/date-fns-tz, PapaParse/JSZip. Dependencies được khóa chính xác bằng package-lock. Node 24.19.0 dùng trong CI (khác ví dụ Node 20 trong tài liệu vì phiên bản Vite được cài yêu cầu runtime mới hơn).
-
-S0 có schema v4, bộ fixture/golden, cấu hình ESLint/Prettier/Vitest/Playwright/axe, CI và bản build tĩnh. **Chưa có giao diện sản phẩm, core v6, Dexie repository hoặc migration.** Các phần này thuộc S1–S9. Không bật PWA trước S9; plugin đã được chuẩn bị.
-
-## Chạy
-
-Trong thư mục `v6/`:
+Trong `v6/`, Node 24.19.0:
 
 ```sh
 npm ci
 npm run dev
 npm run verify
-npm run build:single
 npx playwright install --with-deps chromium
 npm run e2e
 ```
 
-`npm run verify`: lint → typecheck → unit/golden fixture → build. `npm run e2e`: kiểm tra khung S0 trống, tiêu đề, HTTP 200 và axe ở 360/768/1280 px. Không coi kiểm tra khung trống là nghiệm thu UI S2/S3. Có thể xem bản build bằng `npm run preview`; đây vẫn là nền trống có chủ đích.
+`verify` chạy lint, TypeScript strict, 20 kiểm thử unit/golden và build. E2E kiểm tra nhập fixture gốc, xác nhận trước lưu, tải lại vẫn còn dữ liệu và axe ở 360/768/1280. Kết quả CI phải được kiểm tra riêng; không coi việc viết test là đã chạy thành công.
 
-## Dữ liệu gốc & số mốc
+## Phạm vi S1
 
-- `tests/golden/fixture-30-trades.json`: **file JSON xuất nguyên vẹn từ website v3** ngày 19/10/2026; 1 tài khoản minh họa, 60 fills, 30 overlay, 24 review. Không phải giao dịch thật, không phải fixture tái dựng.
-- `provenance.json`: nguồn, checksum, SHA-256 của file, commit tham chiếu, seed dữ liệu và bootstrap.
-- `golden.expected.json`: các số mốc 4.1–4.9 và dung sai 4.10; không thay đổi giá trị để làm test xanh.
-- `../../tests/trading/v6-baseline.test.ts`: kiểm tra dữ liệu bằng **lõi v3 hiện hữu**, không chứng nhận lõi v6 chưa được viết. Chạy từ root repo bằng `npm run test:trading`.
-- `golden.test.ts`: checksum, cấu trúc fixture và tính nhất quán số mốc. Ba `it.todo` công khai: nghiệm thu core v6 ở S1, mâu thuẫn đơn vị thời gian, chính sách mẫu số winrate khi có lệnh hòa vốn.
+- `src/core`: phép tính Decimal thuần, giá vốn sau chốt từng phần/mua thêm, 24 chỉ số, R, phí, lịch theo thời điểm hiện thực hóa, shadow giả định, hàng đợi review, setup/rolling và bootstrap có seed.
+- `src/data`: schema v4, kiểm tra quan hệ và nghiệp vụ, Dexie transaction + revision chống ghi đè cạnh tranh; chỉ mục đóng lệnh nằm ngoài Trade canonical.
+- Sao lưu JSON v4 có checksum, giữ nguyên nguồn v3. Xem trước trước khi lưu; tự sao lưu dữ liệu hiện có trước thay thế. Nhập v3 trùng ID sổ bị từ chối.
+- `src/pages/Debug.tsx`: chọn JSON v3/v4, xem kết quả, lưu, xuất backup và tải bản gốc; phần phân tích chạy trong Worker.
 
-**Mâu thuẫn cần chốt trước S1:** timestamps gốc và code `replayBook.ts` cho trung bình **234,333 phút**, tương đương **3,906 giờ**, không phải 234,33 giờ như giả định trong đặc tả. Không nhân thời gian lên 60 lần. Ngoài ra v3 winrate tính thắng/tất cả chu kỳ; công thức v6 loại hòa vốn khỏi mẫu số. Bộ minh họa không có lệnh hòa nên không thể phân biệt hai định nghĩa bằng golden 30 lệnh.
+Dữ liệu ở IndexedDB trên từng origin/trình duyệt. Bản xem trước không tự đọc được dữ liệu của website v3. Xuất JSON từ v3 rồi chọn file ở v6. Sao lưu trên cùng trình duyệt không thay thế bản sao ngoài máy.
 
-Mọi schema chỉ lưu sự kiện/facts. Việc đối chiếu trạng thái closed/open với số lượng legs, foreign keys, thứ tự thời gian, highest/lowest và chi phí kế toán là cổng nghiệp vụ S1; S0 chưa thực hiện các phép tính đó. Chỉ mục `[journalId+closedAt]` trong đề xuất cũng cần chốt ở S1 vì schema cấm lưu trường dẫn xuất closedAt.
+## Quyết định nghiệp vụ đã chốt
 
-## Kiến trúc & cách chuyển đổi
+Winrate = thắng / (thắng + thua), bỏ hòa vốn khỏi mẫu số, theo lựa chọn trực tiếp của chủ dự án. 4 thắng + 4 thua + 2 hòa = 50%.
 
-`src/core/` không phụ thuộc React/DB; `src/data/` schema/repository; `src/ui/`, `src/pages/`, `src/app/`; mọi chuỗi UI mới lấy `src/i18n/vi.json`. Không dùng dữ liệu lệnh trong localStorage. Migration S1 phải lưu bản v3 nguyên vẹn trước khi chuyển, giữ điểm kỷ luật cũ và ID liên kết; không truy cập IndexedDB của origin khác.
+Timestamps gốc xác nhận thời gian giữ lệnh trung bình **234,333 phút = 3,906 giờ**. Không sửa timestamps hoặc số mốc để ép khớp giả định đơn vị giờ trong tài liệu ban đầu.
 
-## Git, CI và deploy
+Chi phí v4: commission/tax/other không âm; funding/swap dương khi trả, âm khi nhận. Net = Gross − tổng costs. `Leg.fee` là thông tin, không cộng lần hai. Phân bổ theo lượng đã chốt, phần cuối nhận số dư chính xác; phí của vị thế đang mở chỉ ghi nhận theo phần đã chốt. Báo cáo phí sử dụng cùng các sự kiện hiện thực hóa với đường vốn.
 
-Nhánh `sprint/S0-foundation`, PR dựa trên `feature/multi-broker-quant-engine` để chỉ hiển thị thay đổi S0. PR #4 vẫn chứa phiên bản v3 production. Workflow `v6-s0.yml` kiểm tra nền v6 và hồi quy v3; bản build S0 được giữ làm artifact CI. Main cần ít nhất một human approval theo CONTRIBUTING.
+## Golden và tương thích
 
-Theo xác nhận phạm vi S0, **không deploy nền trống đè website chính**. Từ S2/S3, deploy bản v6 có UI song song để kiểm tra trước chuyển đổi. Cloudflare Pages: root `v6`, build `npm ci && npm run build`, output `dist`, Node 24.19.0; dùng HashRouter, không cần SPA rewrite. Nếu tiếp tục dùng Sites, tạo site v6 riêng ở bước triển khai UI, đặt static directory `dist` và giữ project identity riêng. Không dùng Worker/server v3 cho bản tĩnh v6. `public/_headers` dành cho host hỗ trợ file này; phải kiểm tra headers thực tế của host trước khi tuyên bố CSP đã có hiệu lực.
+Fixture `tests/golden/fixture-30-trades.json` là bản xuất v3 nguyên vẹn, checksum/provenance không đổi. 30 lệnh là minh họa, không phải giao dịch thật. `core-golden.test.ts` kiểm chứng core v6 theo mục 4.1–4.9; test tham chiếu v3 ở root vẫn độc lập. Toàn bộ TODO S0 được thay bằng kiểm thử thực và ghi nhận quyết định trên.
 
-`npm run build:single` tạo một index.html với JS inline; CSP script-src self của bản nhiều file không dùng nguyên xi được cho bản single-file. Không triển khai single-file với unsafe-inline; cần thêm hash của bundle sau build hoặc dùng bản nhiều file mặc định.
+`data/legacy-v3` giữ nguyên bộ đọc/replay v3 từ nhánh nền để chuyển đổi và đối chiếu lịch sử. Giao diện v6 và chỉ số mới không dùng bộ tính cũ này.
 
-Chỉ chuyển production khi core/golden/migration và các trang S3 đạt nghiệm thu, có bản sao lưu và kế hoạch rollback. Không xóa website hoặc dữ liệu v3 ở S0.
+Migration chỉ nhận các chu kỳ tuyến tính có thể giữ chính xác giá, lượng, tiền tệ, Net và từng sự kiện đóng. Khi gặp P&L báo cáo không đủ legs, FX không đồng nhất, số dư đầu kỳ, điều chỉnh doanh nghiệp, cash event hoặc phân bổ chi phí không thể đối chiếu, hệ thống từ chối và giữ bản gốc. Không dựng giá giả để làm khớp P&L. Ảnh Blob chưa được đóng gói trong JSON S1 và bị từ chối rõ; ảnh/ZIP thuộc chặng sau.
+
+## Git và triển khai
+
+S1 ở nhánh `sprint/S1-core-storage`, PR dựa trên `sprint/S0-foundation`. Cần human approval trước merge main theo CONTRIBUTING. CI `v6-s0.yml` kiểm tra v6 và hồi quy v3.
+
+Build tĩnh mặc định: `npm run build`, thư mục `dist`. Sites S1 dùng identity riêng, không thay identity v3. Website chính: https://tuannhatky.fabledcoot2.chatgpt.site/. Chỉ chuyển sản phẩm khi các trang S3 đạt nghiệm thu và có phương án rollback.
+
+PWA/offline thuộc S9. Không tuyên bố CSP `_headers` có hiệu lực khi host chưa xác nhận hỗ trợ. Bản nhiều file là bản triển khai; `build:single` không phải đường phát hành đã kiểm chứng Worker.

@@ -1,3 +1,5 @@
-// S0 is a buildable foundation with no product UI. The React shell starts in S2.
-import { appMetaSchema } from '../data/schema';
-export const schemaVersion = appMetaSchema.shape.schemaVersion.value;
+import { createElement } from 'react';
+import { createRoot } from 'react-dom/client';
+import Debug from '../pages/Debug';
+import './debug.css';
+createRoot(document.getElementById('root')!).render(createElement(Debug));

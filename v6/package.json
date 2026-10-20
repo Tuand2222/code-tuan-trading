@@ -1,6 +1,6 @@
 {
   "name": "trading-plan-pro-v6",
-  "version": "0.0.0-s0",
+  "version": "0.1.0-s1",
   "private": true,
   "type": "module",
   "engines": {
@@ -48,6 +48,7 @@
     "@vitejs/plugin-react": "6.1.2",
     "eslint": "10.13.0",
     "eslint-plugin-react-hooks": "7.1.1",
+    "fake-indexeddb": "6.2.6",
     "globals": "17.13.0",
     "prettier": "3.9.10",
     "typescript": "5.9.3",
