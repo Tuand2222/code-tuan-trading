@@ -249,3 +249,5 @@ Sửa phát hiện trong kiểm thử: báo cáo từng loại phí phải lấy
 Migration từ chối cấu trúc không bảo toàn được (reported P&L, FX phức tạp, opening balances, corporate adjustments, cash events, phân bổ phí khác) và giữ nguồn. Blob attachment chưa được đóng gói S1. Không coi đây là hỗ trợ mọi loại dữ liệu v3. Xem README.
 
 Giữ website v3, Tổng quan cũ, các lựa chọn MetriX/System Tracker. Bản kiểm chứng S1 ở Site riêng. Main cần review theo CONTRIBUTING.
+
+Nghiệm thu cuối S1: CI 39389306523 SUCCESS cả hai job, E2E 360/768/1280 PASS; Sites v6 version 1 đã xuất bản. Vòng nhập v3 → lưu → reload → xuất v4 → khôi phục v4 thực tế thành công trên URL đã deploy, vẫn golden Đạt. Chi tiết SHA/PR/deployment tại S1-release.md. Website v3 không đổi.
