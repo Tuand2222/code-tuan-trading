@@ -123,7 +123,7 @@ export function TradeTable({
       <div className="actions">
         <label>
           {t.sort}
-          <select value={sort} onChange={(e) => setSort(e.target.value)}>
+          <select aria-label={t.sort} value={sort} onChange={(e) => setSort(e.target.value)}>
             <option value="newest">{t.newest}</option>
             <option value="oldest">{t.oldest}</option>
             <option value="profit">{t.profit}</option>

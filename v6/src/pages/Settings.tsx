@@ -60,7 +60,11 @@ export function NewJournal({ onCreated }: { onCreated: (id: string) => void }) {
         </label>
         <label>
           {t.currency}
-          <select value={currency} onChange={(e) => setCurrency(e.target.value as typeof currency)}>
+          <select
+            aria-label={t.currency}
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value as typeof currency)}
+          >
             {['VND', 'USD', 'USDT'].map((v) => (
               <option key={v}>{v}</option>
             ))}

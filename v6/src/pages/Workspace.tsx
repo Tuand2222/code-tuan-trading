@@ -181,7 +181,11 @@ function Application() {
           <h2>{vi.shell.analysis}</h2>
           <label>
             {vi.shell.timeUnit}
-            <select value={holding} onChange={(e) => setHolding(e.target.value as typeof holding)}>
+            <select
+              aria-label={vi.shell.timeUnit}
+              value={holding}
+              onChange={(e) => setHolding(e.target.value as typeof holding)}
+            >
               <option value="hours">Giờ</option>
               <option value="minutes">Phút</option>
               <option value="days">Ngày</option>

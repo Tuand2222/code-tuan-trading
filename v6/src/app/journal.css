@@ -257,10 +257,21 @@ button[aria-pressed='true'] {
     background: var(--surface);
   }
   .classic-scope {
+    --panel: var(--surface);
     --muted: #4d6073;
     --green: #186d51;
     --red: #a52d48;
     --gold: #795400;
+  }
+  .classic-scope .overview-hero-copy > p,
+  .classic-scope .overview-principles small,
+  .classic-scope .bar-value,
+  .classic-scope .bar-column,
+  .classic-scope .market-overview-grid small {
+    color: var(--muted);
+  }
+  .classic-scope .overview-principles strong {
+    color: var(--text);
   }
   .classic-scope .metrix-card,
   .classic-scope .metrix-hero,
