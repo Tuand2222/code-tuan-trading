@@ -48,3 +48,11 @@ S1 ở nhánh `sprint/S1-core-storage`, PR dựa trên `sprint/S0-foundation`. C
 Build tĩnh mặc định: `npm run build`, thư mục `dist`. Sites S1 dùng identity riêng, không thay identity v3. Website chính: https://tuannhatky.fabledcoot2.chatgpt.site/. Chỉ chuyển sản phẩm khi các trang S3 đạt nghiệm thu và có phương án rollback.
 
 PWA/offline thuộc S9. Không tuyên bố CSP `_headers` có hiệu lực khi host chưa xác nhận hỗ trợ. Bản nhiều file là bản triển khai; `build:single` không phải đường phát hành đã kiểm chứng Worker.
+
+## Cập nhật S2
+
+Khung v6 tại `#workspace`, kiểm chứng S1 tại `#debug`, thuật ngữ tại `#glossary`, trạng thái mẫu tại `#components`. Tổng quan cũ mở về site v3. Chưa cutover.
+
+24 tests kiểm chứng định dạng, đủ sáu phần KPI và bốn dòng trợ giúp, scope AND/OR không trộn sổ, URL roundtrip, projections %/R và thiếu dữ liệu. E2E thêm kiểm tra saved Views, lọc VCB (5 lệnh), tải lại, phím tắt trong input, bảng biểu đồ, overflow và axe ở 360/768/1280. Xem báo cáo phát hành để biết kiểm tra đã thực chạy.
+
+Saved Views ở IndexedDB phụ `tuan-trader-v6-views`, chưa gồm trong backup ledger S1; có thể khôi phục cấu hình bằng URL bộ lọc. V6 mới là khung S2, các trang và giao dịch S3 đang chờ triển khai. Không tuyên bố đã xong Inline Edit/sao lệnh/1–9 trên một bảng lệnh chưa có.

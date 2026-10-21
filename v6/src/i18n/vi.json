@@ -68,5 +68,412 @@
     "grossLoss": "Tổng lỗ",
     "roi": "Net / Tổng rủi ro (%)",
     "discipline": "Kỷ luật đã review (%)"
-  }
+  },
+  "shell": {
+    "title": "Không gian phân tích",
+    "subtitle": "Đọc dữ liệu theo một mạch: kết quả → bằng chứng → nguyên nhân → hành động.",
+    "stage": "Bản xem trước S2 · Khung giao diện",
+    "local": "Trên thiết bị",
+    "add": "＋ Thêm giao dịch",
+    "addNotice": "Form thêm giao dịch v6 sẽ hoàn thiện ở S3. Nhật ký hiện tại vẫn hoạt động tại website v3.",
+    "old": "Mở nhật ký hiện tại",
+    "menu": "Menu",
+    "close": "Đóng",
+    "backup": "Kiểm chứng & sao lưu",
+    "library": "Thuật ngữ",
+    "components": "Chuẩn giao diện",
+    "overview": "Tổng quan cũ",
+    "journal": "Nhật ký",
+    "analysis": "Phân tích",
+    "filter": "Bộ lọc chung",
+    "clear": "Xóa bộ lọc",
+    "all": "Tất cả",
+    "saved": "Góc nhìn đã lưu",
+    "viewName": "Tên góc nhìn",
+    "saveView": "Lưu góc nhìn",
+    "date": "Khoảng ngày",
+    "from": "Từ ngày",
+    "to": "Đến ngày",
+    "operator": "Kết hợp điều kiện",
+    "market": "Thị trường",
+    "symbol": "Mã sản phẩm",
+    "setup": "Setup",
+    "side": "Chiều",
+    "error": "Lỗi kỷ luật",
+    "result": "Kết quả",
+    "review": "Review",
+    "tag": "Nhãn",
+    "journalLabel": "Sổ nhật ký",
+    "and": "AND · khớp tất cả",
+    "or": "OR · khớp ít nhất một",
+    "scope": "Sổ và khoảng ngày luôn giới hạn phạm vi; AND/OR áp dụng cho các điều kiện còn lại.",
+    "empty": "Chưa có sổ dữ liệu",
+    "load": "Nhập bản sao v3/v4",
+    "emptyDescription": "Mở phần sao lưu để xem trước và nạp dữ liệu. Mọi thay đổi đều lưu tại trình duyệt này.",
+    "noMatches": "Không có lệnh phù hợp bộ lọc.",
+    "loading": "Đang tính từ sổ dữ liệu…",
+    "errorTitle": "Không thể đọc dữ liệu",
+    "retry": "Thử lại",
+    "small": "Chưa đủ mẫu",
+    "sufficient": "Đạt ngưỡng mẫu tối thiểu",
+    "demo": "MINH HỌA",
+    "help": "Cách tính & Cách đọc",
+    "helpLabels": ["Là gì", "Cách tính", "Cách đọc", "Không nói được gì"],
+    "unit": "Đơn vị",
+    "sample": "Mẫu",
+    "unknown": "Thiếu dữ liệu hoặc mẫu số bằng 0",
+    "signed": "Dấu +/− thể hiện chiều lãi/lỗ; màu chỉ hỗ trợ đọc.",
+    "timeUnit": "Đơn vị thời gian",
+    "chart": "Đường lãi/lỗ lũy kế sau phí",
+    "actual": "Thực tế",
+    "shadow": "Shadow · GIẢ ĐỊNH",
+    "chartNote": "Shadow loại các lệnh vi phạm đã review; không dự báo hiệu suất tương lai.",
+    "table": "Xem bảng dữ liệu biểu đồ",
+    "png": "Xuất PNG",
+    "zoom": "Số điểm hiển thị",
+    "chartDate": "Ngày giờ",
+    "tradeId": "ID lệnh",
+    "chartUnit": "Đơn vị trục Y",
+    "money": "Tiền",
+    "percent": "%",
+    "r": "R",
+    "unavailableUnit": "Cần vốn đầu kỳ để tính %; đường R cần dữ liệu rủi ro cho từng sự kiện và sẽ được nối ở S4.",
+    "phases": [
+      "01 · Sức khỏe tài khoản",
+      "02 · Bằng chứng lợi thế",
+      "03 · Nguồn gốc lợi thế",
+      "04 · Rò rỉ lợi nhuận",
+      "05 · Hành động"
+    ],
+    "questions": [
+      "Sau phí, tôi đang lãi hay lỗ?",
+      "Đã đủ bằng chứng về lợi thế chưa?",
+      "Lợi thế đến từ đâu?",
+      "Tôi mất tiền ở đâu?",
+      "Việc cần làm tiếp theo là gì?"
+    ],
+    "phaseDescriptions": [
+      "Xem kết quả thực và sụt giảm trên Tổng quan cũ.",
+      "Đọc chỉ số cùng cỡ mẫu và phạm vi dữ liệu.",
+      "Tách điều kiện bằng bộ lọc, lưu góc nhìn để so sánh.",
+      "Đối chiếu đường vốn thực với Shadow giả định.",
+      "Review các lệnh còn thiếu, kiểm tra và xuất sao lưu."
+    ],
+    "stateTitle": "Trạng thái dữ liệu",
+    "states": {
+      "empty": "Chưa có dữ liệu",
+      "loading": "Đang tải dữ liệu",
+      "missing": "Thiếu dữ liệu rủi ro",
+      "small": "Chưa đủ mẫu kết luận",
+      "demo": "DỮ LIỆU MINH HỌA — không phản ánh hiệu suất thật.",
+      "error": "Không thể nhập dữ liệu"
+    },
+    "inputError": "Dòng 2 · Cột Giá: nhập số hợp lệ, không để trống.",
+    "missingDescription": "Bổ sung mức 1R cho các lệnh thiếu để tính kỳ vọng R.",
+    "stateExample": "Ví dụ trạng thái giao diện — không phải lỗi của sổ đang mở.",
+    "pending": "Trang chuyên biệt được nối trong các chặng kế tiếp. Hiện bạn có thể dùng bộ lọc, chỉ số và biểu đồ ở không gian phân tích.",
+    "viewSaved": "Đã lưu góc nhìn.",
+    "viewError": "Không lưu được góc nhìn. Kiểm tra tên và dung lượng trình duyệt.",
+    "presetLabels": [
+      "Tất cả thời gian",
+      "Hôm nay",
+      "Tuần này",
+      "Tháng này",
+      "Quý này",
+      "Từ đầu năm"
+    ],
+    "nav": [
+      {
+        "name": "HÔM NAY",
+        "links": [
+          ["Tổng quan cũ", "overview"],
+          ["Kế hoạch & Lệnh dự kiến", "plans"]
+        ]
+      },
+      {
+        "name": "NHẬT KÝ",
+        "links": [
+          ["Nhật ký giao dịch", "journal"],
+          ["Lịch giao dịch", "calendar"],
+          ["Ghi chú & Review", "review"],
+          ["Chartbook", "chartbook"]
+        ]
+      },
+      {
+        "name": "PHÂN TÍCH",
+        "links": [
+          ["Không gian phân tích", "workspace"],
+          ["Lợi thế thống kê", "edge"],
+          ["Phân tích khoan sâu", "evaluator"],
+          ["Lợi nhuận & rủi ro", "risk"],
+          ["Kỷ luật & Quản lý lệnh", "discipline"],
+          ["Trading MetriX", "metrix"],
+          ["Theo dõi hệ thống", "system"],
+          ["Mô phỏng & What-if", "simulation"]
+        ]
+      },
+      {
+        "name": "HỆ THỐNG",
+        "links": [
+          ["Quy trình setup", "playbook"],
+          ["Định giá doanh nghiệp", "valuation"],
+          ["Kiểm chứng & sao lưu", "debug"],
+          ["Chuẩn giao diện", "components"],
+          ["Thuật ngữ", "glossary"]
+        ]
+      }
+    ],
+    "markets": {
+      "stocks": "Chứng khoán",
+      "futures": "Phái sinh",
+      "forex": "Forex",
+      "crypto": "Crypto",
+      "commodities": "Hàng hóa",
+      "cfd": "CFD",
+      "options": "Quyền chọn"
+    }
+  },
+  "metricHelp": {
+    "total": {
+      "kind": "count",
+      "help": [
+        "Số chu kỳ đã đóng.",
+        "Đếm chu kỳ đóng trong khoảng ngày của sổ.",
+        "Đọc cùng số lệnh còn mở.",
+        "Không bằng số lần khớp lệnh."
+      ]
+    },
+    "wins": {
+      "kind": "count",
+      "help": [
+        "Số lệnh có Net dương.",
+        "Đếm chu kỳ đã đóng có Net > 0.",
+        "Phải xét cả quy mô lời/lỗ.",
+        "Không nói được lợi nhuận tổng."
+      ]
+    },
+    "losses": {
+      "kind": "count",
+      "help": [
+        "Số lệnh có Net âm.",
+        "Đếm chu kỳ đã đóng có Net < 0.",
+        "Một lệnh thua không chứng minh sai phương pháp.",
+        "Không đo mức thiệt hại của từng lệnh."
+      ]
+    },
+    "breakeven": {
+      "kind": "count",
+      "help": [
+        "Số lệnh hòa vốn sau phí.",
+        "Đếm chu kỳ đóng có Net = 0.",
+        "Được tách khỏi mẫu số tỷ lệ thắng.",
+        "Hòa giá chưa chắc hòa vốn sau phí."
+      ]
+    },
+    "winRate": {
+      "kind": "percent",
+      "help": [
+        "Tỷ lệ thắng trong các lệnh có kết quả thắng/thua.",
+        "Số thắng ÷ (số thắng + số thua) × 100; không gồm hòa vốn.",
+        "Xem cùng PF, R và khoảng tin cậy.",
+        "Không chứng minh lợi thế khi mẫu nhỏ."
+      ]
+    },
+    "profitFactor": {
+      "kind": "ratio",
+      "help": [
+        "Tương quan tổng lãi và tổng lỗ ròng.",
+        "Σ Net dương ÷ |Σ Net âm|; thiếu mẫu số trả về —.",
+        "Trên 1 nghĩa là tổng lãi lớn hơn tổng lỗ trong mẫu.",
+        "Không phản ánh thứ tự lệnh hoặc rủi ro đuôi."
+      ]
+    },
+    "averageR": {
+      "kind": "R",
+      "help": [
+        "Kỳ vọng ròng theo mức rủi ro ban đầu.",
+        "Trung bình Net/1R trên các lệnh có 1R > 0.",
+        "Đọc cùng n có dữ liệu rủi ro.",
+        "Không đại diện các lệnh chưa biết 1R."
+      ]
+    },
+    "avgWin": {
+      "kind": "money",
+      "help": [
+        "Lãi ròng trung bình của lệnh thắng.",
+        "Σ Net của lệnh thắng ÷ số lệnh thắng.",
+        "So với lỗ trung bình và tỷ lệ thắng.",
+        "Không mô tả mọi lệnh thắng."
+      ]
+    },
+    "avgLoss": {
+      "kind": "money",
+      "help": [
+        "Lỗ ròng trung bình của lệnh thua.",
+        "Σ Net của lệnh thua ÷ số lệnh thua.",
+        "Giữ dấu âm để thấy chiều kết quả.",
+        "Không thay thế mức lỗ cực đại."
+      ]
+    },
+    "expectancy": {
+      "kind": "money",
+      "help": [
+        "Lợi nhuận ròng trung bình mỗi chu kỳ đóng.",
+        "Σ Net của chu kỳ đã đóng ÷ số chu kỳ đóng.",
+        "Mẫu nhỏ nhạy với một lệnh lớn.",
+        "Không phải lợi nhuận cam kết."
+      ]
+    },
+    "net": {
+      "kind": "money",
+      "help": [
+        "Lợi nhuận hiện thực hóa sau chi phí.",
+        "Σ (Gross − chi phí ròng) của sự kiện chốt trong phạm vi.",
+        "Có thể gồm phần chốt của vị thế còn mở.",
+        "Không gồm lãi/lỗ chưa hiện thực hóa."
+      ]
+    },
+    "currentStreak": {
+      "kind": "streak",
+      "help": [
+        "Chuỗi thắng/thua cuối mẫu.",
+        "Đếm liên tiếp theo thứ tự đóng; dấu thể hiện chiều.",
+        "Chuỗi phụ thuộc khoảng lọc.",
+        "Không dự đoán lệnh kế tiếp."
+      ]
+    },
+    "longestWin": {
+      "kind": "count",
+      "help": [
+        "Chuỗi thắng dài nhất.",
+        "Số lệnh Net dương liên tiếp lớn nhất trong mẫu.",
+        "Đọc cùng độ dài lịch sử.",
+        "Không chứng minh lợi thế ổn định."
+      ]
+    },
+    "longestLoss": {
+      "kind": "count",
+      "help": [
+        "Chuỗi thua dài nhất.",
+        "Số lệnh Net âm liên tiếp lớn nhất trong mẫu.",
+        "Giúp chuẩn bị cho giai đoạn khó khăn.",
+        "Tương lai có thể có chuỗi dài hơn."
+      ]
+    },
+    "maxDrawdown": {
+      "kind": "money",
+      "help": [
+        "Sụt giảm lớn nhất từ đỉnh lãi/lỗ lũy kế.",
+        "Max(đỉnh trước đó − đường lãi/lỗ hiện thực hóa).",
+        "Xem theo cùng khoảng thời gian.",
+        "Không đo biến động nội lệnh."
+      ]
+    },
+    "recovery": {
+      "kind": "ratio",
+      "help": [
+        "Mức lợi nhuận so với sụt giảm lớn nhất.",
+        "Net ÷ Max Drawdown; mẫu số 0 trả về —.",
+        "Cần lịch sử đủ dài.",
+        "Không đánh giá xác suất phục hồi tương lai."
+      ]
+    },
+    "sharpe": {
+      "kind": "ratio",
+      "help": [
+        "Chỉ số ổn định kết quả theo lệnh.",
+        "Trung bình Net ÷ độ lệch chuẩn tổng thể Net theo lệnh.",
+        "Đây là chỉ số theo lệnh, chưa thường niên hóa.",
+        "Không phải Sharpe chuẩn theo chuỗi lợi suất ngày."
+      ]
+    },
+    "avgDuration": {
+      "kind": "duration",
+      "help": [
+        "Thời gian giữ lệnh trung bình.",
+        "Trung bình phút từ mở đến đóng; đổi đơn vị chỉ khi hiển thị.",
+        "Giá trị mẫu gốc 234,333 phút ≈ 3,906 giờ.",
+        "Không đo thời gian tiếp xúc rủi ro của từng phần khớp."
+      ]
+    },
+    "biggestWin": {
+      "kind": "money",
+      "help": [
+        "Lệnh thắng ròng lớn nhất.",
+        "Max Net trên các chu kỳ thắng đã đóng.",
+        "Một ngoại lệ có thể chi phối kết quả.",
+        "Không đại diện mức lãi thông thường."
+      ]
+    },
+    "biggestLoss": {
+      "kind": "money",
+      "help": [
+        "Lệnh thua ròng lớn nhất.",
+        "Min Net trên các chu kỳ thua đã đóng.",
+        "Đọc cùng kế hoạch rủi ro.",
+        "Không phải giới hạn lỗ tương lai."
+      ]
+    },
+    "grossProfit": {
+      "kind": "money",
+      "help": [
+        "Tổng Net của các lệnh thắng.",
+        "Σ Net dương của chu kỳ đóng.",
+        "Tên tổng lãi không phải Gross trước phí.",
+        "Không bao gồm lệnh thua."
+      ]
+    },
+    "grossLoss": {
+      "kind": "money",
+      "help": [
+        "Tổng Net của các lệnh thua.",
+        "Σ Net âm của chu kỳ đóng.",
+        "Giá trị giữ dấu âm.",
+        "Không phản ánh thứ tự phát sinh lỗ."
+      ]
+    },
+    "roi": {
+      "kind": "percent",
+      "help": [
+        "Net so với tổng rủi ro đã biết.",
+        "Σ Net ÷ Σ 1R × 100; cả tử và mẫu cùng tập lệnh có 1R.",
+        "Không nhầm với lợi suất trên vốn tài khoản.",
+        "Không đại diện lệnh thiếu 1R."
+      ]
+    },
+    "discipline": {
+      "kind": "percent",
+      "help": [
+        "Điểm kỷ luật lịch sử đã review.",
+        "Trung bình điểm cũ trên lệnh đã review có điểm.",
+        "Kiểm tra độ phủ review và thiên lệch thắng/thua.",
+        "Không suy ra điểm cho lệnh chưa review."
+      ]
+    }
+  },
+  "glossary": [
+    ["Lãi/lỗ ròng (Net PnL)", "Kết quả sau phí, thuế và chi phí tài trợ."],
+    ["Lãi/lỗ gộp (Gross)", "Kết quả trước chi phí."],
+    ["1R / R-Multiple", "1R là tiền rủi ro ban đầu; R-Multiple là Net chia 1R."],
+    ["Kỳ vọng (Expectancy)", "Kết quả trung bình trên một tập lệnh xác định."],
+    ["Hệ số lợi nhuận (Profit Factor)", "Tổng Net thắng chia trị tuyệt đối tổng Net thua."],
+    ["Sụt giảm (Drawdown)", "Khoảng giảm từ đỉnh trước đó của đường vốn."],
+    ["Hệ số phục hồi (Recovery Factor)", "Net chia sụt giảm tối đa."],
+    ["Tỷ lệ thắng (Win rate)", "Số thắng chia tổng thắng và thua; bỏ hòa vốn."],
+    [
+      "Khoảng tin cậy (CI)",
+      "Khoảng bất định thống kê; Wilson cho tỷ lệ, bootstrap cho trung bình."
+    ],
+    ["Đường Shadow", "Kết quả giả định khi loại các vi phạm đã ghi nhận."],
+    ["Lot / Pip", "Đơn vị lượng / đơn vị biến động giá; phụ thuộc sản phẩm và hợp đồng."],
+    ["Funding / Swap", "Khoản tài trợ hoặc qua đêm có thể trả hoặc nhận."],
+    ["Hệ số nhân (Multiplier)", "Quy đổi biến động giá và lượng thành tiền theo hợp đồng."],
+    ["MAE / MFE", "Mức bất lợi / thuận lợi lớn nhất khi lệnh đang mở; cần dữ liệu nội lệnh."],
+    ["OTP Hit", "TP gốc được chạm trước SL gốc; cần thứ tự giá, không suy ra từ giá đóng."],
+    ["Tiltmeter", "Đo tuân thủ theo các khâu; không tự suy từ lời/lỗ."],
+    ["Scale In/Out / Merge", "Vào/ra từng phần; gộp các giao dịch đúng quy tắc nghiệp vụ."],
+    ["Equity MA", "Trung bình động của đường vốn theo cửa sổ được công bố."],
+    ["Monte Carlo", "Mô phỏng theo giả định lấy mẫu; không phải dự báo chắc chắn."],
+    ["n (cỡ mẫu)", "Số quan sát hợp lệ thực sự dùng trong phép tính."]
+  ]
 }

@@ -5,3 +5,10 @@
 - Trang kiểm chứng S1 chạy song song; chưa thay nhật ký chính.
 - Winrate loại hòa vốn theo quyết định chủ dự án. Thời gian mẫu thực là 234,333 phút.
 - Giới hạn migration và ảnh được ghi rõ trong README; không tự suy diễn dữ liệu thiếu.
+
+# S2 — 2026-10-21
+
+- Khung điều hướng, bộ lọc AND/OR + saved Views và URL.
+- KPI đủ hợp đồng 6 phần, giải thích 4 dòng, định dạng đa tiền tệ, trạng thái và thuật ngữ.
+- Biểu đồ có đơn vị Tiền/%/R, Shadow giả định, tooltip ID/ngày, PNG và bảng dữ liệu.
+- Thành phần responsive; nghiệp vụ các trang và thêm/sửa lệnh tiếp tục ở S3.
