@@ -125,7 +125,7 @@ test('QT02/QT03 one ledger: add, preview, inline edit, star, review and reload r
   await expect(dialog).toHaveCount(0);
   await page.getByRole('button', { name: 'Tổng quan', exact: true }).click();
   await expect(page.getByRole('article', { name: 'Lợi nhuận ròng', exact: true })).toContainText(
-    '+1,00 USDT',
+    '+1.00 USDT',
   );
   await expect(page.getByRole('button', { name: 'USDT bên phải', exact: true })).toBeVisible();
 });

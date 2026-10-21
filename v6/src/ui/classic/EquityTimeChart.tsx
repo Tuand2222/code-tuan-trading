@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { RotateCcw, ZoomIn, ZoomOut } from 'lucide-react';
 import type { Currency } from '../../data/schema';
+import { DecimalValue } from '../../core/money';
+import { formatValue } from '../format';
 import {
   AreaSeries,
   ColorType,
@@ -57,11 +59,7 @@ function dateFromTime(time: Time) {
 }
 
 function compactMoney(value: number, currency: Currency = 'VND') {
-  if (currency !== 'VND')
-    return new Intl.NumberFormat('vi-VN', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
+  if (currency !== 'VND') return formatValue(new DecimalValue(value).toFixed(), 'money', currency);
   const sign = value < 0 ? '−' : '';
   const absolute = Math.abs(value);
   if (absolute >= 1_000_000_000) return `${sign}${(absolute / 1_000_000_000).toFixed(1)} tỷ`;
@@ -94,11 +92,7 @@ export default function EquityTimeChart({
   currency?: Currency;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const cash = (value: number) =>
-    new Intl.NumberFormat('vi-VN', {
-      minimumFractionDigits: currency === 'VND' ? 0 : 2,
-      maximumFractionDigits: currency === 'VND' ? 0 : 2,
-    }).format(value) + (currency === 'VND' ? ' đ' : ' ' + currency);
+  const cash = (value: number) => formatValue(new DecimalValue(value).toFixed(), 'money', currency);
   const chartRef = useRef<IChartApi | null>(null);
   const percentSeriesRef = useRef<ISeriesApi<'Line'> | null>(null);
   const moneySeriesRef = useRef<ISeriesApi<'Area'> | null>(null);
