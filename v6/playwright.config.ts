@@ -3,7 +3,7 @@ export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
   reporter: process.env.CI ? 'github' : 'list',
-  use: { baseURL: 'http://127.0.0.1:4176' },
+  use: { baseURL: 'http://127.0.0.1:4176', actionTimeout: 15000, navigationTimeout: 30000 },
   projects: [360, 768, 1280].map((width) => ({
     name: 'chromium-' + width,
     use: { ...devices['Desktop Chrome'], viewport: { width, height: 900 } },

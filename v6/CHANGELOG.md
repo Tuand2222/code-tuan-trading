@@ -1,3 +1,11 @@
+# S3 — 2026-10-21
+
+- Các trang nhật ký, thêm/sửa, sao, review, lịch, setup và cấu hình nối cùng repository.
+- Giữ Tổng quan cũ và các chức năng MetriX/System cũ qua adapter v6; chọn được chế độ chi tiết.
+- Cảnh báo cấu hình, Fee Impact, histogram R, drawdown và hàng đợi cân bằng.
+- Mẫu ghi chú, ẩn danh mục và backup workspace có Views/checksum/recovery.
+- Xem S3-release để biết trạng thái nghiệm thu và giới hạn.
+
 # S1 — 2026-10-20
 
 - Lõi Decimal và dữ liệu v4; 24 chỉ số, lịch theo phần chốt, phí, R, shadow, setup và review.
