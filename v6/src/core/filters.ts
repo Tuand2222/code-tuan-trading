@@ -38,7 +38,7 @@ export function parseHash(hash: string): { page: string; filters: Filters } {
   filters.operator = p.get('operator') === 'OR' ? 'OR' : 'AND';
   for (const key of ['from', 'to'] as const)
     if (!/^\d{4}-\d{2}-\d{2}$/.test(filters[key])) filters[key] = '';
-  return { page: route || 'workspace', filters };
+  return { page: route || 'overview', filters };
 }
 export function filterHash(page: string, filters: Filters) {
   const p = new URLSearchParams();

@@ -1,6 +1,6 @@
-# Trading Plan Pro v6 — S1
+# Trading Plan Pro v6 — S3
 
-V6 chạy song song với nhật ký v3. S1 cung cấp lõi tính toán, lưu trữ và trang kiểm chứng; chưa thay giao diện sản phẩm. Giữ Tổng quan cũ và lựa chọn giao diện MetriX/Theo dõi hệ thống theo yêu cầu chủ dự án.
+V6 chạy song song với nhật ký v3. S3 nối các trang lõi, thêm/sửa giao dịch, review, lịch và sao lưu vào cùng ledger. Tổng quan giữ các khối của bản cũ; MetriX/Theo dõi hệ thống có giao diện gốc và chế độ chi tiết. Xem [nghiệm thu S3](docs/S3-release.md), [checkpoint v10](docs/NHAT_KY_SUA_LOI_Trading_Plan_Pro_v10.md) và [bàn giao S4](docs/PROMPT_BAN_GIAO_S4.md).
 
 ## Chạy và kiểm tra
 
@@ -14,7 +14,7 @@ npx playwright install --with-deps chromium
 npm run e2e
 ```
 
-`verify` chạy lint, TypeScript strict, 20 kiểm thử unit/golden và build. E2E kiểm tra nhập fixture gốc, xác nhận trước lưu, tải lại vẫn còn dữ liệu và axe ở 360/768/1280. Kết quả CI phải được kiểm tra riêng; không coi việc viết test là đã chạy thành công.
+`verify` chạy lint, TypeScript strict, bộ kiểm thử unit/golden và build. E2E kiểm tra nhập fixture gốc, thêm/sửa/sao/review lệnh, lịch, các chế độ phân tích, sao lưu và axe ở 360/768/1280. Kết quả CI phải được kiểm tra riêng; không coi việc viết test là đã chạy thành công.
 
 ## Phạm vi S1
 

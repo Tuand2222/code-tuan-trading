@@ -6,9 +6,18 @@ export interface SavedView {
 }
 class ViewRepository extends Dexie {
   views!: Table<SavedView, string>;
+  meta!: Table<{ key: string; value: string }, string>;
   constructor() {
     super('tuan-trader-v6-views');
     this.version(1).stores({ views: 'name' });
+    this.version(2)
+      .stores({ views: 'name', meta: 'key' })
+      .upgrade(async (tx) => {
+        await tx.table('meta').put({
+          key: 'before-v2-views',
+          value: JSON.stringify(await tx.table('views').toArray()),
+        });
+      });
   }
 }
 export const viewRepository = new ViewRepository();

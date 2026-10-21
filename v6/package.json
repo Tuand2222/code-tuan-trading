@@ -1,6 +1,6 @@
 {
   "name": "trading-plan-pro-v6",
-  "version": "0.2.0-s2",
+  "version": "0.3.0-s3",
   "private": true,
   "type": "module",
   "engines": {
@@ -29,6 +29,8 @@
     "dompurify": "3.4.17",
     "echarts": "6.1.0",
     "jszip": "3.10.2",
+    "lightweight-charts": "5.2.0",
+    "lucide-react": "1.29.0",
     "papaparse": "5.5.3",
     "react": "18.3.1",
     "react-dom": "18.3.1",

@@ -34,7 +34,7 @@ jobs:
       - run: npm run e2e
       - uses: actions/upload-artifact@v4
         with:
-          name: v6-s2-interface-build
+          name: v6-s3-journal-build
           path: v6/dist/
       - uses: actions/upload-artifact@v4
         if: always()
