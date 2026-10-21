@@ -34,8 +34,13 @@ jobs:
       - run: npm run e2e
       - uses: actions/upload-artifact@v4
         with:
-          name: v6-s1-debug-build
+          name: v6-s2-interface-build
           path: v6/dist/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v6-responsive-evidence
+          path: v6/test-results/
   v3-reference:
     runs-on: ubuntu-latest
     timeout-minutes: 15

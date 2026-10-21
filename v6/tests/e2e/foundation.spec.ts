@@ -4,10 +4,12 @@ import path from 'node:path';
 test('S1 previews and imports original v3 safely, persists across reload and passes accessibility checks', async ({
   page,
 }, testInfo) => {
-  const response = await page.goto('/');
+  const response = await page.goto('/#debug');
   expect(response?.status()).toBe(200);
   await expect(page).toHaveTitle('Trading Plan Pro v6');
-  await expect(page.getByRole('heading', { name: 'Kiểm chứng dữ liệu v6 · S1' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Kiểm chứng & sao lưu', exact: true }),
+  ).toBeVisible();
   await page
     .getByLabel('Chọn bản sao JSON v3 hoặc v4')
     .setInputFiles(path.resolve('tests/golden/fixture-30-trades.json'));

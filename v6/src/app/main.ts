@@ -1,5 +1,6 @@
 import { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
-import Debug from '../pages/Debug';
+import Workspace from '../pages/Workspace';
 import './debug.css';
-createRoot(document.getElementById('root')!).render(createElement(Debug));
+import './workspace.css';
+createRoot(document.getElementById('root')!).render(createElement(Workspace));
