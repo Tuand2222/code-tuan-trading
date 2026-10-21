@@ -186,8 +186,8 @@ export default function TradingMetrix() {
           </span>
           <h2>Đánh giá hiệu suất & giới hạn rủi ro</h2>
           <p>
-            Dùng chung sổ v3 và bộ lọc với Nhật ký. Balance tính theo từng sự kiện đã thực hiện, gồm
-            chốt từng phần.
+            Dùng chung sổ đang chọn và bộ lọc với Nhật ký. Balance tính theo từng sự kiện đã thực
+            hiện, gồm chốt từng phần.
           </p>
         </div>
         <div className="metrix-controls">

@@ -23,3 +23,4 @@ Nhánh `sprint/S3-journal` dựa trên `sprint/S2-interface`. Website v6 song so
 - N02: test checksum, xem trước không ghi DB, restore chính xác ledger/Views, revision cũ bị từ chối, recovery không lồng vào các bản backup tiếp theo.
 - Phát hiện: form datetime-local làm tròn tới phút; giữ timestamp cũ khi người dùng không sửa giờ để tránh đổi giây gốc. Worker cập nhật dữ liệu giữ component bảng đang mở, không reset sao/sắp xếp mỗi lần lưu.
 - Còn đang nghiệm thu: CI E2E sáng/tối 360/768/1280, hồi quy v3, deploy exact source và bằng chứng site đã phát hành.
+- CI lần đầu phát hiện khối bar chart trong grid Tổng quan gây tràn ngang: chuyển cột sang minmax(0,…) và giữ cuộn bên trong khối. Đo DOM desktop sau sửa: scrollWidth 1265 ≤ viewport 1280. Sửa locator test chọn đúng mã TEST, tránh khớp chữ Retest trong tên setup; giữ toàn bộ điều kiện kiểm thử.

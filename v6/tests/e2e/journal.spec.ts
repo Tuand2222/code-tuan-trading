@@ -45,7 +45,9 @@ test('QT02/QT03 one ledger: add, preview, inline edit, star, review and reload r
   await dialog.getByRole('button', { name: 'Lưu giao dịch', exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await expect(page.locator('[data-trade-id]')).toHaveCount(31);
-  const row = page.getByRole('row').filter({ hasText: 'TEST' });
+  const row = page
+    .locator('[data-trade-id]')
+    .filter({ has: page.getByText('TEST', { exact: true }) });
   await expect(row).toContainText('+98 đ');
   await row.getByRole('button', { name: /Đánh dấu sao/ }).click();
   await expect(row.getByRole('button', { name: /Đánh dấu sao/ })).toHaveAttribute(
@@ -67,6 +69,10 @@ test('QT02/QT03 one ledger: add, preview, inline edit, star, review and reload r
   await dialog.getByLabel('Nhận xét review', { exact: true }).pressSequentially('123r');
   await expect(chip).toHaveAttribute('aria-pressed', 'false');
   await chip.click();
+  await expect(chip).toHaveAttribute('aria-pressed', 'true');
+  await chip.press('1');
+  await expect(chip).toHaveAttribute('aria-pressed', 'false');
+  await chip.press('1');
   await expect(chip).toHaveAttribute('aria-pressed', 'true');
   await dialog.getByRole('button', { name: 'Đánh dấu đã review', exact: true }).click();
   await expect(dialog.getByRole('button', { name: 'Mở lại review', exact: true })).toBeVisible();

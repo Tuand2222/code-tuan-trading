@@ -25,6 +25,33 @@ form > button {
 .actions > label {
   min-width: 140px;
 }
+.actions > button {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.panel {
+  min-width: 0;
+}
+.classic-scope .dashboard-grid {
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+}
+.classic-scope .dashboard-grid > * {
+  min-width: 0;
+}
+.classic-scope .market-overview-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.classic-scope .market-overview-grid article {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.classic-scope .market-overview-grid article > div {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
 label.check {
   display: flex;
   flex-direction: row;
@@ -197,6 +224,9 @@ button[aria-pressed='true'] {
   margin-top: 24px;
 }
 @media (max-width: 700px) {
+  .classic-scope .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .modal {
     padding: 16px;
   }
@@ -223,6 +253,9 @@ button[aria-pressed='true'] {
   }
 }
 @media (prefers-color-scheme: light) {
+  .classic-scope .market-overview-grid article {
+    background: var(--surface);
+  }
   .classic-scope {
     --muted: #4d6073;
     --green: #186d51;
