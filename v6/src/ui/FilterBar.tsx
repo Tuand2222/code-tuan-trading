@@ -206,6 +206,7 @@ export function FilterBar({
           <label>
             {vi.shell.saved}
             <select
+              aria-label={vi.shell.saved}
               value=""
               onChange={(e) => {
                 const v = views.find((v) => v.name === e.target.value);
