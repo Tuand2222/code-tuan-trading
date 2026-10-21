@@ -22,9 +22,7 @@ test('S2 shared filters, complete KPI contracts, saved views and accessible resp
     await expect(net.locator(`[data-part="${part}"]`)).toBeVisible();
   await page.getByLabel('Mã sản phẩm', { exact: true }).fill('VCB');
   await expect(page).toHaveURL(/symbol=VCB/);
-  await expect(page.getByRole('article', { name: 'Tổng số lệnh', exact: true })).toContainText(
-    '5',
-  );
+  await expect(page.getByRole('article', { name: 'Tổng số lệnh', exact: true })).toContainText('5');
   await page.getByLabel('Tên góc nhìn', { exact: true }).fill('VCB review');
   await page.getByRole('button', { name: 'Lưu góc nhìn', exact: true }).click();
   await expect(page.getByText('Đã lưu góc nhìn.', { exact: true })).toBeVisible();

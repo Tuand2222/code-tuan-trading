@@ -265,3 +265,5 @@ Chart: trục có đơn vị, chú giải, ngày + ID trong tooltip, n và nhãn
 Đã chạy local lint/typecheck/golden/unit/build; 24 tests PASS. Cổng CI/E2E và bằng chứng responsive ghi tại S2-release khi có kết quả. Giữ toàn bộ golden S1.
 
 Giới hạn đúng thứ tự chặng: S2 là khung/thành phần. Trang chuyên biệt, thêm lệnh, Inline Edit, sao lệnh và phím 1–9/[ ]/R có tác vụ nghiệp vụ thuộc S3 trở đi; chưa gắn hành vi giả. Nút thêm mở thông báo rõ và link đến nhật ký hiện tại. Ctrl+K/palette thuộc S8. Phím N và / có tác dụng và bỏ qua ô nhập. Giao diện sáng/tối theo hệ thống, chạm 44px.
+
+Nghiệm thu cuối S2: CI 39532413967 SUCCESS cả foundation/v3-reference, 24 unit/golden và 6 E2E PASS; Sites version 3 đã xuất bản. Ảnh/ID tại S2-release.md. Lỗi nhãn Saved View phát hiện bởi E2E đã được sửa và bài test giữ nguyên. S3 tiếp tục form/nhật ký; Tổng quan cũ được giữ.
