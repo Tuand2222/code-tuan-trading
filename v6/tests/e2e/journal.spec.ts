@@ -94,12 +94,47 @@ test('QT02/QT03 one ledger: add, preview, inline edit, star, review and reload r
   await page.getByRole('button', { name: 'Mở nhật ký ngày 2026-10-20', exact: true }).click();
   await expect(page.locator('[data-trade-id]')).toHaveCount(1);
   await expect(row).toContainText('+118 đ');
+  await page.goto('/#settings');
+  const create = page
+    .locator('section')
+    .filter({ has: page.getByRole('heading', { name: 'Tạo sổ giao dịch', exact: true }) });
+  await create.getByLabel('Tên sổ', { exact: true }).fill('Kiểm tra USDT');
+  await create.getByLabel('Đơn vị tiền của sổ', { exact: true }).selectOption('USDT');
+  await create.getByRole('button', { name: 'Tạo sổ giao dịch', exact: true }).click();
+  await expect(page.getByLabel('Sổ nhật ký', { exact: true })).toContainText('Kiểm tra USDT');
+  await page
+    .locator('.topbar')
+    .getByRole('button', { name: 'Thêm giao dịch', exact: true })
+    .click();
+  for (const [label, value] of [
+    ['Mã sản phẩm', 'BTCUSDT'],
+    ['Thời gian vào', '2026-10-20T09:00'],
+    ['Thời gian đóng', '2026-10-20T10:00'],
+    ['Giá vào', '100'],
+    ['Giá ra', '100.11'],
+    ['Khối lượng', '10'],
+    ['1R ban đầu', '1'],
+    ['Phí giao dịch', '0.1'],
+  ])
+    await dialog.getByLabel(label, { exact: true }).fill(value);
+  await dialog.getByLabel('Thị trường', { exact: true }).selectOption('crypto');
+  await dialog
+    .getByLabel('Tôi đã xác nhận đầy đủ phí, thuế, funding/swap', { exact: true })
+    .check();
+  await dialog.getByRole('button', { name: 'Lưu giao dịch', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await page.getByRole('button', { name: 'Tổng quan', exact: true }).click();
+  await expect(page.getByRole('article', { name: 'Lợi nhuận ròng', exact: true })).toContainText(
+    '+1,00 USDT',
+  );
+  await expect(page.getByRole('button', { name: 'USDT bên phải', exact: true })).toBeVisible();
 });
 test('S3 F01–F10, T-R1, classic modes and full restore verification preserve the 30-trade baseline', async ({
   page,
 }, info) => {
   test.setTimeout(180000);
   await seed(page);
+  await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto('/#overview');
   await expect(page.getByTestId('kpi-card')).toHaveCount(24);
   await expect(page.getByRole('article', { name: 'Lợi nhuận ròng', exact: true })).toContainText(

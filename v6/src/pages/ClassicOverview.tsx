@@ -112,6 +112,7 @@ export function ClassicOverview({
           <h2>{vi.shell.chart}</h2>
           {report.complete ? (
             <EquityTimeChart
+              currency={journal.currency}
               percentEnabled={report.riskCount > 0}
               percentLabel="Net / Tổng 1R (lệnh đủ R)"
               moneyLabel={journal.currency}

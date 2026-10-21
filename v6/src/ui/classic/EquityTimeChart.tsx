@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { RotateCcw, ZoomIn, ZoomOut } from 'lucide-react';
+import type { Currency } from '../../data/schema';
 import {
   AreaSeries,
   ColorType,
@@ -44,11 +45,6 @@ const SHORT_DATE = new Intl.DateTimeFormat('vi-VN', {
   year: '2-digit',
   timeZone: 'UTC',
 });
-const VND = new Intl.NumberFormat('vi-VN', {
-  style: 'currency',
-  currency: 'VND',
-  maximumFractionDigits: 0,
-});
 
 function timestamp(date: string) {
   return Math.floor(Date.parse(`${date}T00:00:00Z`) / 1000) as UTCTimestamp;
@@ -60,7 +56,12 @@ function dateFromTime(time: Time) {
   return new Date(Date.UTC(time.year, time.month - 1, time.day));
 }
 
-function compactMoney(value: number) {
+function compactMoney(value: number, currency: Currency = 'VND') {
+  if (currency !== 'VND')
+    return new Intl.NumberFormat('vi-VN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
   const sign = value < 0 ? '−' : '';
   const absolute = Math.abs(value);
   if (absolute >= 1_000_000_000) return `${sign}${(absolute / 1_000_000_000).toFixed(1)} tỷ`;
@@ -81,6 +82,7 @@ export default function EquityTimeChart({
   percentLabel = 'Tỷ lệ (%)',
   moneyLabel = 'Số tiền (VND)',
   emptyMessage = 'Chưa có dữ liệu trong khoảng thời gian này.',
+  currency = 'VND',
 }: {
   points: EquityChartPoint[];
   percentEnabled?: boolean;
@@ -89,8 +91,14 @@ export default function EquityTimeChart({
   percentLabel?: string;
   moneyLabel?: string;
   emptyMessage?: string;
+  currency?: Currency;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const cash = (value: number) =>
+    new Intl.NumberFormat('vi-VN', {
+      minimumFractionDigits: currency === 'VND' ? 0 : 2,
+      maximumFractionDigits: currency === 'VND' ? 0 : 2,
+    }).format(value) + (currency === 'VND' ? ' đ' : ' ' + currency);
   const chartRef = useRef<IChartApi | null>(null);
   const percentSeriesRef = useRef<ISeriesApi<'Line'> | null>(null);
   const moneySeriesRef = useRef<ISeriesApi<'Area'> | null>(null);
@@ -122,7 +130,7 @@ export default function EquityTimeChart({
       height: Math.max(container.clientHeight, 230),
       layout: {
         background: { type: ColorType.Solid, color: 'transparent' },
-        textColor: '#697582',
+        textColor: '#a7b5c5',
         fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
         fontSize: 10,
       },
@@ -189,7 +197,7 @@ export default function EquityTimeChart({
       lineWidth: 2,
       priceLineVisible: false,
       lastValueVisible: true,
-      priceFormat: { type: 'custom', formatter: compactMoney },
+      priceFormat: { type: 'custom', formatter: (value: number) => compactMoney(value, currency) },
       visible: showMoneyRef.current,
     });
     const percentSeries = chart.addSeries(LineSeries, {
@@ -257,7 +265,7 @@ export default function EquityTimeChart({
       percentSeriesRef.current = null;
       moneySeriesRef.current = null;
     };
-  }, [normalizedPoints, references]);
+  }, [normalizedPoints, references, currency]);
 
   useEffect(() => {
     showPercentRef.current = percentEnabled && showPercent;
@@ -307,7 +315,7 @@ export default function EquityTimeChart({
             aria-pressed={showMoney}
             onClick={() => setShowMoney((value) => !value)}
           >
-            <i /> VND bên phải
+            <i /> {currency} bên phải
           </button>
         </div>
         <div className="dual-axis-zoom" role="group" aria-label="Thu phóng khung thời gian">
@@ -350,9 +358,7 @@ export default function EquityTimeChart({
             {displayedPoint ? percent(displayedPoint.percent) : '—'}
           </strong>
         )}
-        <strong className="money">
-          {displayedPoint ? VND.format(Math.round(displayedPoint.money)) : '—'}
-        </strong>
+        <strong className="money">{displayedPoint ? cash(displayedPoint.money) : '—'}</strong>
         <small>Kéo để pan · Cuộn hoặc chụm để zoom</small>
       </div>
 
@@ -378,7 +384,7 @@ export default function EquityTimeChart({
         {!showPercent && !showMoney && normalizedPoints.length > 0 && (
           <div className="dual-axis-chart-empty muted">
             <strong>Hai trục đang tắt</strong>
-            <p>Bật % hoặc VND để hiển thị đường cong vốn.</p>
+            <p>Bật % hoặc {currency} để hiển thị đường cong vốn.</p>
           </div>
         )}
       </div>

@@ -253,6 +253,27 @@ button[aria-pressed='true'] {
   }
 }
 @media (prefers-color-scheme: light) {
+  .classic-scope .overview-principles article {
+    background: var(--surface2);
+    border-color: var(--line);
+  }
+  .classic-scope .market-switcher button,
+  .classic-scope .dual-axis-switches button,
+  .classic-scope .dual-axis-zoom button {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: var(--line);
+  }
+  .classic-scope .dual-axis-readout > span,
+  .classic-scope .dual-axis-readout small {
+    color: var(--muted);
+  }
+  .classic-scope .dual-axis-readout strong.percent {
+    color: #345697;
+  }
+  .classic-scope .dual-axis-readout strong.money {
+    color: var(--green);
+  }
   .classic-scope .market-overview-grid article {
     background: var(--surface);
   }
