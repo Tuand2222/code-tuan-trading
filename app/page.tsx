@@ -118,6 +118,10 @@ function HomeContent() {
     {mobileNav&&<button className="mobile-backdrop" aria-label="Đóng menu" onClick={()=>setMobileNav(false)}/>}
     <main className="main-content" id="main-content"><header className="topbar"><button className="mobile-menu" aria-label="Mở menu" onClick={()=>setMobileNav(true)}><Menu size={18}/></button><div><h1>{meta.title}</h1><p>{meta.subtitle}</p></div><div className="top-actions"><span className="data-state-chip device"><Database size={14}/>Sổ v3 · Trên thiết bị</span><button className="quick-add" onClick={()=>setManualOpen(true)}><Plus size={16}/><span>Thêm lệnh</span></button></div></header>
       <div className="content-area">
+        <section className="hub-notice" aria-label="Bản nhật ký mới">
+          <strong>Nhật ký v6 · S5–S9 preview</strong>
+          <p>Nhập Binance, phân tích nâng cao, mô phỏng và sao lưu mã hóa. <a href="/v6/">Mở nhật ký v6</a>. Bản v6 dùng sổ riêng trên thiết bị; dữ liệu sổ v3 không tự chuyển sang. Các công cụ cũ tiếp tục ở trang này.</p>
+        </section>
         {demoVisible&&!['valuation','connections'].includes(view)&&<section className="hub-notice" role="status"><strong>DỮ LIỆU MINH HỌA</strong><p>Phạm vi hiện tại có lệnh giả lập để trải nghiệm nhật ký; không phải giao dịch hoặc thành tích thực tế. Chọn tài khoản ở bộ lọc để tách dữ liệu. Có thể hoàn tác cả đợt tại <a href="#connections?tab=history">Lịch sử nhập</a>.</p></section>}
         {!['valuation','connections'].includes(view)&&<div className="data-hub"><LedgerFilters/></div>}
         <DataConnections active={view==='connections'}/>

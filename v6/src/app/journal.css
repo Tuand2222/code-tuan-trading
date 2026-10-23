@@ -33,6 +33,7 @@ form > button {
 }
 .panel {
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 .classic-scope .dashboard-grid {
   grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);

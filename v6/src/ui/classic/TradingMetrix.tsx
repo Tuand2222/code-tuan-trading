@@ -25,7 +25,8 @@ function cash(value: number) {
   return VND.format(Math.round(value));
 }
 
-function compactCash(value: number) {
+function compactCash(value: number | null) {
+  if (value === null) return '—';
   const sign = value > 0 ? '+' : value < 0 ? '−' : '';
   const absolute = Math.abs(value);
   if (absolute >= 1_000_000_000) return `${sign}${(absolute / 1_000_000_000).toFixed(2)} tỷ`;
@@ -527,7 +528,8 @@ export default function TradingMetrix() {
               Ngày tốt nhất <strong className="positive-text">{compactCash(report.bestDay)}</strong>
             </span>
             <span>
-              Tổng ngày xanh <strong>{report.rows.filter((row) => row.pnl > 0).length}</strong>
+              Tổng ngày xanh{' '}
+              <strong>{report.rows.filter((row) => row.pnl !== null && row.pnl > 0).length}</strong>
             </span>
           </div>
         </div>
@@ -569,7 +571,15 @@ export default function TradingMetrix() {
                       </small>
                     </td>
                     <td>{row.fees === undefined ? '—' : compactCash(-row.fees)}</td>
-                    <td className={row.pnl >= 0 ? 'positive-text' : 'negative-text'}>
+                    <td
+                      className={
+                        row.pnl === null
+                          ? undefined
+                          : row.pnl >= 0
+                            ? 'positive-text'
+                            : 'negative-text'
+                      }
+                    >
                       {compactCash(row.pnl)}
                     </td>
                     <td>{cash(row.endBalance)}</td>

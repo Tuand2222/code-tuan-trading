@@ -52,7 +52,7 @@ export function classicReport(
       buys: cs.filter((f) => f.trade.side === 'long').length,
       sells: cs.filter((f) => f.trade.side === 'short').length,
       riskPercent: D(totalRisk).gt(0) ? number(dec(riskNet.div(totalRisk).mul(100))) : undefined,
-      pnl: day.net === null ? 0 : number(day.net),
+      pnl: day.net === null ? null : number(day.net),
       risk: number(sum(cs.filter((f) => f.risk).map((f) => f.risk!))),
       riskCount: cs.filter((f) => f.risk).length,
       fees: es.every((e) => e.net !== undefined) ? number(sum(es.map((e) => e.cost))) : undefined,
@@ -74,8 +74,10 @@ export function classicReport(
       };
     })
     .sort((a, b) => b.pnl - a.pnl);
-  const absoluteSum = rows.reduce((s, d) => s + Math.abs(d.pnl), 0),
-    largest = Math.max(0, ...rows.map((d) => Math.abs(d.pnl)));
+  const completeDays = rows.every((d) => d.pnl !== null);
+  const knownDailyPnls = rows.flatMap((d) => (d.pnl === null ? [] : [d.pnl]));
+  const absoluteSum = knownDailyPnls.reduce((s, pnl) => s + Math.abs(pnl), 0),
+    largest = Math.max(0, ...knownDailyPnls.map(Math.abs));
   return {
     metrics: r.metrics,
     ordered: r.closed.map((f) => ({
@@ -97,8 +99,8 @@ export function classicReport(
     anyDailyBreach: rows.some((d) => d.dailyDrawdown > dailyLimitAmount),
     anyMaximumBreach: number(dec(low)) < capital - maximumAmount,
     worstDailyDrawdown: Math.max(0, ...rows.map((d) => d.dailyDrawdown)),
-    bestDay: Math.max(0, ...rows.map((d) => d.pnl)),
-    consistency: absoluteSum ? (1 - largest / absoluteSum) * 100 : undefined,
+    bestDay: completeDays ? Math.max(0, ...knownDailyPnls) : null,
+    consistency: completeDays && absoluteSum ? (1 - largest / absoluteSum) * 100 : undefined,
     stats: Object.entries(r.metrics).map(([id, m]) => [
       vi.metricLabels[id as keyof typeof vi.metricLabels],
       formatValue(
@@ -108,6 +110,17 @@ export function classicReport(
       ),
     ]),
   };
+}
+export function classicWeekdays(rows: { date: string; pnl: number | null }[]) {
+  const days = Array.from({ length: 7 }, (_, i) => ({
+    label: i === 6 ? 'CN' : 'T' + (i + 2),
+    pnl: 0 as number | null,
+  }));
+  for (const row of rows) {
+    const day = days[(new Date(row.date + 'T12:00:00Z').getUTCDay() + 6) % 7];
+    day.pnl = day.pnl === null || row.pnl === null ? null : day.pnl + row.pnl;
+  }
+  return days;
 }
 export function classicYear(
   year: number,

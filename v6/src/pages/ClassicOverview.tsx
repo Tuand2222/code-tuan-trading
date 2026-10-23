@@ -2,7 +2,7 @@ import { useMemo, type CSSProperties } from 'react';
 import type { Journal, Trade } from '../data/schema';
 import type { Filters } from '../core/filters';
 import type { analyze } from '../core/analyze';
-import { classicReport } from '../core/classic';
+import { classicReport, classicWeekdays } from '../core/classic';
 import { KpiCard } from '../ui/KpiCard';
 import EquityTimeChart from '../ui/classic/EquityTimeChart';
 import { formatValue } from '../ui/format';
@@ -39,13 +39,8 @@ export function ClassicOverview({
       }),
     [journal, trades, filters],
   );
-  const daily = Array.from({ length: 7 }, (_, i) => ({
-    label: i === 6 ? 'CN' : 'T' + (i + 2),
-    pnl: 0,
-  }));
-  for (const row of report.rows)
-    daily[(new Date(row.date + 'T12:00:00Z').getUTCDay() + 6) % 7].pnl += row.pnl;
-  const maximum = Math.max(1, ...daily.map((d) => Math.abs(d.pnl)));
+  const daily = classicWeekdays(report.rows);
+  const maximum = Math.max(1, ...daily.flatMap((d) => (d.pnl === null ? [] : [Math.abs(d.pnl)])));
   const total = Number(result.metrics.total.value ?? 0),
     wins = Number(result.metrics.wins.value ?? 0),
     losses = Number(result.metrics.losses.value ?? 0);
@@ -146,16 +141,18 @@ export function ClassicOverview({
               <div className="bar-column" key={day.label}>
                 <div className="bar-value">
                   {formatValue(
-                    report.complete ? String(day.pnl) : null,
+                    day.pnl === null ? null : String(day.pnl),
                     'money',
                     journal.currency,
                     true,
                   )}
                 </div>
-                <div
-                  className={'bar ' + (day.pnl >= 0 ? 'up' : 'down')}
-                  style={{ height: (Math.abs(day.pnl) / maximum) * 112 }}
-                />
+                {day.pnl !== null && (
+                  <div
+                    className={'bar ' + (day.pnl >= 0 ? 'up' : 'down')}
+                    style={{ height: (Math.abs(day.pnl) / maximum) * 112 }}
+                  />
+                )}
                 <span>{day.label}</span>
               </div>
             ))}

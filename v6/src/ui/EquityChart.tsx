@@ -126,6 +126,12 @@ export function EquityChart({
         </button>
       </div>
       <p>{vi.shell.chartNote}</p>
+      {unit === 'percent' && (
+        <p>
+          Tỷ lệ Net giao dịch / vốn đầu kỳ. TWR có điều chỉnh nạp/rút xem tại Cài đặt → Vốn và
+          nạp/rút.
+        </p>
+      )}
       <p className="muted">
         {vi.shell.chartUnit}: {axisUnit}
       </p>

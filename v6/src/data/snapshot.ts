@@ -13,6 +13,7 @@ import {
   customStatDefSchema,
 } from './schema';
 import { tradeFacts } from '../core/trade';
+import { imageDataURL } from './images';
 export const snapshotSchema = z
   .object({
     sources: z
@@ -51,6 +52,8 @@ export const emptySnapshot = (): Snapshot => ({
 export function validateSnapshot(value: unknown): Snapshot {
   const data = snapshotSchema.parse(value),
     journals = new Set(data.journals.map((j) => j.id));
+  const sourcesById = new Map(data.sources.map((s) => [s.id, s])),
+    checkedImages = new Set<string>();
   for (const [table, rows] of Object.entries(data)) {
     if (table === 'sources') {
       if (new Set(data.sources.map((x) => x.id)).size !== data.sources.length)
@@ -86,7 +89,14 @@ export function validateSnapshot(value: unknown): Snapshot {
     for (const id of [...t.errorTagIds, ...Object.values(t.stageChips ?? {}).flat()])
       requireRef(id, data.errorTags, t.journalId);
     for (const a of t.attachments)
-      if (a.kind === 'blob') throw Error('BLOB_BACKUP_NOT_SUPPORTED_S1');
+      if (a.kind === 'blob') {
+        const source = sourcesById.get(a.blobKey);
+        if (!source) throw Error('BLOB_SOURCE_MISSING');
+        if (!checkedImages.has(a.blobKey)) {
+          imageDataURL(source.raw);
+          checkedImages.add(a.blobKey);
+        }
+      }
   }
   for (const n of data.notes)
     if (n.scope === 'trade') requireRef(n.refId, data.trades, n.journalId);

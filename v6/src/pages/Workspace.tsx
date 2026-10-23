@@ -24,6 +24,8 @@ import { ClassicProvider } from '../ui/classic/LedgerContext';
 import { formatDate } from '../ui/format';
 import Debug from './Debug';
 import vi from '../i18n/vi.json';
+import { CommandPalette } from '../ui/CommandPalette';
+import { Welcome } from './Welcome';
 const EquityChart = lazy(() =>
   import('../ui/EquityChart').then((m) => ({ default: m.EquityChart })),
 );
@@ -32,6 +34,9 @@ const Overview = lazy(() =>
 );
 const OldMetrix = lazy(() => import('../ui/classic/TradingMetrix'));
 const OldSystem = lazy(() => import('../ui/classic/SystemTracker'));
+const AdvancedWorkspace = lazy(() =>
+  import('./AdvancedWorkspace').then((m) => ({ default: m.AdvancedWorkspace })),
+);
 const t = vi.s3;
 export default function Workspace() {
   return (
@@ -48,7 +53,9 @@ function Application() {
     [detail, setDetail] = useState(''),
     [mode, setMode] = useState<'classic' | 'extended'>('classic'),
     [holding, setHolding] = useState<'minutes' | 'hours' | 'days'>('hours');
-  const journal = data.journals.find((j) => j.id === route.filters.journal) ?? data.journals[0];
+  const journal =
+    data.journals.find((j) => j.id === route.filters.journal && !j.archivedAt) ??
+    data.journals.find((j) => !j.archivedAt);
   const filters = { ...route.filters, journal: journal?.id ?? '' };
   const scope = JSON.stringify(filters);
   const key = scope + revision;
@@ -60,8 +67,14 @@ function Application() {
   }>();
   const result = computed?.scope === scope ? computed.result : undefined;
   const trades = journal ? selectTrades(data.trades, filters, journal.id) : [];
+  const scopedTradeIds = new Set([
+    ...(result?.closed.map((f) => f.id) ?? []),
+    ...(result?.events.map((e) => e.tradeId) ?? []),
+  ]);
   const alerts = useMemo(() => {
-    const selected = data.journals.find((j) => j.id === route.filters.journal) ?? data.journals[0];
+    const selected =
+      data.journals.find((j) => j.id === route.filters.journal && !j.archivedAt) ??
+      data.journals.find((j) => !j.archivedAt);
     return selected
       ? journalAlerts(
           selected,
@@ -243,6 +256,14 @@ function Application() {
             <button onClick={() => go('review')}>{t.notes} →</button>
           </section>
         </>
+      ) : route.page === 'advanced' ? (
+        <AdvancedWorkspace
+          key={journal.id + scope}
+          journal={journal}
+          trades={trades.filter((t) => t.status === 'open' || scopedTradeIds.has(t.id))}
+          scope={{ from: filters.from || undefined, to: filters.to || undefined }}
+          base={computed?.key === key ? result : undefined}
+        />
       ) : route.page === 'journal' ? (
         <TradeTable
           trades={trades.filter((trade) => {
@@ -349,6 +370,7 @@ function Application() {
     </>
   );
   if (route.page === 'debug') body = <Debug />;
+  if (route.page === 'welcome') body = <Welcome />;
   if (route.page === 'glossary')
     body = (
       <section className="panel glossary">
@@ -408,11 +430,13 @@ function Application() {
               <option value="" disabled>
                 —
               </option>
-              {data.journals.map((j) => (
-                <option key={j.id} value={j.id}>
-                  {j.name}
-                </option>
-              ))}
+              {data.journals
+                .filter((j) => !j.archivedAt)
+                .map((j) => (
+                  <option key={j.id} value={j.id}>
+                    {j.name}
+                  </option>
+                ))}
             </select>
           </label>
           <button className="local-state" onClick={() => go('settings')}>
@@ -437,6 +461,10 @@ function Application() {
             <span className="eyebrow">{vi.shell.stage}</span>
             <h1>{title}</h1>
             <p>{vi.shell.subtitle}</p>
+            <div className="actions">
+              <button onClick={() => go('advanced')}>Phân tích nâng cao</button>
+              <CommandPalette go={go} />
+            </div>
           </div>
           {journal?.isDemo && <div className="demo-banner">{vi.status.demo}</div>}
           {status && (

@@ -49,13 +49,57 @@ export async function previewWorkspace(raw: string, repo: JournalRepository) {
 export async function restoreWorkspace(raw: string, repo: JournalRepository, revision: number) {
   const preview = await previewWorkspace(raw, repo);
   const before = await exportWorkspace(repo);
-  await viewRepository.meta.put({ key: 'before-workspace-restore', value: before });
-  await repo.restore(preview.ledger, revision);
-  if (preview.views && preview.preferences)
-    await viewRepository.transaction('rw', viewRepository.views, viewRepository.meta, async () => {
+  if ((await repo.snapshot()).revision !== revision) throw Error('STALE_REVISION');
+  await viewRepository.transaction('rw', viewRepository.meta, async () => {
+    if (await viewRepository.meta.get('pending-workspace-restore'))
+      throw Error('WORKSPACE_RECOVERY_REQUIRED');
+    await viewRepository.meta.put({ key: 'before-workspace-restore', value: before });
+    await viewRepository.meta.put({
+      key: 'pending-workspace-restore',
+      value: JSON.stringify({ repository: repo.name, raw }),
+    });
+  });
+  try {
+    await repo.restore(preview.ledger, revision);
+  } catch (error) {
+    await viewRepository.meta.delete('pending-workspace-restore');
+    throw error;
+  }
+  await finishWorkspaceRestore(preview);
+  return preview.data;
+}
+async function finishWorkspaceRestore(preview: Awaited<ReturnType<typeof previewWorkspace>>) {
+  await viewRepository.transaction('rw', viewRepository.views, viewRepository.meta, async () => {
+    if (preview.views && preview.preferences) {
       await viewRepository.views.clear();
       await viewRepository.views.bulkPut(preview.views!);
+      await viewRepository.meta.delete('lastBackupAt');
       await viewRepository.meta.bulkPut(preview.preferences!);
-    });
-  return preview.data;
+    }
+    await viewRepository.meta.delete('pending-workspace-restore');
+  });
+}
+export async function recoverWorkspaceRestore(repo: JournalRepository) {
+  const pending = await viewRepository.meta.get('pending-workspace-restore');
+  if (!pending) return false;
+  const record = z
+    .object({ repository: z.string(), raw: z.string() })
+    .strict()
+    .parse(JSON.parse(pending.value));
+  if (record.repository !== repo.name) throw Error('WORKSPACE_RECOVERY_WRONG_REPOSITORY');
+  const preview = await previewWorkspace(record.raw, repo);
+  if (canonical((await repo.snapshot()).data) !== canonical(preview.data)) {
+    const before = await viewRepository.meta.get('before-workspace-restore');
+    if (before) {
+      const previous = await previewWorkspace(before.value, repo);
+      if (canonical((await repo.snapshot()).data) === canonical(previous.data)) {
+        // The process stopped before the ledger commit; Views were never changed.
+        await viewRepository.meta.delete('pending-workspace-restore');
+        return false;
+      }
+    }
+    throw Error('WORKSPACE_RECOVERY_LEDGER_CHANGED');
+  }
+  await finishWorkspaceRestore(preview);
+  return true;
 }

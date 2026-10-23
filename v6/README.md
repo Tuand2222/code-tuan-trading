@@ -1,4 +1,6 @@
-# Trading Plan Pro v6 — S3
+# Trading Plan Pro v6 — 0.9.0-preview
+
+Bản tích hợp local S5–S9: [phạm vi, giới hạn và cách kiểm chứng](docs/S5-S9-preview-release.md). Chưa hợp nhất/deploy vào Site chính. Nền S3 và 24 KPI được giữ; các công cụ mới mở tại “Phân tích nâng cao”, hoặc Ctrl+K. Không coi adapter CSV đối chiếu Binance là đã hỗ trợ mọi file export gốc.
 
 V6 chạy song song với nhật ký v3. S3 nối các trang lõi, thêm/sửa giao dịch, review, lịch và sao lưu vào cùng ledger. Tổng quan giữ các khối của bản cũ; MetriX/Theo dõi hệ thống có giao diện gốc và chế độ chi tiết. Xem [nghiệm thu S3](docs/S3-release.md), [checkpoint v10](docs/NHAT_KY_SUA_LOI_Trading_Plan_Pro_v10.md) và [bàn giao S4](docs/PROMPT_BAN_GIAO_S4.md).
 

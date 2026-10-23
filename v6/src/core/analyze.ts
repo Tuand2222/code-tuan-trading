@@ -24,8 +24,17 @@ export function analyze(
   scope: Scope = {},
   cashFlows: CashFlow[] = [],
 ) {
+  const dates = new Map<string, string>();
+  const dateInJournal = (time: string) => {
+    let date = dates.get(time);
+    if (date === undefined) {
+      date = dayInZone(time, journal.timezone);
+      dates.set(time, date);
+    }
+    return date;
+  };
   const inRange = (ts: string) => {
-    const day = dayInZone(ts, journal.timezone);
+    const day = dateInJournal(ts);
     return (!scope.from || day >= scope.from) && (!scope.to || day <= scope.to);
   };
   const all = trades
@@ -173,7 +182,7 @@ export function analyze(
   if (known && n && D(gl).isZero() && D(gp).gt(0)) metrics.profitFactor.reason = 'no-losses';
   const groups = new Map<string, TradeEvent[]>();
   for (const e of events) {
-    const day = dayInZone(e.time, journal.timezone);
+    const day = dateInJournal(e.time);
     groups.set(day, [...(groups.get(day) ?? []), e]);
   }
   const days = [...groups]
@@ -182,15 +191,15 @@ export function analyze(
       date,
       net: es.every((e) => e.net !== undefined) ? sum(es.map((e) => e.net!)) : null,
       events: es.length,
-      closed: closed.filter((f) => dayInZone(f.closeTime!, journal.timezone) === date).length,
-      wins: wins.filter((f) => dayInZone(f.closeTime!, journal.timezone) === date).length,
-      losses: losses.filter((f) => dayInZone(f.closeTime!, journal.timezone) === date).length,
+      closed: closed.filter((f) => dateInJournal(f.closeTime!) === date).length,
+      wins: wins.filter((f) => dateInJournal(f.closeTime!) === date).length,
+      losses: losses.filter((f) => dateInJournal(f.closeTime!) === date).length,
     }));
   const period = (key: (date: string) => string) => {
     const keys = [...new Set(days.map((d) => key(d.date)))];
     return keys.map((label) => {
       const ds = days.filter((d) => key(d.date) === label),
-        cs = closed.filter((f) => key(dayInZone(f.closeTime!, journal.timezone)) === label);
+        cs = closed.filter((f) => key(dateInJournal(f.closeTime!)) === label);
       return {
         label,
         net: ds.every((d) => d.net !== null) ? sum(ds.map((d) => d.net!)) : null,
@@ -315,24 +324,29 @@ export function balancedQueue(closed: TradeFacts[]) {
     losses = closed.filter((f) => f.net !== undefined && D(f.net).lt(0));
   let rw = wins.filter((f) => f.trade.review.done).length,
     rl = losses.filter((f) => f.trade.review.done).length;
-  while (remaining.length) {
+  const rank = (a: TradeFacts, b: TradeFacts) =>
+    D(b.r ?? '0')
+      .abs()
+      .cmp(D(a.r ?? '0').abs()) ||
+    a.closeTime!.localeCompare(b.closeTime!) ||
+    a.id.localeCompare(b.id);
+  const positive = remaining.filter((f) => f.net !== undefined && D(f.net).gt(0)).sort(rank),
+    negative = remaining.filter((f) => f.net !== undefined && D(f.net).lt(0)).sort(rank),
+    neutral = remaining.filter((f) => f.net === undefined || D(f.net).isZero());
+  let wi = 0,
+    li = 0,
+    ni = 0;
+  while (queue.length < remaining.length) {
     const winFirst = !losses.length || (!!wins.length && rw / wins.length <= rl / losses.length);
-    const rank = (positive: boolean) =>
-      remaining
-        .filter((f) => f.net !== undefined && (positive ? D(f.net).gt(0) : D(f.net).lt(0)))
-        .sort(
-          (a, b) =>
-            D(b.r ?? '0')
-              .abs()
-              .cmp(D(a.r ?? '0').abs()) ||
-            a.closeTime!.localeCompare(b.closeTime!) ||
-            a.id.localeCompare(b.id),
-        );
-    const next = rank(winFirst)[0] ?? rank(!winFirst)[0] ?? remaining[0];
+    let next: TradeFacts;
+    if ((winFirst && wi < positive.length) || (li >= negative.length && wi < positive.length)) {
+      next = positive[wi++];
+      rw++;
+    } else if (li < negative.length) {
+      next = negative[li++];
+      rl++;
+    } else next = neutral[ni++];
     queue.push(next);
-    remaining.splice(remaining.indexOf(next), 1);
-    if (next.net !== undefined && D(next.net).gt(0)) rw++;
-    else if (next.net !== undefined && D(next.net).lt(0)) rl++;
   }
   return queue;
 }

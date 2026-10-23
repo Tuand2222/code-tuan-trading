@@ -68,7 +68,8 @@ it('F08 preserves classic report controls and original metrics through the share
   expect(report.balance).toBe(203302290);
   expect(report.metrics.winRate.value).toBe('60');
   expect(report.riskCount).toBe(30);
-  expect(report.rows.reduce((s, d) => s + d.pnl, 0)).toBe(3302290);
+  expect(report.rows.every((d) => d.pnl !== null)).toBe(true);
+  expect(report.rows.reduce((s, d) => s + d.pnl!, 0)).toBe(3302290);
   const year = classicYear(2026, source, { ...emptyFilters, journal: journal.id }, 200000000);
   expect(year.total).toBe(30);
   expect(year.net).toBe(3302290);

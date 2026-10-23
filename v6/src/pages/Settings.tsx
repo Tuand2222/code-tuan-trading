@@ -3,9 +3,19 @@ import { journalSchema, type Journal, type Plan, type AlertRule } from '../data/
 
 import { useLedger } from '../app/LedgerContext';
 import { ensureCatalog } from '../data/tradeCommands';
+import { cloneJournalTemplate, archiveJournal } from '../data/journalCommands';
 import { viewRepository } from '../data/views';
-import { exportWorkspace, previewWorkspace, restoreWorkspace } from '../data/workspaceBackup';
+import {
+  exportWorkspace,
+  previewWorkspace,
+  restoreWorkspace,
+  recoverWorkspaceRestore,
+} from '../data/workspaceBackup';
 import { formatDate } from '../ui/format';
+import { CashFlowSettings } from './CashFlowSettings';
+import { BinanceImport } from './BinanceImport';
+import { LegEditor } from './LegEditor';
+import { BackupSecurity } from './BackupSecurity';
 import vi from '../i18n/vi.json';
 const t = vi.s3;
 const download = (raw: string) => {
@@ -118,6 +128,37 @@ export function Settings({
           <p className="notice">{t.backupDue}</p>
         )}
         <div className="actions">
+          <button
+            onClick={() =>
+              void viewRepository.meta
+                .get('before-workspace-restore')
+                .then((record) => {
+                  if (record) download(record.value);
+                  else setMessage('Chưa có bản sao trước khôi phục.');
+                })
+                .catch(() => setMessage(t.error))
+            }
+          >
+            Tải bản sao trước khôi phục
+          </button>
+          <button
+            disabled={busy}
+            onClick={() =>
+              void recoverWorkspaceRestore(repo)
+                .then((recovered) =>
+                  setMessage(
+                    recovered ? 'Đã hoàn tất khôi phục Views.' : 'Không có khôi phục dở dang.',
+                  ),
+                )
+                .catch(() =>
+                  setMessage(
+                    'Chưa thể hoàn tất khôi phục. Hãy giữ bản sao trước khôi phục và kiểm tra dữ liệu hiện tại.',
+                  ),
+                )
+            }
+          >
+            Hoàn tất khôi phục dở dang
+          </button>
           <button className="primary" onClick={() => void exportFile()}>
             {t.backup}
           </button>
@@ -203,7 +244,12 @@ export function Settings({
         {message && <p role="status">{message}</p>}
       </section>
       {journal && <JournalSettings key={journal.id + ':' + revision} journal={journal} />}
+      {journal && <CashFlowSettings key={journal.id} journal={journal} />}
+      {journal && <BinanceImport key={'import:' + journal.id} journal={journal} />}
+      {journal && <LegEditor key={'legs:' + journal.id} journal={journal} />}
       <NewJournal onCreated={onCreated} />
+      <JournalManagement onCreated={onCreated} />
+      <BackupSecurity />
       <section className="panel">
         <h2>{t.demo}</h2>
         <p>{t.demoHelp}</p>
@@ -227,6 +273,59 @@ export function Settings({
         </button>
       </section>
     </>
+  );
+}
+function JournalManagement({ onCreated }: { onCreated: (id: string) => void }) {
+  const { data, mutate, busy } = useLedger();
+  const [message, setMessage] = useState('');
+  return (
+    <section className="panel">
+      <h2>Quản lý sổ</h2>
+      <p>
+        Nhân bản cấu hình tạo sổ trống cùng tiền tệ, setup, lỗi và quy tắc. Vốn và lịch sử giao dịch
+        không được sao chép.
+      </p>
+      {data.journals.map((j) => (
+        <div className="actions" key={j.id}>
+          <span>
+            {j.name} · {j.currency}
+            {j.archivedAt ? ' · Đã lưu trữ' : ''}
+          </span>
+          <button
+            disabled={busy}
+            onClick={() => {
+              try {
+                const cloned = cloneJournalTemplate(
+                  data,
+                  j.id,
+                  j.name.slice(0, 185) + ' (bản sao)',
+                );
+                void mutate(() => cloned.data)
+                  .then(() => onCreated(cloned.journal.id))
+                  .catch(() => setMessage(t.error));
+              } catch {
+                setMessage(t.error);
+              }
+            }}
+          >
+            Nhân bản cấu hình {j.name}
+          </button>
+          <button
+            disabled={
+              busy || (!j.archivedAt && data.journals.filter((x) => !x.archivedAt).length <= 1)
+            }
+            onClick={() =>
+              void mutate((s) => archiveJournal(s, j.id, !j.archivedAt))
+                .then(() => setMessage(t.saved))
+                .catch(() => setMessage(t.error))
+            }
+          >
+            {j.archivedAt ? 'Khôi phục sổ' : 'Lưu trữ sổ'} {j.name}
+          </button>
+        </div>
+      ))}
+      {message && <p role="status">{message}</p>}
+    </section>
   );
 }
 function JournalSettings({ journal }: { journal: Journal }) {

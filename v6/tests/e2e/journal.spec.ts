@@ -14,6 +14,113 @@ async function seed(page: Page) {
   await page.getByRole('button', { name: 'Nạp và sao lưu bản gốc' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Đã lưu dữ liệu' })).toBeVisible();
 }
+test('audit: unknown fees do not render a weekday PnL bar or a false zero', async ({ page }) => {
+  await seed(page);
+  await page.goto('/#journal');
+  await page
+    .locator('.topbar')
+    .getByRole('button', { name: 'Thêm giao dịch', exact: true })
+    .click();
+  const dialog = page.getByRole('dialog');
+  for (const [label, value] of [
+    ['Mã sản phẩm', 'UNKNOWN'],
+    ['Thời gian vào', '2026-10-20T09:00'],
+    ['Thời gian đóng', '2026-10-20T10:00'],
+    ['Giá vào', '100'],
+    ['Giá ra', '110'],
+    ['Khối lượng', '10'],
+    ['1R ban đầu', '50'],
+  ])
+    await dialog.getByLabel(label, { exact: true }).fill(value);
+  await dialog
+    .getByLabel('Tôi đã xác nhận đầy đủ phí, thuế, funding/swap', { exact: true })
+    .uncheck();
+  await dialog.getByRole('button', { name: 'Lưu giao dịch', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await page.goto('/#overview');
+  const tuesday = page
+    .locator('.bar-column')
+    .filter({ has: page.getByText('T3', { exact: true }) });
+  await expect(tuesday.locator('.bar-value')).toHaveText('—');
+  await expect(tuesday.locator('.bar')).toHaveCount(0);
+  await expect(page.locator('.kpi-grid > *')).toHaveCount(24);
+});
+test('audit: journal configuration clone and archive preserve original trades', async ({
+  page,
+}) => {
+  await seed(page);
+  await page.goto('/#settings');
+  const management = page
+    .locator('section')
+    .filter({ has: page.getByRole('heading', { name: 'Quản lý sổ', exact: true }) });
+  await expect(management.getByRole('button', { name: /^Lưu trữ sổ/ })).toBeDisabled();
+  await management.getByRole('button', { name: /^Nhân bản cấu hình/ }).click();
+  await expect(page).toHaveURL(/#journal/);
+  await page.goto('/#settings');
+  await expect(management.getByRole('button', { name: /^Nhân bản cấu hình/ })).toHaveCount(2);
+  await management
+    .getByRole('button', { name: /^Lưu trữ sổ/ })
+    .first()
+    .click();
+  await expect(management.getByRole('button', { name: /^Khôi phục sổ/ })).toHaveCount(1);
+  await management.getByRole('button', { name: /^Khôi phục sổ/ }).click();
+  await expect(management.getByRole('button', { name: /^Khôi phục sổ/ })).toHaveCount(0);
+  await page.reload();
+  await expect(management.getByRole('button', { name: /^Khôi phục sổ/ })).toHaveCount(0);
+  await management
+    .getByRole('button', { name: /^Lưu trữ sổ/ })
+    .last()
+    .click();
+  await page.goto('/#journal');
+  await expect(page.locator('[data-trade-id]')).toHaveCount(30);
+});
+test('audit: cashflows reconcile capital, persist edits and preserve trading Net', async ({
+  page,
+}) => {
+  await seed(page);
+  await page.goto('/#settings');
+  await page.getByLabel('Vốn đầu kỳ (không có thì để trống)', { exact: true }).fill('100000000');
+  await page.getByRole('button', { name: 'Lưu cấu hình', exact: true }).click();
+  const capital = page
+    .locator('section')
+    .filter({ has: page.getByRole('heading', { name: 'Vốn và nạp/rút', exact: true }) });
+  await expect(capital).toContainText('103.302.290 đ');
+  await capital.getByLabel('Thời điểm dòng tiền (UTC)', { exact: true }).fill('2026-11-01T10:00');
+  await capital.getByLabel('Số tiền dòng tiền (VND)', { exact: true }).fill('100');
+  await capital.getByRole('button', { name: 'Lưu dòng tiền', exact: true }).click();
+  await expect(capital).toContainText('103.302.390 đ');
+  await capital.getByRole('button', { name: /^Sửa dòng tiền/ }).click();
+  await capital.getByLabel('Số tiền dòng tiền (VND)', { exact: true }).fill('200');
+  await capital.getByRole('button', { name: 'Lưu dòng tiền', exact: true }).click();
+  await expect(capital).toContainText('103.302.490 đ');
+  await page.reload();
+  await expect(capital).toContainText('103.302.490 đ');
+  await capital.getByRole('button', { name: /^Xóa dòng tiền/ }).click();
+  await capital.getByRole('button', { name: 'Xác nhận xóa dòng tiền', exact: true }).click();
+  await expect(capital).toContainText('103.302.290 đ');
+  await page.goto('/#overview');
+  await expect(page.getByRole('article', { name: 'Lợi nhuận ròng', exact: true })).toContainText(
+    '3.302.290',
+  );
+});
+test('audit: stale cashflow draft cannot overwrite a newer tab revision', async ({ page }) => {
+  await seed(page);
+  await page.goto('/#settings');
+  const capital = page
+    .locator('section')
+    .filter({ has: page.getByRole('heading', { name: 'Vốn và nạp/rút', exact: true }) });
+  await capital.getByLabel('Thời điểm dòng tiền (UTC)', { exact: true }).fill('2026-11-01T10:00');
+  await capital.getByLabel('Số tiền dòng tiền (VND)', { exact: true }).fill('100');
+  const other = await page.context().newPage();
+  await other.goto('/#settings');
+  await other.getByLabel('Vốn đầu kỳ (không có thì để trống)', { exact: true }).fill('100000000');
+  await other.getByRole('button', { name: 'Lưu cấu hình', exact: true }).click();
+  await expect(capital).toContainText('103.302.290 đ');
+  await capital.getByRole('button', { name: 'Lưu dòng tiền', exact: true }).click();
+  await expect(capital.getByRole('status')).toContainText('Không lưu được');
+  await expect(capital.getByRole('listitem')).toHaveCount(0);
+  await other.close();
+});
 test('QT02/QT03 one ledger: add, preview, inline edit, star, review and reload reconcile to calendar', async ({
   page,
 }, info) => {
