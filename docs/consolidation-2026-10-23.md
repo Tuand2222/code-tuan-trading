@@ -1,6 +1,6 @@
 # Hợp nhất web cũ và v6
 
-Ứng dụng chính duy nhất nằm trong `v6/`. Site giữ nguyên tên miền và chuyển `/` về `/v6/`; `/legacy` mở Cài đặt của cùng ứng dụng. Đã bỏ 15 thành phần giao diện cũ bị trùng với các trang nhật ký, thống kê, hệ thống và định giá của v6. Root vẫn giữ lớp hosting, xác thực, API kết nối và các công cụ đọc dữ liệu tương thích.
+Ứng dụng v6 nằm trong `v6/`, mở từ `/` hoặc `/v6/`. Toàn bộ giao diện GitHub gốc được giữ tại `/classic`, gồm kết nối API/bridge, cloud, ảnh, PDF/Excel, ghi chú và cài đặt. Giao diện sổ v3 và bộ nhập nhiều tài khoản được giữ tại `/legacy`. Menu v6 có liên kết trực tiếp đến các công cụ này; lớp hosting, xác thực và API dùng chung repository và DB/R2 hiện tại. Chỉ chuyển một chức năng sang v6 và bỏ bản tương thích sau khi đã đối chiếu đủ luồng người dùng.
 
 ## Dữ liệu và phục hồi
 
@@ -14,9 +14,13 @@
 
 ## Công cụ được đưa về giao diện chung
 
-- CSV/TSV/TXT/XLSX/XLS/HTML → chọn bảng → ánh xạ cột → xem trước FIFO → xác nhận. Bộ đọc bảng cũ được tách khỏi sổ v3; tính toán và ghi dữ liệu chỉ qua v6. Worker đọc bảng, giữ chuỗi số và hệ ngày Excel 1900/1904. Không dựng khớp vào/ra từ báo cáo tổng hợp.
+- CSV/TSV/TXT/XLSX/XLS/HTML → chọn bảng → ánh xạ cột → xem trước FIFO → xác nhận. Bộ đọc bảng trong v6 được tách khỏi sổ v3; luồng fills của v6 tính và ghi dữ liệu qua core v6. Bộ nhập nhiều tài khoản, MT4/MT5 và dữ liệu tổng hợp của web trước vẫn có tại `/legacy`. Worker đọc bảng, giữ chuỗi số và hệ ngày Excel 1900/1904. Không dựng khớp vào/ra từ báo cáo tổng hợp.
 - Excel toàn bộ sổ gồm lệnh, khớp, ghi chú và dòng tiền, lấy số từ core v6. Thiếu phí/1R giữ trống; số thập phân lưu dạng văn bản và ghi chú được ghi thành chuỗi, không chạy như công thức.
-- Định giá, TradingMetrix, System Tracker, biểu đồ, nhiều khớp, review, báo cáo và sao lưu dùng giao diện v6. Các thư viện/parser cũ còn được API hoặc kiểm thử sử dụng được giữ để tránh mất tương thích.
+- Định giá, TradingMetrix, System Tracker, biểu đồ, nhiều khớp, review, báo cáo và sao lưu có trong v6. Bản web gốc giữ nguyên giao diện tương ứng, bản Excel 5 sheet, nhập PDF Binance và ảnh cloud. Kết nối API/bridge dùng lại endpoint hiện có, token mã hóa và ownership gốc. Endpoint webhook lấy đúng origin hiện tại. Tự đồng bộ Pull chỉ bật theo lựa chọn trong phiên; đọc cloud có hủy khi đổi tài khoản và giữ/sao lưu dữ liệu thiết bị trước khi thay.
+
+## Phạm vi các sổ
+
+Cloud/web gốc, sổ v3 và sổ v6 có mô hình dữ liệu khác nhau. Chúng cùng website và source nhưng chưa phải một sổ ghi chung. Không tự biến báo cáo tổng hợp thành khớp lệnh hoặc tự chép số thiếu thành 0 vào v6. Dùng xem trước/gộp để chuyển các nguồn v3/v4 biểu diễn được chính xác; luôn giữ nguồn cũ.
 
 ## Giới hạn cần phân biệt
 

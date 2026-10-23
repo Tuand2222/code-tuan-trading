@@ -223,6 +223,12 @@ function Application() {
           ))}
         </div>
       ))}
+      <div className="nav-group restored-tools">
+        <h2>CÔNG CỤ WEB TRƯỚC</h2>
+        <a href="/classic">Web trước · đầy đủ</a>
+        <a href="/classic#connections">Kết nối sàn & đồng bộ</a>
+        <a href="/legacy#connections">Nhập nâng cao · MT4/MT5</a>
+      </div>
     </>
   );
   const cards =
@@ -542,10 +548,26 @@ function Application() {
           {error && (
             <p role="alert">{String(error).includes('STALE_REVISION') ? t.conflict : t.error}</p>
           )}
+          {route.page === 'connections' && (
+            <section className="panel">
+              <h2>Kết nối sàn và công cụ nhập của web trước</h2>
+              <p>
+                Binance/Bybit API, TradingView, bridge VPS/SSI/TCX/MT5/CQG, ảnh cloud và báo cáo
+                PDF/Excel đã có lại trong web trước. Các nguồn tổng hợp và sổ v6 được giữ riêng để
+                không dựng khớp lệnh hoặc thay đổi số liệu gốc.
+              </p>
+              <div className="actions">
+                <a href="/classic#connections">Mở kết nối sàn & đồng bộ</a>
+                <a href="/classic#journal">Nhập PDF/Excel và ảnh cloud</a>
+                <a href="/legacy#connections">Nhập nhiều tài khoản · MT4/MT5</a>
+              </div>
+            </section>
+          )}
           <Suspense fallback={<StateFrame kind="loading" />}>{body}</Suspense>
         </main>
         <footer>
-          {vi.app.brand} · {vi.shell.signed} · <a href="/legacy">{t.oldSite}</a>
+          {vi.app.brand} · {vi.shell.signed} · <a href="/classic">Web trước đầy đủ</a> ·{' '}
+          <a href="/legacy">Nhập nâng cao</a>
         </footer>
       </div>
       <nav className="bottom-nav" aria-label="Điều hướng di động">

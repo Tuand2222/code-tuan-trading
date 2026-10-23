@@ -29,6 +29,11 @@ interface ExecutionContext {
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    const cachedFont = url.pathname.match(/\/\.vinext\/fonts\/([A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\.woff2)$/);
+    if (cachedFont) {
+      url.pathname = '/assets/_vinext_fonts/' + cachedFont[1];
+      return env.ASSETS.fetch(new Request(url, request));
+    }
 
     if (url.pathname === "/" || url.pathname === "/index.html" || url.pathname === "/v6") {
       url.pathname = "/v6/";
