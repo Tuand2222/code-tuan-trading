@@ -2,6 +2,11 @@ import { z } from 'zod';
 import { canonical, sha256, decodeBackup } from './backup';
 import { viewRepository } from './views';
 import type { JournalRepository } from './repository';
+import {
+  devicePreferenceSchema,
+  readDevicePreferences,
+  writeDevicePreferences,
+} from './devicePreferences';
 const view = z.object({ name: z.string().min(1).max(80), hash: z.string().max(4096) }).strict();
 const meta = z.object({ key: z.literal('lastBackupAt'), value: z.string().datetime() }).strict();
 const bodySchema = z
@@ -12,6 +17,7 @@ const bodySchema = z
     ledger: z.string(),
     views: z.array(view).max(1000),
     preferences: z.array(meta).max(1000),
+    devicePreferences: z.array(devicePreferenceSchema).max(2).optional(),
     checksum: z.string(),
   })
   .strict();
@@ -23,6 +29,7 @@ export async function exportWorkspace(repo: JournalRepository) {
     ledger: await repo.exportJSON(),
     views: await viewRepository.views.toArray(),
     preferences: (await viewRepository.meta.toArray()).filter((p) => p.key === 'lastBackupAt'),
+    devicePreferences: readDevicePreferences(),
   };
   return canonical({ ...body, checksum: await sha256(canonical(body)) });
 }
@@ -35,6 +42,7 @@ export async function previewWorkspace(raw: string, repo: JournalRepository) {
       ledger: raw,
       views: undefined,
       preferences: undefined,
+      devicePreferences: undefined,
     };
   const parsed = bodySchema.parse(value),
     { checksum, ...body } = parsed;
@@ -44,6 +52,7 @@ export async function previewWorkspace(raw: string, repo: JournalRepository) {
     ledger: parsed.ledger,
     views: parsed.views,
     preferences: parsed.preferences,
+    devicePreferences: parsed.devicePreferences,
   };
 }
 export async function restoreWorkspace(raw: string, repo: JournalRepository, revision: number) {
@@ -69,6 +78,7 @@ export async function restoreWorkspace(raw: string, repo: JournalRepository, rev
   return preview.data;
 }
 async function finishWorkspaceRestore(preview: Awaited<ReturnType<typeof previewWorkspace>>) {
+  writeDevicePreferences(preview.devicePreferences);
   await viewRepository.transaction('rw', viewRepository.views, viewRepository.meta, async () => {
     if (preview.views && preview.preferences) {
       await viewRepository.views.clear();

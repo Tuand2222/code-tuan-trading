@@ -439,6 +439,15 @@ export function ResearchTools({
         </>
       )}
       <h3>Báo cáo chỉ đọc</h3>
+      <button
+        onClick={() =>
+          void import('../data/excelReport')
+            .then((m) => m.exportJournalExcel(data, journal.id))
+            .catch((e) => setMessage(String(e)))
+        }
+      >
+        Xuất Excel toàn bộ sổ · lệnh, khớp, ghi chú, dòng tiền
+      </button>
       <p>
         Xuất tổng hợp theo phạm vi đang chọn; không chứa ghi chú, URL chart hoặc ID giao dịch. Mở
         file rồi dùng In/Lưu PDF của trình duyệt.

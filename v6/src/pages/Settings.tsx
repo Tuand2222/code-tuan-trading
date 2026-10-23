@@ -20,6 +20,7 @@ import { FeeProfiles } from './FeeProfiles';
 import { FifoImport } from './FifoImport';
 import { DirectoryBackup } from '../ui/DirectoryBackup';
 import vi from '../i18n/vi.json';
+import { WorkspaceMerge } from './WorkspaceMerge';
 const t = vi.s3;
 const download = (raw: string) => {
   const url = URL.createObjectURL(new Blob([raw], { type: 'application/json' }));
@@ -129,6 +130,7 @@ export function Settings({
   const days = last ? (openedAt - Date.parse(last)) / 86400000 : Infinity;
   return (
     <>
+      <WorkspaceMerge />
       <section className="panel">
         <h2>{t.settings}</h2>
         <p>{t.backupInfo}</p>

@@ -12,6 +12,8 @@ import {
 } from '../data/fifoImport';
 import { useLedger } from '../app/LedgerContext';
 import { formatValue } from '../ui/format';
+import { type SheetSample } from '../data/tableReader';
+import { tableCSV } from '../data/importTables';
 export function FifoImport({ journal }: { journal: Journal }) {
   const { data, mutate, revision, busy } = useLedger();
   const [raw, setRaw] = useState(''),
@@ -29,7 +31,21 @@ export function FifoImport({ journal }: { journal: Journal }) {
     [preview, setPreview] = useState<Awaited<ReturnType<typeof previewFIFO>>>(),
     [version, setVersion] = useState(0);
   const worker = useRef<Worker>();
-  useEffect(() => () => worker.current?.terminate(), []);
+  const reader = useRef<Worker>();
+  const [tables, setTables] = useState<SheetSample[]>([]);
+  const [tableIndex, setTableIndex] = useState(0);
+  useEffect(
+    () => () => {
+      worker.current?.terminate();
+      reader.current?.terminate();
+    },
+    [],
+  );
+  function selectTable(table: SheetSample) {
+    const text = tableCSV(table);
+    setRaw(text);
+    setMapping(suggestMapping(csvHeaders(text)));
+  }
   const totals = preview?.data ? fifoTotals(preview.data, journal.id) : undefined;
   const headers = raw ? csvHeaders(raw) : [],
     templates = journal.settings.importTemplates ?? [];
@@ -53,27 +69,84 @@ export function FifoImport({ journal }: { journal: Journal }) {
         File CSV khớp lệnh
         <input
           type="file"
-          accept=".csv"
+          accept=".csv,.tsv,.txt,.xlsx,.xls,.html,.htm"
           disabled={busy}
           onChange={(e) => {
             invalidate();
+            reader.current?.terminate();
+            setTables([]);
+            setRaw('');
+            setMessage('');
             const file = e.target.files?.[0];
             if (!file) return;
-            if (file.size > 20 * 1024 * 1024) {
-              setMessage('Tối đa 20 MB.');
+            if (file.size > 10 * 1024 * 1024) {
+              setMessage('Tối đa 10 MB.');
               return;
             }
             void file
-              .text()
-              .then((text) => {
-                setRaw(text);
+              .arrayBuffer()
+              .then((bytes) => {
                 setFileName(file.name);
-                setMapping(suggestMapping(csvHeaders(text)));
+                const w = new Worker(new URL('../app/tables.worker.ts', import.meta.url), {
+                  type: 'module',
+                });
+                reader.current = w;
+                setPending(true);
+                w.onmessage = (e: MessageEvent<{ tables?: SheetSample[]; error?: string }>) => {
+                  setPending(false);
+                  if (e.data.error) setMessage(e.data.error);
+                  else if (e.data.tables?.length) {
+                    try {
+                      setTables(e.data.tables);
+                      setTableIndex(0);
+                      selectTable(e.data.tables[0]);
+                    } catch (error) {
+                      setMessage(String(error));
+                    }
+                  }
+                  w.terminate();
+                };
+                w.onerror = () => {
+                  setPending(false);
+                  setMessage('Không đọc được file.');
+                  w.terminate();
+                };
+                w.postMessage({ bytes, name: file.name }, [bytes]);
               })
               .catch((e) => setMessage(String(e)));
           }}
         />
       </label>
+      <p>
+        Nhận CSV, TSV, Excel XLSX/XLS và bảng HTML. Chọn đúng bảng khớp lệnh; số ngày Excel được đổi
+        theo hệ 1900/1904 và hiểu là UTC. Báo cáo tổng hợp không có khớp vào/ra sẽ không tự tạo giao
+        dịch.
+      </p>
+      {tables.length > 1 && (
+        <label>
+          Bảng dữ liệu
+          <select
+            value={tableIndex}
+            onChange={(e) => {
+              invalidate();
+              const index = Number(e.target.value);
+              setTableIndex(index);
+              try {
+                selectTable(tables[index]);
+              } catch (error) {
+                setRaw('');
+                setMessage(String(error));
+              }
+            }}
+          >
+            {tables.map((table, i) => (
+              <option key={i} value={i}>
+                {table.name} · {table.rows.length} dòng
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <label>
         Nền tảng nhập
         <input

@@ -32,8 +32,8 @@ test("renders production HTML without development preview metadata", async () =>
   const html = await response.text();
   assert.doesNotMatch(html, developmentPreviewMeta);
   assert.doesNotMatch(html, /Xem nhật ký cũ|Xem bản minh họa cũ|Bản xem trước Chặng 2/);
-  assert.match(html, /Sổ v3/);
-  assert.match(html, /href="\/v6\/"/);
+  assert.match(html, /Đã gộp về một ứng dụng/);
+  assert.match(html, /href="\/v6\/#settings"/);
 });
 
 test("v6 routes serve isolated assets with security headers and preserve missing asset status", async () => {
