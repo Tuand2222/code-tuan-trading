@@ -152,14 +152,17 @@ it('S7 computes long/short excursions from explicit extrema and preserves group 
     highestPrice: '15',
     lowestPrice: '8',
     plannedTP: '14',
+    plannedSL: '9',
+    otpHit: 'yes' as const,
   };
   expect(exitAnalysis(t)?.mfeR).toBe('10');
   expect(exitAnalysis(t)?.maeR).toBe('-4');
-  expect(exitAnalysis(t)?.otpHit).toBe(true);
+  expect(exitAnalysis(t)?.otpHit).toBe('yes');
   const short = {
     ...t,
     side: 'short' as const,
     plannedTP: '9',
+    plannedSL: '13',
     legs: [
       { ...t.legs[0], price: '12' },
       { ...t.legs[1], price: '10' },
@@ -176,9 +179,10 @@ it('S7 computes long/short excursions from explicit extrema and preserves group 
   expect(movingAverage(['1', '2', '3', null, '5'], 3)).toEqual([null, null, '2', null, null]);
 });
 it('S8 seeded simulation is reproducible, bounded, distinct across seeds and labels assumptions', async () => {
-  const a = monteCarlo([-1, 2, 1], 12, 20);
-  expect(monteCarlo([-1, 2, 1], 12, 20)).toEqual(a);
-  expect(monteCarlo([-1, 2, 1], 13, 20).samples).not.toEqual(a.samples);
+  const values = Array.from({ length: 30 }, (_, i) => [-1, 2, 1][i % 3]);
+  const a = monteCarlo(values, 12, 50);
+  expect(monteCarlo(values, 12, 50)).toEqual(a);
+  expect(monteCarlo(values, 13, 50).samples).not.toEqual(a.samples);
   expect(a.paths).toBe(1000);
   expect(a.p05).toBeLessThanOrEqual(a.median);
   expect(a.median).toBeLessThanOrEqual(a.p95);

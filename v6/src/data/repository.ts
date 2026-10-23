@@ -6,6 +6,7 @@ import { tradeFacts } from '../core/trade';
 import { analyze } from '../core/analyze';
 interface State {
   id: 'current';
+  cacheToken?: string;
   revision: number;
   data: Snapshot;
 }
@@ -39,8 +40,12 @@ export class JournalRepository extends Dexie {
   async snapshot() {
     const state = await this.states.get('current');
     return state
-      ? { revision: state.revision, data: structuredClone(state.data) }
-      : { revision: 0, data: emptySnapshot() };
+      ? {
+          revision: state.revision,
+          cacheToken: state.cacheToken ?? '',
+          data: structuredClone(state.data),
+        }
+      : { revision: 0, cacheToken: '', data: emptySnapshot() };
   }
   async recoveries() {
     return (await this.recovery.toArray()).map(({ id, at, reason }) => ({ id, at, reason }));
@@ -79,7 +84,12 @@ export class JournalRepository extends Dexie {
       });
       await this.tradeIndex.clear();
       await this.tradeIndex.bulkPut(index);
-      await this.states.put({ id: 'current', revision: expectedRevision + 1, data });
+      await this.states.put({
+        id: 'current',
+        revision: expectedRevision + 1,
+        cacheToken: crypto.randomUUID(),
+        data,
+      });
     });
     return expectedRevision + 1;
   }

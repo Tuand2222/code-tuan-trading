@@ -105,6 +105,15 @@ export function validateSnapshot(value: unknown): Snapshot {
   for (const p of data.plannedTrades) {
     requireRef(p.setupId, data.setups, p.journalId);
     requireRef(p.takenTradeId, data.trades, p.journalId);
+    for (const a of p.attachments ?? [])
+      if (a.kind === 'blob') {
+        const source = sourcesById.get(a.blobKey);
+        if (!source) throw Error('BLOB_SOURCE_MISSING');
+        if (!checkedImages.has(a.blobKey)) {
+          imageDataURL(source.raw);
+          checkedImages.add(a.blobKey);
+        }
+      }
   }
   for (const a of data.altStrategies) {
     requireRef(a.setupId, data.setups, a.journalId);

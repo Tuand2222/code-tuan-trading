@@ -10,7 +10,7 @@ test("renders production HTML without development preview metadata", async () =>
   const { default: worker } = await import(workerUrl.href);
 
   const response = await worker.fetch(
-    new Request("http://localhost/", {
+    new Request("http://localhost/legacy", {
       headers: { accept: "text/html" },
     }),
     {
@@ -49,7 +49,7 @@ test("v6 routes serve isolated assets with security headers and preserve missing
   assert.equal(redirect.headers.get('location'), 'https://example.com/v6/?demo=1');
   const index = await worker.fetch(new Request('https://example.com/v6/'), env, ctx);
   assert.equal(index.status, 200);
-  assert.equal(seen[0], '/v6/index.html');
+  assert.equal(seen[0], '/v6/app-shell.txt');
   assert.equal(index.headers.get('x-content-type-options'), 'nosniff');
   assert.equal(index.headers.get('cache-control'), 'no-cache');
   assert.match(index.headers.get('content-security-policy'), /worker-src 'self' blob:/);
@@ -57,3 +57,5 @@ test("v6 routes serve isolated assets with security headers and preserve missing
   assert.equal(missing.status, 404);
   assert.equal(seen[1], '/v6/missing.js');
 });
+
+test('root opens the consolidated application on the existing origin',async()=>{const {default:worker}=await import(new URL('../dist/server/index.js',import.meta.url));const response=await worker.fetch(new Request('https://example.com/?demo=1'),{},{});assert.equal(response.status,308);assert.equal(response.headers.get('location'),'https://example.com/v6/?demo=1');});

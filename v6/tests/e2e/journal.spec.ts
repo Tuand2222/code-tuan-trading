@@ -234,7 +234,7 @@ test('QT02/QT03 one ledger: add, preview, inline edit, star, review and reload r
   await expect(page.getByRole('article', { name: 'Lợi nhuận ròng', exact: true })).toContainText(
     '+1.00 USDT',
   );
-  await expect(page.getByRole('button', { name: 'USDT bên phải', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Đơn vị trục Y' })).toContainText('Tiền');
 });
 test('S3 F01–F10, T-R1, classic modes and full restore verification preserve the 30-trade baseline', async ({
   page,

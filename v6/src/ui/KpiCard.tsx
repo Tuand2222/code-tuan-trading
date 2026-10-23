@@ -10,6 +10,7 @@ export function KpiCard({
   demo,
   minSample = 20,
   holding = 'hours',
+  formatOverride,
 }: {
   id: keyof typeof vi.metricHelp;
   metric: Metric;
@@ -17,10 +18,11 @@ export function KpiCard({
   demo: boolean;
   minSample?: number;
   holding?: 'minutes' | 'hours' | 'days';
+  formatOverride?: FormatKind;
 }) {
   const helpId = useId();
   const definition = vi.metricHelp[id];
-  const kind = definition.kind as FormatKind;
+  const kind = formatOverride ?? (definition.kind as FormatKind);
   const unit =
     kind === 'money'
       ? currency
@@ -59,6 +61,16 @@ export function KpiCard({
       <details data-part="help">
         <summary aria-controls={helpId}>{vi.shell.help}</summary>
         <dl id={helpId}>
+          {formatOverride && formatOverride !== definition.kind && (
+            <div>
+              <dt>Đơn vị đang chọn</dt>
+              <dd>
+                {formatOverride === 'R'
+                  ? 'Tiền lãi/lỗ từng lệnh chia 1R của chính lệnh đó; không bù rủi ro còn thiếu.'
+                  : 'Tiền lãi/lỗ chia vốn đầu kỳ; nạp/rút không cộng vào lợi nhuận. TWR xem tại Vốn/dòng tiền.'}
+              </dd>
+            </div>
+          )}
           {definition.help.map((line, i) => (
             <div key={i}>
               <dt>{vi.shell.helpLabels[i]}</dt>

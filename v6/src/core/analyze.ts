@@ -23,6 +23,7 @@ export function analyze(
   trades: Trade[],
   scope: Scope = {},
   cashFlows: CashFlow[] = [],
+  options: { inference?: boolean } = {},
 ) {
   const dates = new Map<string, string>();
   const dateInJournal = (time: string) => {
@@ -183,7 +184,9 @@ export function analyze(
   const groups = new Map<string, TradeEvent[]>();
   for (const e of events) {
     const day = dateInJournal(e.time);
-    groups.set(day, [...(groups.get(day) ?? []), e]);
+    const group = groups.get(day);
+    if (group) group.push(e);
+    else groups.set(day, [e]);
   }
   const days = [...groups]
     .sort(([a], [b]) => a.localeCompare(b))
@@ -196,10 +199,19 @@ export function analyze(
       losses: losses.filter((f) => dateInJournal(f.closeTime!) === date).length,
     }));
   const period = (key: (date: string) => string) => {
-    const keys = [...new Set(days.map((d) => key(d.date)))];
+    const labels = new Map<string, string>();
+    const labelFor = (date: string) => {
+      let label = labels.get(date);
+      if (label === undefined) {
+        label = key(date);
+        labels.set(date, label);
+      }
+      return label;
+    };
+    const keys = [...new Set(days.map((d) => labelFor(d.date)))];
     return keys.map((label) => {
-      const ds = days.filter((d) => key(d.date) === label),
-        cs = closed.filter((f) => key(dateInJournal(f.closeTime!)) === label);
+      const ds = days.filter((d) => labelFor(d.date) === label),
+        cs = closed.filter((f) => labelFor(dateInJournal(f.closeTime!)) === label);
       return {
         label,
         net: ds.every((d) => d.net !== null) ? sum(ds.map((d) => d.net!)) : null,
@@ -233,11 +245,12 @@ export function analyze(
     const rs = fs.filter((f) => f.r !== undefined).map((f) => number(f.r!)),
       w = fs.filter((f) => f.net !== undefined && D(f.net).gt(0)).length,
       l = fs.filter((f) => f.net !== undefined && D(f.net).lt(0)).length;
+    const ci = options.inference === false ? null : bootstrap(rs);
     return {
       n: rs.length,
       of: fs.length,
       mean: mean(fs.filter((f) => f.r !== undefined).map((f) => f.r!)),
-      ci: bootstrap(rs),
+      ci,
       winCI: wilson(w, w + l),
       winRate: w + l ? (w / (w + l)) * 100 : null,
       profitFactor: l

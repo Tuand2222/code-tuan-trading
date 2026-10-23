@@ -128,8 +128,8 @@ export function LegEditor({ journal }: { journal: Journal }) {
                   id: crypto.randomUUID(),
                   kind: 'in',
                   time: new Date().toISOString(),
-                  price: '1',
-                  quantity: '1',
+                  price: '',
+                  quantity: '',
                 },
               ]);
             }}

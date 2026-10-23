@@ -4,18 +4,31 @@ import { calendarMonth } from '../core/journalSelectors';
 import { formatValue } from '../ui/format';
 import { getISOWeek, getISOWeekYear } from 'date-fns';
 import vi from '../i18n/vi.json';
+import { useLedger } from '../app/LedgerContext';
 const t = vi.s3;
 export function CalendarPage({
   journal,
   trades,
   onDay,
+  scope = {},
 }: {
   journal: Journal;
   trades: Trade[];
   onDay: (date: string) => void;
+  scope?: { from?: string; to?: string };
 }) {
   const [month, setMonth] = useState(() => new Date().toISOString().slice(0, 7));
-  const model = useMemo(() => calendarMonth(journal, trades, month), [journal, trades, month]);
+  const { data } = useLedger();
+  const model = useMemo(
+    () => calendarMonth(journal, trades, month, data.cashFlows, scope),
+    [journal, trades, month, data.cashFlows, scope],
+  );
+  const kind =
+    journal.settings.displayUnit === 'money'
+      ? 'money'
+      : journal.settings.displayUnit === 'R'
+        ? 'R'
+        : 'percent';
   const [y, m] = month.split('-').map(Number);
   const start = new Date(Date.UTC(y, m - 1, 1, 12));
   start.setUTCDate(start.getUTCDate() - ((start.getUTCDay() + 6) % 7));
@@ -44,7 +57,7 @@ export function CalendarPage({
         </label>
       </div>
       <p>
-        {t.monthNet}: <strong>{formatValue(model.net, 'money', journal.currency, true)}</strong>
+        {t.monthNet}: <strong>{formatValue(model.net, kind, journal.currency, true)}</strong>
       </p>
       <div className="table-scroll">
         <table className="calendar-table">
@@ -88,7 +101,7 @@ export function CalendarPage({
                           <strong>{date.getUTCDate()}</strong>
                           {day && (
                             <>
-                              <span>{formatValue(day.net, 'money', journal.currency, true)}</span>
+                              <span>{formatValue(day.net, kind, journal.currency, true)}</span>
                               <small>
                                 {t.wins} {day.wins} · {t.losses} {day.losses} · {day.closed}{' '}
                                 {vi.debug.trades}
@@ -101,7 +114,7 @@ export function CalendarPage({
                   })}
                   <td>
                     <strong>{key}</strong>
-                    <p>{formatValue(week?.net ?? null, 'money', journal.currency, true)}</p>
+                    <p>{formatValue(week?.net ?? null, kind, journal.currency, true)}</p>
                     <small>
                       {week?.closed ?? 0} {vi.debug.trades}
                     </small>
@@ -126,7 +139,7 @@ export function CalendarPage({
             {model.weeks.map((w) => (
               <tr key={w.label}>
                 <td>{w.label}</td>
-                <td>{formatValue(w.net, 'money', journal.currency, true)}</td>
+                <td>{formatValue(w.net, kind, journal.currency, true)}</td>
                 <td>{w.closed}</td>
               </tr>
             ))}

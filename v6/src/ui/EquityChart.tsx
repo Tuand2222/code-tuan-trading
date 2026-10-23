@@ -13,6 +13,7 @@ import type { analyze } from '../core/analyze';
 import type { Journal } from '../data/schema';
 import { formatDate, formatValue } from './format';
 import vi from '../i18n/vi.json';
+import { useLedger } from '../app/LedgerContext';
 registerCharts([
   LineChart,
   GridComponent,
@@ -29,17 +30,36 @@ export function EquityChart({
   projections: Record<'money' | 'percent' | 'R', ReturnType<typeof analyze>['curve']>;
   journal: Journal;
 }) {
-  const [unit, setUnit] = useState<'money' | 'percent' | 'R'>('money');
+  const { mutate } = useLedger();
+  const unit = journal.settings.displayUnit;
+  const setUnit = (displayUnit: typeof unit) =>
+    void mutate((s) => ({
+      ...s,
+      journals: s.journals.map((j) =>
+        j.id === journal.id ? { ...j, settings: { ...j.settings, displayUnit } } : j,
+      ),
+    })).catch(() => {});
   const curve = projections[unit];
   const kind = unit === 'money' ? 'money' : unit === 'percent' ? 'percent' : 'R';
   const axisUnit = unit === 'money' ? journal.currency : unit === 'percent' ? '%' : 'R';
   const host = useRef<HTMLDivElement>(null),
     chart = useRef<EChartsType>();
   const [failed, setFailed] = useState(false);
+  const [tableOpen, setTableOpen] = useState(false),
+    [tablePage, setTablePage] = useState(0);
   useEffect(() => {
     if (!host.current) return;
     const instance = init(host.current);
     chart.current = instance;
+    const labels = new Map<string, string>();
+    const dateLabel = (time: string) => {
+      let label = labels.get(time);
+      if (label === undefined) {
+        label = formatDate(time, journal.timezone);
+        labels.set(time, label);
+      }
+      return label;
+    };
     try {
       instance.setOption({
         animation: false,
@@ -60,7 +80,7 @@ export function EquityChart({
         },
         xAxis: {
           type: 'category',
-          data: curve.map((p) => formatDate(p.time, journal.timezone)),
+          data: curve.map((p) => dateLabel(p.time)),
           axisLabel: { hideOverlap: true, color: '#8999ad' },
         },
         yAxis: {
@@ -145,31 +165,49 @@ export function EquityChart({
       </div>
       {curve.length > 0 && curve.every((p) => p.net === null) && <p>{vi.shell.unknown}</p>}
       <div className="chart" ref={host} role="img" aria-label={vi.shell.chart} />
-      <details>
+      <details onToggle={(e) => setTableOpen(e.currentTarget.open)}>
         <summary>{vi.shell.table}</summary>
-        <div className="table-scroll">
-          <table>
-            <caption>{vi.shell.chart}</caption>
-            <thead>
-              <tr>
-                <th>{vi.shell.chartDate}</th>
-                <th>{vi.shell.tradeId}</th>
-                <th>{vi.shell.actual}</th>
-                <th>{vi.shell.shadow}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {curve.map((p, i) => (
-                <tr key={i}>
-                  <td>{formatDate(p.time, journal.timezone)}</td>
-                  <td>{p.tradeId}</td>
-                  <td>{formatValue(p.net, kind, journal.currency, true)}</td>
-                  <td>{formatValue(p.shadow, kind, journal.currency, true)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {tableOpen && (
+          <>
+            <div className="table-scroll">
+              <table>
+                <caption>{vi.shell.chart}</caption>
+                <thead>
+                  <tr>
+                    <th>{vi.shell.chartDate}</th>
+                    <th>{vi.shell.tradeId}</th>
+                    <th>{vi.shell.actual}</th>
+                    <th>{vi.shell.shadow}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {curve.slice(tablePage * 100, (tablePage + 1) * 100).map((p, i) => (
+                    <tr key={i}>
+                      <td>{formatDate(p.time, journal.timezone)}</td>
+                      <td>{p.tradeId}</td>
+                      <td>{formatValue(p.net, kind, journal.currency, true)}</td>
+                      <td>{formatValue(p.shadow, kind, journal.currency, true)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="actions">
+              <button disabled={tablePage === 0} onClick={() => setTablePage(tablePage - 1)}>
+                100 điểm trước
+              </button>
+              <span>
+                {tablePage * 100 + 1}–{Math.min(curve.length, (tablePage + 1) * 100)}/{curve.length}
+              </span>
+              <button
+                disabled={(tablePage + 1) * 100 >= curve.length}
+                onClick={() => setTablePage(tablePage + 1)}
+              >
+                100 điểm tiếp
+              </button>
+            </div>
+          </>
+        )}
       </details>
     </section>
   );

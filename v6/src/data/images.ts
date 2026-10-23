@@ -37,14 +37,32 @@ export async function prepareImage(file: File) {
   } finally {
     image.close();
   }
-  const blob = await new Promise<Blob>((resolve, reject) =>
+  let blob = await new Promise<Blob>((resolve, reject) =>
     canvas.toBlob(
       (b) => (b ? resolve(b) : reject(Error('IMAGE_ENCODE_FAILED'))),
       'image/webp',
       0.85,
     ),
   );
-  if (blob.size > 2 * 1024 * 1024) throw Error('COMPRESSED_IMAGE_TOO_LARGE');
+  for (let attempt = 0; blob.size > 300 * 1024 && attempt < 8; attempt++) {
+    const next = document.createElement('canvas');
+    next.width = Math.max(1, Math.floor(canvas.width * 0.8));
+    next.height = Math.max(1, Math.floor(canvas.height * 0.8));
+    const ctx = next.getContext('2d');
+    if (!ctx) throw Error('IMAGE_CANVAS_UNAVAILABLE');
+    ctx.drawImage(canvas, 0, 0, next.width, next.height);
+    canvas.width = next.width;
+    canvas.height = next.height;
+    canvas.getContext('2d')!.drawImage(next, 0, 0);
+    blob = await new Promise<Blob>((resolve, reject) =>
+      canvas.toBlob(
+        (b) => (b ? resolve(b) : reject(Error('IMAGE_ENCODE_FAILED'))),
+        'image/webp',
+        0.75,
+      ),
+    );
+  }
+  if (blob.size > 300 * 1024) throw Error('COMPRESSED_IMAGE_TOO_LARGE');
   const bytes = new Uint8Array(await blob.arrayBuffer());
   let binary = '';
   for (let i = 0; i < bytes.length; i += 8192)

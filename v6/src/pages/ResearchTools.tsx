@@ -3,7 +3,7 @@ import type { Journal, Trade } from '../data/schema';
 import type { analyze } from '../core/analyze';
 import type { Dimension, monteCarlo, researchBundle } from '../core/advanced';
 import { formatValue } from '../ui/format';
-import { exportReport } from '../data/staticReport';
+import { exportReport, printReport } from '../data/staticReport';
 import type { Scope } from '../core/analyze';
 import { LinePlot } from '../ui/LinePlot';
 import { useLedger } from '../app/LedgerContext';
@@ -20,6 +20,7 @@ export function ResearchTools({
 }) {
   const [first, setFirst] = useState<Dimension>('symbol'),
     [second, setSecond] = useState<Dimension>('side'),
+    [third, setThird] = useState<Dimension | ''>(''),
     [question, setQuestion] = useState<'missing' | 'loss' | 'review'>('missing');
   const { data, revision } = useLedger();
   const [seed, setSeed] = useState('2103'),
@@ -29,6 +30,9 @@ export function ResearchTools({
     [message, setMessage] = useState(''),
     [pending, setPending] = useState(false);
   const worker = useRef<Worker>();
+  const [mcMode, setMCMode] = useState<'fixedR' | 'percent'>('fixedR'),
+    [riskPercent, setRiskPercent] = useState('1'),
+    [ruin, setRuin] = useState('20');
   const [simulationKey, setSimulationKey] = useState('');
   useEffect(() => () => worker.current?.terminate(), []);
   const requestKey =
@@ -42,7 +46,11 @@ export function ResearchTools({
     '|' +
     second +
     '|' +
-    question;
+    question +
+    '|' +
+    third;
+  const simulationRequestKey =
+    requestKey + '|' + [seed, steps, milestone, mcMode, riskPercent, ruin].join('|');
   const [analysis, setAnalysis] = useState<{
     key: string;
     value: ReturnType<typeof researchBundle>;
@@ -59,12 +67,12 @@ export function ResearchTools({
       journal,
       trades,
       scope,
-      dimensions: [first, second],
+      dimensions: [first, second, ...(third ? [third] : [])],
       question,
       base,
     });
     return () => w.terminate();
-  }, [requestKey, journal, trades, scope, first, second, question, base]);
+  }, [requestKey, journal, trades, scope, first, second, third, question, base]);
   const bundle = analysis?.key === requestKey ? analysis.value : undefined;
   const curve = bundle?.curve ?? [],
     ma20 = bundle?.ma20 ?? [],
@@ -78,7 +86,7 @@ export function ResearchTools({
     });
     worker.current = w;
     setPending(true);
-    setSimulationKey(requestKey);
+    setSimulationKey(simulationRequestKey);
     setSimulation(undefined);
     w.onmessage = (e) => {
       setPending(false);
@@ -96,6 +104,7 @@ export function ResearchTools({
       seed: Number(seed),
       steps: Number(steps),
       milestone: Number(milestone),
+      options: { mode: mcMode, riskPercent: Number(riskPercent), ruin: Number(ruin) },
     });
   };
   return (
@@ -106,7 +115,7 @@ export function ResearchTools({
         Phạm vi theo sổ và bộ lọc đang chọn. Mô phỏng và What-if là GIẢ ĐỊNH, không phải dự báo hoặc
         khuyến nghị giao dịch.
       </p>
-      <h3>Drill-down hai cấp</h3>
+      <h3>Drill-down đa cấp</h3>
       {[first, second].map((value, i) => (
         <label key={i}>
           Chiều nhóm {i + 1}
@@ -114,12 +123,66 @@ export function ResearchTools({
             value={value}
             onChange={(e) => (i === 0 ? setFirst : setSecond)(e.target.value as Dimension)}
           >
-            {(['symbol', 'setupId', 'market', 'side'] as const).map((d) => (
+            {(
+              [
+                'symbol',
+                'setupId',
+                'market',
+                'side',
+                'entryHour',
+                'exitHour',
+                'halfHour',
+                'tenMinute',
+                'entryWeekday',
+                'exitWeekday',
+                'positionSize',
+                'weekday',
+                'holding',
+                'rBucket',
+                'errorTag',
+              ] as const
+            ).map((d) => (
               <option key={d}>{d}</option>
             ))}
           </select>
         </label>
       ))}
+      <label>
+        Chiều nhóm 3
+        <select value={third} onChange={(e) => setThird(e.target.value as Dimension | '')}>
+          <option value="">Không dùng cấp 3</option>
+          {(
+            [
+              'symbol',
+              'setupId',
+              'market',
+              'side',
+              'entryHour',
+              'exitHour',
+              'halfHour',
+              'tenMinute',
+              'entryWeekday',
+              'exitWeekday',
+              'positionSize',
+              'weekday',
+              'holding',
+              'rBucket',
+              'errorTag',
+            ] as const
+          ).map((d) => (
+            <option key={d}>{d}</option>
+          ))}
+        </select>
+      </label>
+      <button
+        onClick={() => {
+          setFirst(second);
+          setSecond(first);
+        }}
+      >
+        Đảo cấp nhóm 1 và 2
+      </button>
+      {bundle && <GroupTree groups={bundle.groups} currency={journal.currency} depth={0} />}
       <div className="table-scroll">
         <table>
           <thead>
@@ -127,6 +190,10 @@ export function ResearchTools({
               <th>Nhóm</th>
               <th>n</th>
               <th>Net</th>
+              <th>Winrate · CI 95%</th>
+              <th>PF</th>
+              <th>Kỳ vọng R · n/N</th>
+              <th>Mẫu</th>
               <th>ID bằng chứng</th>
             </tr>
           </thead>
@@ -136,6 +203,21 @@ export function ResearchTools({
                 <td>{g.key}</td>
                 <td>{g.tradeIds.length}</td>
                 <td>{formatValue(g.metrics.net.value, 'money', journal.currency)}</td>
+                <td>
+                  {formatValue(g.metrics.winRate.value, 'percent')} ·{' '}
+                  {g.summary.winCI?.map((v) => (v * 100).toFixed(1) + '%').join('…') ?? '—'}
+                </td>
+                <td>{g.summary.profitFactor ?? '—'}</td>
+                <td>
+                  {formatValue(g.summary.mean, 'R')} · {g.summary.n}/{g.summary.of}
+                </td>
+                <td>
+                  {journal.isDemo
+                    ? 'Minh họa'
+                    : g.summary.n < journal.settings.minSample
+                      ? 'Mẫu nhỏ'
+                      : 'Đủ mẫu tối thiểu'}
+                </td>
                 <td>
                   {g.tradeIds.slice(0, 20).join(', ')}
                   {g.tradeIds.length > 20 && (
@@ -282,26 +364,64 @@ export function ResearchTools({
         <input value={seed} onChange={(e) => setSeed(e.target.value)} />
       </label>
       <label>
-        Số lệnh mỗi đường (1–1000)
+        Số lệnh mỗi đường (50–500)
         <input value={steps} onChange={(e) => setSteps(e.target.value)} />
       </label>
       <label>
-        Cột mốc R giả định
+        Cột mốc giả định ({mcMode === 'percent' ? '%' : 'R'})
         <input value={milestone} onChange={(e) => setMilestone(e.target.value)} />
       </label>
-      <button disabled={pending || !bundle} onClick={run}>
+      <label>
+        Cách mô phỏng rủi ro
+        <select value={mcMode} onChange={(e) => setMCMode(e.target.value as typeof mcMode)}>
+          <option value="fixedR">1R cố định</option>
+          <option value="percent">% vốn hiện tại, lãi kép</option>
+        </select>
+      </label>
+      {mcMode === 'percent' && (
+        <label>
+          Rủi ro mỗi lệnh (% vốn)
+          <input value={riskPercent} onChange={(e) => setRiskPercent(e.target.value)} />
+        </label>
+      )}
+      <label>
+        Ngưỡng lỗ từ vốn ban đầu ({mcMode === 'percent' ? '%' : 'R'})
+        <input value={ruin} onChange={(e) => setRuin(e.target.value)} />
+      </label>
+      {(bundle?.rs.length ?? 0) < 50 && (
+        <p className="notice">
+          Mẫu dưới 50 lệnh: độ bất định cao; cần ít nhất 20 R đã biết để mô phỏng.
+        </p>
+      )}
+      <button disabled={pending || !bundle || bundle.rs.length < 20} onClick={run}>
         {pending ? 'Đang mô phỏng…' : 'Chạy 1.000 đường'}
       </button>
-      {simulation && simulationKey === requestKey && (
+      {simulation && simulationKey === simulationRequestKey && (
         <>
+          <p>
+            P25 / P75: {simulation.p25.toFixed(2)} / {simulation.p75.toFixed(2)} {simulation.unit} ·
+            P(Net&gt;0) {(simulation.positiveProbability * 100).toFixed(1)}% · Xác suất từng chạm
+            ngưỡng −{simulation.ruin}
+            {simulation.unit}: {(simulation.ruinProbability * 100).toFixed(1)}%.
+          </p>
+          <LinePlot
+            label={'Dải phân vị theo thời gian · GIẢ ĐỊNH · ' + simulation.unit}
+            series={[0, 1, 2, 3, 4].map((k) => ({
+              name: ['P5', 'P25', 'P50', 'P75', 'P95'][k],
+              values: simulation.band.map((b) => b[k]),
+              color: ['#ba5566', '#b98c27', '#237b62', '#668cce', '#8999ad'][k],
+            }))}
+          />
           <p>
             GIẢ ĐỊNH · seed {simulation.seed} · {simulation.paths} đường × {simulation.steps} lệnh ·
             cuối kỳ P5/P50/P95: {simulation.p05.toFixed(2)} / {simulation.median.toFixed(2)} /{' '}
-            {simulation.p95.toFixed(2)} R · Drawdown P95: {simulation.drawdown95.toFixed(2)} R · tần
-            suất đạt mốc trong mô phỏng: {(simulation.milestoneFrequency * 100).toFixed(1)}%
+            {simulation.p95.toFixed(2)} {simulation.unit} · Drawdown P95:{' '}
+            {simulation.drawdown95.toFixed(2)}{' '}
+            {simulation.unit === '%' ? 'điểm % vốn ban đầu' : 'R'} · tần suất đạt mốc trong mô
+            phỏng: {(simulation.milestoneFrequency * 100).toFixed(1)}%
           </p>
           <LinePlot
-            label="GIẢ ĐỊNH · 10 đường Monte Carlo mẫu · R"
+            label={'GIẢ ĐỊNH · 10 đường Monte Carlo mẫu · ' + simulation.unit}
             series={simulation.samples.map((values, i) => ({
               name: 'Đường ' + (i + 1),
               values,
@@ -330,7 +450,64 @@ export function ResearchTools({
       >
         Tải báo cáo HTML để In/PDF
       </button>
+      <button
+        onClick={() => void printReport(journal, trades, scope).catch((e) => setMessage(String(e)))}
+      >
+        In báo cáo / Lưu PDF
+      </button>
       {message && <p role="status">{message}</p>}
     </section>
+  );
+}
+function GroupTree({
+  groups,
+  currency,
+  depth,
+}: {
+  groups: ReturnType<typeof researchBundle>['groups'];
+  currency: Journal['currency'];
+  depth: number;
+}) {
+  const nodes = new Map<string, typeof groups>();
+  for (const g of groups) {
+    const key = (JSON.parse(g.key) as string[])[depth] ?? '(chưa gán)';
+    const rows = nodes.get(key);
+    if (rows) rows.push(g);
+    else nodes.set(key, [g]);
+  }
+  return (
+    <div>
+      {[...nodes].map(([label, rows]) => (
+        <details key={label}>
+          <summary>
+            {label} · n={rows.reduce((n, g) => n + g.tradeIds.length, 0)}
+          </summary>
+          {depth + 1 < (JSON.parse(rows[0].key) as string[]).length ? (
+            <GroupTree groups={rows} currency={currency} depth={depth + 1} />
+          ) : (
+            <>
+              <p>
+                Net {formatValue(rows[0].metrics.net.value, 'money', currency)} ·{' '}
+                {rows[0].tradeIds.slice(0, 20).join(', ')}
+              </p>
+              <button
+                onClick={() => {
+                  const url = URL.createObjectURL(
+                    new Blob([rows[0].tradeIds.join('\n')], { type: 'text/plain' }),
+                  );
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'drilldown-evidence.txt';
+                  a.click();
+                  setTimeout(() => URL.revokeObjectURL(url), 1000);
+                }}
+              >
+                Tải ID bằng chứng
+              </button>
+            </>
+          )}
+        </details>
+      ))}
+    </div>
   );
 }

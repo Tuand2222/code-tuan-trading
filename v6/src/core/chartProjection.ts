@@ -1,5 +1,6 @@
 import type { analyze } from './analyze';
-import type { Journal, Trade } from '../data/schema';
+import type { Journal, Trade, CashFlow } from '../data/schema';
+import { capitalReport } from './capital';
 import { tradeFacts } from './trade';
 import { D, dec } from './money';
 export function projectCurve(
@@ -7,8 +8,18 @@ export function projectCurve(
   trades: Trade[],
   result: ReturnType<typeof analyze>,
   unit: 'money' | 'percent' | 'R',
+  flows: CashFlow[] = [],
 ) {
   if (unit === 'money') return result.curve;
+  if (unit === 'percent' && flows.length) {
+    const report = capitalReport(journal, trades, flows, result),
+      byId = new Map(report.points.map((p) => [p.tradeId + '|' + p.id, p.twrPercent]));
+    return result.curve.map((p, i) => ({
+      ...p,
+      net: byId.get(result.events[i].tradeId + '|' + result.events[i].id) ?? null,
+      shadow: null,
+    }));
+  }
   if (unit === 'percent')
     return result.curve.map((p) => ({
       ...p,

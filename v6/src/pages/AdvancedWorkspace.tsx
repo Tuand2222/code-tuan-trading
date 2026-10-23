@@ -4,6 +4,7 @@ import { ResearchTools } from './ResearchTools';
 import { PlannedTrades } from './PlannedTrades';
 import type { Scope, analyze } from '../core/analyze';
 import { CustomDefinitions } from './CustomDefinitions';
+import { DeepAnalysis } from './DeepAnalysis';
 export function AdvancedWorkspace({
   journal,
   trades,
@@ -27,6 +28,7 @@ export function AdvancedWorkspace({
         base={base}
       />
       <PlannedTrades journal={journal} />
+      <DeepAnalysis journal={journal} trades={trades} result={base} />
     </>
   );
 }

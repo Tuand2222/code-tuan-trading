@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Journal } from '../data/schema';
 import type { analyze } from '../core/analyze';
 import type { JournalAlert } from '../core/journalSelectors';
@@ -12,13 +13,16 @@ export function AlertsPage({
   alerts: JournalAlert[];
   onOpen: (id: string) => void;
 }) {
+  const [page, setPage] = useState(0),
+    pages = Math.ceil(alerts.length / 50);
+  const currentPage = Math.min(page, Math.max(0, pages - 1));
   return (
     <section className="panel">
       <h2>
         {t.alerts} · {alerts.length}
       </h2>
       {!alerts.length && <p>{t.noAlerts}</p>}
-      {alerts.map((a) => (
+      {alerts.slice(currentPage * 50, (currentPage + 1) * 50).map((a) => (
         <article key={a.id} className="notice">
           <h3>{t.alertNames[a.rule]}</h3>
           <p>
@@ -31,6 +35,19 @@ export function AlertsPage({
           ))}
         </article>
       ))}
+      {pages > 1 && (
+        <div className="actions">
+          <button disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>
+            Trang trước
+          </button>
+          <span>
+            {currentPage + 1}/{pages}
+          </span>
+          <button disabled={currentPage >= pages - 1} onClick={() => setPage(currentPage + 1)}>
+            Trang tiếp
+          </button>
+        </div>
+      )}
     </section>
   );
 }

@@ -91,9 +91,9 @@ test('S6–S8 profile, command palette, planned trade, simulation and read-only 
   await expect(
     page.getByRole('heading', { name: 'Phân tích và giả định', exact: true }),
   ).toBeVisible();
-  await page.getByLabel('Số lệnh mỗi đường (1–1000)').fill('20');
+  await page.getByLabel('Số lệnh mỗi đường (50–500)').fill('50');
   await page.getByRole('button', { name: 'Chạy 1.000 đường', exact: true }).click();
-  await expect(page.getByText(/GIẢ ĐỊNH · seed 2103 · 1000 đường × 20 lệnh/)).toBeVisible();
+  await expect(page.getByText(/GIẢ ĐỊNH · seed 2103 · 1000 đường × 50 lệnh/)).toBeVisible();
   const profile = page.getByLabel('Hồ sơ phân tích lệnh');
   const id = await profile.locator('option').nth(1).getAttribute('value');
   await profile.selectOption(id!);

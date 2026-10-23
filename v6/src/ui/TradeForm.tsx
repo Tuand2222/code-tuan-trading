@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { formatInTimeZone } from 'date-fns-tz';
-import type { Journal, Trade } from '../data/schema';
+import { tradeSchema, type Journal, type Trade, type PlannedTrade } from '../data/schema';
 import { manualTrade, saveTrade, ensureCatalog, type TradeInput } from '../data/tradeCommands';
 import { tradeFacts } from '../core/trade';
 import { useLedger } from '../app/LedgerContext';
@@ -13,11 +13,13 @@ export function TradeForm({
   trade,
   revision,
   onClose,
+  planned,
 }: {
   journal: Journal;
   trade?: Trade;
   revision: number;
   onClose: () => void;
+  planned?: PlannedTrade;
 }) {
   const { data, mutate, busy } = useLedger();
   const catalog = ensureCatalog(data, journal.id);
@@ -25,19 +27,19 @@ export function TradeForm({
   const local = (date: string) =>
     formatInTimeZone(new Date(date), journal.timezone, "yyyy-MM-dd'T'HH:mm");
   const [input, setInput] = useState<TradeInput>(() => ({
-    symbol: trade?.symbol ?? '',
+    symbol: trade?.symbol ?? planned?.symbol ?? '',
     market: trade?.market ?? 'stocks',
-    side: trade?.side ?? 'long',
-    status: trade?.status ?? 'closed',
+    side: trade?.side ?? planned?.side ?? 'long',
+    status: trade?.status ?? (planned ? 'open' : 'closed'),
     open: local(facts?.openTime ?? new Date().toISOString()),
     close: local(facts?.closeTime ?? new Date().toISOString()),
-    entry: facts?.avgEntry ?? '',
+    entry: facts?.avgEntry ?? planned?.plannedEntry ?? '',
     exit: facts?.avgExit ?? '',
     quantity: trade?.legs[0].quantity ?? '',
     multiplier: trade?.multiplier ?? '1',
     risk: trade?.initialRisk ?? '',
-    sl: trade?.plannedSL ?? '',
-    tp: trade?.plannedTP ?? '',
+    sl: trade?.plannedSL ?? planned?.plannedSL ?? '',
+    tp: trade?.plannedTP ?? planned?.plannedTP ?? '',
     ...trade?.costs,
     commission: trade?.costs.commission ?? '0',
     tax: trade?.costs.tax ?? '0',
@@ -45,20 +47,45 @@ export function TradeForm({
     swap: trade?.costs.swap ?? '0',
     other: trade?.costs.other ?? '0',
     costsKnown: trade?.costsKnown ?? false,
-    setupId: trade?.setupId ?? '',
+    setupId: trade?.setupId ?? planned?.setupId ?? '',
     note: data.notes.find((n) => n.scope === 'trade' && n.refId === trade?.id)?.body ?? '',
   }));
   const [error, setError] = useState('');
+  const [advanced, setAdvanced] = useState<{ base: Trade; legs: Trade['legs'] }>();
   const complex = !!trade && trade.legs.length > 2;
   const candidate = () =>
-    complex
-      ? {
-          ...trade!,
+    advanced
+      ? tradeSchema.parse({
+          ...advanced.base,
+          symbol: input.symbol,
+          market: input.market,
+          side: input.side,
+          status: input.status,
+          legs: advanced.legs,
+          multiplier: input.multiplier,
           initialRisk: input.risk || undefined,
+          plannedSL: input.sl || undefined,
+          plannedTP: input.tp || undefined,
           setupId: input.setupId || undefined,
+          costs: {
+            commission: input.commission,
+            tax: input.tax,
+            funding: input.funding,
+            swap: input.swap,
+            other: input.other,
+          },
+          costsKnown: input.costsKnown,
+          review: { done: false },
           updatedAt: new Date().toISOString(),
-        }
-      : manualTrade(input, journal, trade);
+        })
+      : complex
+        ? {
+            ...trade!,
+            initialRisk: input.risk || undefined,
+            setupId: input.setupId || undefined,
+            updatedAt: new Date().toISOString(),
+          }
+        : manualTrade(input, journal, trade);
   let preview: ReturnType<typeof tradeFacts> | undefined;
   try {
     preview = tradeFacts(candidate());
@@ -97,10 +124,17 @@ export function TradeForm({
     setError('');
     try {
       const next = candidate();
-      await mutate(
-        (snapshot) => saveTrade(ensureCatalog(snapshot, journal.id), next, input.note),
-        revision,
-      );
+      await mutate((snapshot) => {
+        const saved = saveTrade(ensureCatalog(snapshot, journal.id), next, input.note);
+        return planned
+          ? {
+              ...saved,
+              plannedTrades: saved.plannedTrades.map((p) =>
+                p.id === planned.id ? { ...p, status: 'taken' as const, takenTradeId: next.id } : p,
+              ),
+            }
+          : saved;
+      }, revision);
       onClose();
     } catch (e) {
       setError(String(e).includes('STALE_REVISION') ? t.conflict : t.error + ' ' + t.positive);
@@ -116,6 +150,12 @@ export function TradeForm({
         }}
       >
         <h2 id="trade-form-title">{trade ? t.edit : t.add}</h2>
+        {planned && (
+          <p>
+            Chuyển từ kế hoạch {planned.symbol}. Xác nhận thời điểm, giá khớp và khối lượng thực tế;
+            kế hoạch chưa trở thành giao dịch cho tới khi bạn lưu.
+          </p>
+        )}
         <p>
           {t.currency}: {journal.currency} · {t.timezone}: {journal.timezone}
         </p>
@@ -130,7 +170,12 @@ export function TradeForm({
                 inputMode={['symbol', 'open', 'close'].includes(key) ? undefined : 'decimal'}
                 value={input[key]}
                 onChange={(e) => set(key, e.target.value)}
-                disabled={busy || (complex && key !== 'risk')}
+                disabled={
+                  busy ||
+                  (advanced
+                    ? ['entry', 'exit', 'quantity', 'open', 'close'].includes(key)
+                    : complex && key !== 'risk')
+                }
                 required={
                   ['symbol', 'open', 'entry', 'quantity', 'multiplier'].includes(key) ||
                   (input.status === 'closed' && ['exit', 'close'].includes(key))
@@ -229,6 +274,99 @@ export function TradeForm({
             {t.r}: {formatValue(preview?.r ?? null, 'R')}
           </p>
         </section>
+        <button
+          type="button"
+          onClick={() => {
+            try {
+              const base = trade ?? manualTrade(input, journal);
+              setAdvanced({ base, legs: structuredClone(base.legs) });
+              setError('');
+            } catch {
+              setError('Nhập khớp vào hợp lệ trước; chọn Đang mở nếu chưa có khớp ra.');
+            }
+          }}
+        >
+          ＋ Vào / ra nhiều phần
+        </button>
+        {advanced && (
+          <fieldset>
+            <legend>Các lần khớp thực tế · UTC</legend>
+            <p>
+              Giá vốn theo bình quân khi nhập tay; lệnh gộp có phân bổ entry gốc riêng. Lệnh chỉ
+              đóng khi khối lượng mở bằng 0.
+            </p>
+            {advanced.legs.map((leg, i) => (
+              <div className="filter-grid" key={leg.id}>
+                <label>
+                  Loại khớp nâng cao {i + 1}
+                  <select
+                    value={leg.kind}
+                    onChange={(e) =>
+                      setAdvanced({
+                        ...advanced,
+                        legs: advanced.legs.map((l, k) =>
+                          k === i ? { ...l, kind: e.target.value as 'in' | 'out' } : l,
+                        ),
+                      })
+                    }
+                  >
+                    <option value="in">Vào</option>
+                    <option value="out">Ra</option>
+                  </select>
+                </label>
+                {(['time', 'price', 'quantity'] as const).map((field) => (
+                  <label key={field}>
+                    {{ time: 'Thời điểm', price: 'Giá', quantity: 'Khối lượng' }[field]} khớp nâng
+                    cao {i + 1}
+                    <input
+                      value={leg[field]}
+                      onChange={(e) =>
+                        setAdvanced({
+                          ...advanced,
+                          legs: advanced.legs.map((l, k) =>
+                            k === i ? { ...l, [field]: e.target.value } : l,
+                          ),
+                        })
+                      }
+                    />
+                  </label>
+                ))}
+                <button
+                  type="button"
+                  onClick={() =>
+                    setAdvanced({ ...advanced, legs: advanced.legs.filter((_, k) => k !== i) })
+                  }
+                >
+                  Bỏ khớp nâng cao {i + 1}
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() =>
+                setAdvanced({
+                  ...advanced,
+                  legs: [
+                    ...advanced.legs,
+                    {
+                      id: crypto.randomUUID(),
+                      kind: 'in',
+                      time: new Date().toISOString(),
+                      price: '',
+                      quantity: '',
+                    },
+                  ],
+                })
+              }
+            >
+              Thêm lần khớp thực
+            </button>
+            <p>
+              Khối lượng còn mở: {preview?.openQty ?? 'Chưa hợp lệ'} · Vào TB{' '}
+              {preview?.avgEntry ?? '—'} · Ra TB {preview?.avgExit ?? '—'}
+            </p>
+          </fieldset>
+        )}
         {error && <p role="alert">{error}</p>}
         <div className="actions">
           <button className="primary" disabled={busy} type="submit">

@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig(({ mode }) => ({
+  define: { 'import.meta.env.VITE_CALCULATION_BUILD': JSON.stringify(String(Date.now())) },
   plugins: [
     react(),
     ...(mode === 'single'
@@ -19,12 +20,21 @@ export default defineConfig(({ mode }) => ({
               display: 'standalone',
               theme_color: '#172b3a',
               background_color: '#f5f7fa',
-              icons: [{ src: 'icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }],
+              icons: [
+                { src: 'icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+                { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+                {
+                  src: 'icons/icon-512.png',
+                  sizes: '512x512',
+                  type: 'image/png',
+                  purpose: 'any maskable',
+                },
+              ],
             },
             workbox: {
-              globPatterns: ['**/*.{js,css,html,svg,webmanifest}'],
+              globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
               maximumFileSizeToCacheInBytes: 6000000,
-              skipWaiting: false,
+              skipWaiting: true,
               clientsClaim: false,
               navigateFallback: 'index.html',
             },

@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync, cpSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, cpSync, rmSync, renameSync } from 'node:fs';
 import path from 'node:path';
 const action = process.argv[2];
 if (!['install', 'build'].includes(action)) throw new Error('Expected install or build');
@@ -15,6 +15,8 @@ if (action === 'build') {
   if (path.dirname(destination) !== path.resolve('public')) throw new Error('Invalid v6 asset destination');
   rmSync(destination, { recursive: true, force: true });
   cpSync(path.join(v6Root, 'dist'), destination, { recursive: true });
+  // HTML requests must pass through the Worker so response security headers apply.
+  renameSync(path.join(destination,'index.html'),path.join(destination,'app-shell.txt'));
 }
 if (process.platform !== 'win32') run('bash', [action === 'install' ? 'scripts/install-ci.sh' : 'scripts/build-verified.sh']);
 else if (action === 'install') {

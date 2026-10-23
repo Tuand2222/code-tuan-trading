@@ -15,13 +15,31 @@ export function classicReport(
   capital: number,
   dailyPct = 5,
   maximumPct = 10,
+  base?: ReturnType<typeof analyze>,
 ) {
   const { journal } = source;
   const selected = selectTrades(source.trades, filters, journal.id),
-    r = analyze(journal, selected, {
-      from: filters.from || undefined,
-      to: filters.to || undefined,
-    });
+    r =
+      base ??
+      analyze(
+        journal,
+        selected,
+        {
+          from: filters.from || undefined,
+          to: filters.to || undefined,
+        },
+        [],
+        { inference: false },
+      );
+  const dates = new Map<string, string>();
+  const dateFor = (time: string) => {
+    let date = dates.get(time);
+    if (!date) {
+      date = dayInZone(time, journal.timezone);
+      dates.set(time, date);
+    }
+    return date;
+  };
   const val = (key: string) =>
     r.metrics[key].value === null ? null : number(r.metrics[key].value!);
   const totalRisk = sum(r.closed.filter((f) => f.risk && f.net !== undefined).map((f) => f.risk!));
@@ -33,8 +51,8 @@ export function classicReport(
   const maximumAmount = (capital * maximumPct) / 100,
     dailyLimitAmount = (capital * dailyPct) / 100;
   const rows = r.days.map((day) => {
-    const cs = r.closed.filter((f) => dayInZone(f.closeTime!, journal.timezone) === day.date),
-      es = r.events.filter((e) => dayInZone(e.time, journal.timezone) === day.date);
+    const cs = r.closed.filter((f) => dateFor(f.closeTime!) === day.date),
+      es = r.events.filter((e) => dateFor(e.time) === day.date);
     const startBalance = number(dec(balance));
     let dayLow = balance;
     for (const e of es) {

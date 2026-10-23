@@ -8,7 +8,13 @@ export async function chartbookZip(data: Snapshot, journalId: string, workspaceR
   zip.file('ledger.json', await encodeBackup(data));
   if (workspaceRaw) zip.file('workspace.json', workspaceRaw);
   const links: string[] = [];
-  for (const [i, trade] of data.trades.filter((t) => t.journalId === journalId).entries())
+  const records = [
+    ...data.trades.filter((t) => t.journalId === journalId),
+    ...data.plannedTrades
+      .filter((p) => p.journalId === journalId)
+      .map((p) => ({ ...p, attachments: p.attachments ?? [] })),
+  ];
+  for (const [i, trade] of records.entries())
     for (const [j, a] of trade.attachments.entries()) {
       if (a.kind === 'url') links.push(trade.id + '\t' + a.url);
       else {

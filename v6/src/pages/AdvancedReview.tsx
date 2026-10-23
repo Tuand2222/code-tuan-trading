@@ -3,11 +3,13 @@ import { planSchema, tradeSchema, type Journal, type Trade } from '../data/schem
 import { useLedger } from '../app/LedgerContext';
 import { compliance, exitAnalysis, sessionFindings, tilt } from '../core/advanced';
 import { formatValue } from '../ui/format';
-import { prepareImage, imageDataURL } from '../data/images';
+import { prepareImage } from '../data/images';
+import { Chartbook } from '../ui/Chartbook';
 import { chartbookZip } from '../data/chartbookZip';
 import { exportWorkspace, previewWorkspace } from '../data/workspaceBackup';
 export function AdvancedReview({ journal, trades }: { journal: Journal; trades: Trade[] }) {
   const { data, mutate, revision, busy, repo } = useLedger();
+  const savedPlan = data.plans.find((p) => p.journalId === journal.id);
   const [imageBusy, setImageBusy] = useState(false),
     [imageSources, setImageSources] = useState<{ id: string; raw: string; createdAt: string }[]>(
       [],
@@ -16,9 +18,12 @@ export function AdvancedReview({ journal, trades }: { journal: Journal; trades: 
     [draft, setDraft] = useState<Trade>(),
     [version, setVersion] = useState(0),
     [message, setMessage] = useState('');
-  const [max, setMax] = useState(''),
-    [from, setFrom] = useState(''),
-    [to, setTo] = useState('');
+  const [max, setMax] = useState(savedPlan?.maxTradesPerDay?.toString() ?? ''),
+    [from, setFrom] = useState(savedPlan?.sessionWindows[0]?.from ?? ''),
+    [to, setTo] = useState(savedPlan?.sessionWindows[0]?.to ?? '');
+  const [allowed, setAllowed] = useState(savedPlan?.allowedSetupIds ?? []),
+    [lossLimit, setLossLimit] = useState(savedPlan?.maxLossPerDay?.value ?? ''),
+    [lossUnit, setLossUnit] = useState<'R' | 'money'>(savedPlan?.maxLossPerDay?.type ?? 'R');
   const plan = data.plans.find((p) => p.journalId === journal.id),
     findings = useMemo(
       () => sessionFindings(journal, data.trades, plan),
@@ -62,7 +67,8 @@ export function AdvancedReview({ journal, trades }: { journal: Journal; trades: 
             const next = planSchema.parse({
               ...plan,
               journalId: journal.id,
-              allowedSetupIds: plan?.allowedSetupIds ?? [],
+              allowedSetupIds: allowed,
+              maxLossPerDay: lossLimit ? { type: lossUnit, value: lossLimit } : undefined,
               alertRules: plan?.alertRules ?? [],
               maxTradesPerDay: max ? Number(max) : undefined,
               sessionWindows: from && to ? [{ from, to }] : [],
@@ -90,13 +96,43 @@ export function AdvancedReview({ journal, trades }: { journal: Journal; trades: 
           Kết thúc phiên
           <input type="time" value={to} onChange={(e) => setTo(e.target.value)} />
         </label>
+        <label>
+          Lỗ tối đa mỗi ngày
+          <input value={lossLimit} onChange={(e) => setLossLimit(e.target.value)} />
+        </label>
+        <label>
+          Đơn vị giới hạn lỗ
+          <select value={lossUnit} onChange={(e) => setLossUnit(e.target.value as typeof lossUnit)}>
+            <option value="R">R</option>
+            <option value="money">{journal.currency}</option>
+          </select>
+        </label>
+        <fieldset>
+          <legend>Setup được phép trong Plan · bỏ trống để không giới hạn</legend>
+          {data.setups
+            .filter((s) => s.journalId === journal.id && !s.disabledAt)
+            .map((s) => (
+              <label key={s.id}>
+                <input
+                  type="checkbox"
+                  checked={allowed.includes(s.id)}
+                  onChange={(e) =>
+                    setAllowed(
+                      e.target.checked ? [...allowed, s.id] : allowed.filter((id) => id !== s.id),
+                    )
+                  }
+                />
+                {s.name}
+              </label>
+            ))}
+        </fieldset>
         <button disabled={busy}>Thay giới hạn phiên</button>
       </form>
       <ul>
         {findings.slice(0, 100).map((f) => (
-          <li key={f.tradeId}>
+          <li key={f.tradeId + f.date + (f.reason ?? '')}>
             {f.tradeId}: {f.outside ? 'Ngoài phiên · ' : ''}
-            {f.count} lệnh ngày {f.date}
+            {f.count} lệnh ngày {f.date} · {f.reason}
           </li>
         ))}
       </ul>
@@ -164,14 +200,34 @@ export function AdvancedReview({ journal, trades }: { journal: Journal; trades: 
             Exit Analysis chỉ tính lệnh hai legs có đủ 1R và cực trị do bạn nhập; không suy diễn
             OHLC. MFE/MAE là biến động giá trước phí.
           </p>
+          <label>
+            OTP Hit · TP ban đầu chạm trước SL ban đầu
+            <select
+              value={draft.otpHit ?? ''}
+              onChange={(e) =>
+                put({ otpHit: e.target.value ? (e.target.value as Trade['otpHit']) : undefined })
+              }
+            >
+              <option value="">Chưa quan sát được thứ tự</option>
+              <option value="yes">Có · TP trước SL</option>
+              <option value="no">Không · SL trước TP</option>
+              <option value="breakeven">Hòa vốn · kế hoạch thụ động hòa vốn</option>
+            </select>
+          </label>
+          <p>
+            Chỉ đánh dấu khi có bằng chứng thứ tự chạm. Highest/Lowest không xác định được thứ tự.
+            Set-and-forget là GIẢ ĐỊNH; R tiềm năng chưa trừ chi phí giả định.
+          </p>
           <p>
             MFE: {formatValue(exit?.mfeR ?? null, 'R')} · MAE:{' '}
             {formatValue(exit?.maeR ?? null, 'R')} · OTP chạm:{' '}
             {exit?.otpHit === null || exit?.otpHit === undefined
               ? '—'
-              : exit.otpHit
+              : exit.otpHit === 'yes'
                 ? 'Có'
-                : 'Không'}{' '}
+                : exit.otpHit === 'no'
+                  ? 'Không'
+                  : 'Hòa vốn'}{' '}
             · Hiệu suất: {formatValue(exit?.efficiencyPercent ?? null, 'percent')} · Tác động quản
             lý: {formatValue(exit?.managementEffectR ?? null, 'R')}
           </p>
@@ -315,6 +371,30 @@ export function AdvancedReview({ journal, trades }: { journal: Journal; trades: 
               />
             </label>
           ))}
+          {draft.attachments.map((a, i) => (
+            <label key={a.id}>
+              Mô tả ảnh {i + 1}
+              <input
+                value={a.caption}
+                maxLength={2000}
+                onChange={(e) =>
+                  put({
+                    attachments: draft.attachments.map((x, k) =>
+                      k === i ? { ...x, caption: e.target.value } : x,
+                    ),
+                  })
+                }
+              />
+            </label>
+          ))}
+          {draft.attachments.map((a) => (
+            <button
+              key={'remove:' + a.id}
+              onClick={() => put({ attachments: draft.attachments.filter((x) => x.id !== a.id) })}
+            >
+              Bỏ ảnh · {a.caption || a.id}
+            </button>
+          ))}
           <button
             disabled={busy || imageBusy}
             onClick={() => {
@@ -352,36 +432,7 @@ export function AdvancedReview({ journal, trades }: { journal: Journal; trades: 
           </button>
         </>
       )}
-      <div>
-        {trades
-          .filter((t) => t.attachments.length)
-          .map((t) => (
-            <article key={t.id}>
-              <h3>
-                {t.symbol} · {t.id}
-              </h3>
-              {t.attachments.map((a) =>
-                a.kind === 'url' ? (
-                  <p key={a.id}>
-                    <a href={a.url} target="_blank" rel="noreferrer">
-                      {a.caption || 'Mở chart'}
-                    </a>
-                  </p>
-                ) : (
-                  <figure key={a.id}>
-                    <img
-                      alt={a.caption || 'Chart giao dịch'}
-                      loading="lazy"
-                      style={{ maxWidth: '100%' }}
-                      src={imageDataURL(data.sources.find((s) => s.id === a.blobKey)!.raw)}
-                    />
-                    <figcaption>{a.caption}</figcaption>
-                  </figure>
-                ),
-              )}
-            </article>
-          ))}
-      </div>
+      <Chartbook journal={journal} />
       <button
         onClick={() =>
           void exportWorkspace(repo)

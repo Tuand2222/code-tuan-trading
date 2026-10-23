@@ -30,19 +30,21 @@ const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
-    if (url.pathname === "/v6") {
+    if (url.pathname === "/" || url.pathname === "/index.html" || url.pathname === "/v6") {
       url.pathname = "/v6/";
       return Response.redirect(url.toString(), 308);
     }
     if (url.pathname.startsWith("/v6/")) {
-      if (url.pathname === "/v6/") url.pathname = "/v6/index.html";
+      const document = url.pathname === "/v6/" || url.pathname === "/v6/index.html";
+      if (document) url.pathname = "/v6/app-shell.txt";
       const asset = await env.ASSETS.fetch(new Request(url, request));
       const headers = new Headers(asset.headers);
+      if(document)headers.set("Content-Type","text/html; charset=utf-8");
       headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'");
       headers.set("Referrer-Policy", "no-referrer");
       headers.set("X-Content-Type-Options", "nosniff");
       headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
-      if (url.pathname.endsWith("/index.html") || url.pathname.endsWith("/sw.js") || url.pathname.endsWith("/registerSW.js")) headers.set("Cache-Control", "no-cache");
+      if (document || url.pathname.endsWith("/sw.js") || url.pathname.endsWith("/registerSW.js")) headers.set("Cache-Control", "no-cache");
       return new Response(asset.body, { status: asset.status, statusText: asset.statusText, headers });
     }
 

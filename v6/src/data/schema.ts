@@ -52,6 +52,27 @@ export const alertRuleSchema = z
   .strict();
 export type AlertRule = z.infer<typeof alertRuleSchema>;
 
+export const feeProfileSchema = z
+  .object({
+    id,
+    name: z.string().min(1),
+    market: marketSchema,
+    effectiveFrom: z.iso.date(),
+    effectiveTo: z.iso.date().optional(),
+    currency: currencySchema,
+    multiplier: positive,
+    quantityStep: positive,
+    commissionPercent: nonnegative,
+    commissionPerUnit: nonnegative,
+    sellTaxPercent: nonnegative,
+    overnightPerUnit: decSchema,
+    settlementDays: z.number().int().min(0).max(30),
+    allowShort: z.boolean(),
+    pipSize: positive.optional(),
+  })
+  .strict();
+export type FeeProfile = z.infer<typeof feeProfileSchema>;
+
 export const journalSettingsSchema = z
   .object({
     minSample: z.number().int().min(1).default(20),
@@ -59,6 +80,19 @@ export const journalSettingsSchema = z
     displayUnit: z.enum(['money', 'percent', 'R']).default('money'),
     lossToleranceR: nonnegative.default('0.10'),
     backupReminderDays: z.number().int().min(1).default(7),
+    feeProfiles: z.array(feeProfileSchema).max(100).optional(),
+    importTemplates: z
+      .array(
+        z
+          .object({
+            name: z.string().min(1),
+            mapping: z.record(z.string(), z.string()),
+            broker: z.string().min(1),
+          })
+          .strict(),
+      )
+      .max(50)
+      .optional(),
   })
   .strict();
 export type JournalSettings = z.infer<typeof journalSettingsSchema>;
@@ -79,6 +113,15 @@ export const journalSchema = z
   .strict();
 export type Journal = z.infer<typeof journalSchema>;
 
+export const costsSchema = z
+  .object({
+    commission: nonnegative,
+    tax: nonnegative,
+    funding: decSchema,
+    swap: decSchema,
+    other: nonnegative,
+  })
+  .strict();
 export const legSchema = z
   .object({
     id,
@@ -88,6 +131,12 @@ export const legSchema = z
     quantity: positive,
     fee: nonnegative.optional(),
     synthetic: z.boolean().optional(),
+    realizedCosts: costsSchema.optional(),
+    entryAllocations: z
+      .array(z.object({ entryLegId: id, quantity: positive }).strict())
+      .min(1)
+      .optional(),
+    costsKnown: z.boolean().optional(),
   })
   .strict();
 export type Leg = z.infer<typeof legSchema>;
@@ -158,6 +207,12 @@ export const tradeSchema = z
     if (!trade.legs.some((leg) => leg.kind === 'in'))
       ctx.addIssue({ code: 'custom', path: ['legs'], message: 'Cần ít nhất một khớp vào' });
     const ids = trade.legs.map((leg) => leg.id);
+    if (trade.legs.some((l) => l.kind === 'in' && (l.realizedCosts || l.entryAllocations)))
+      ctx.addIssue({
+        code: 'custom',
+        path: ['legs'],
+        message: 'Phân bổ giá vốn/phí chỉ gắn khớp ra',
+      });
     if (new Set(ids).size !== ids.length)
       ctx.addIssue({ code: 'custom', path: ['legs'], message: 'ID khớp lệnh bị trùng' });
   });
@@ -258,6 +313,8 @@ export const plannedTradeSchema = z
     status: z.enum(['planned', 'taken', 'missed', 'cancelled']),
     missedReason: z.string().optional(),
     takenTradeId: id.optional(),
+    hypotheticalR: decSchema.optional(),
+    attachments: z.array(attachmentSchema).max(6).optional(),
   })
   .strict();
 export type PlannedTrade = z.infer<typeof plannedTradeSchema>;

@@ -13,6 +13,7 @@ const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 
 const localBindingConfig = {
   main: "./worker/index.ts",
+  assets: { binding: "ASSETS", run_worker_first: ["/", "/index.html", "/v6", "/v6/*"] },
   compatibility_flags: ["nodejs_compat"],
   d1_databases: d1
     ? [

@@ -1,14 +1,16 @@
-import { useMemo, type CSSProperties } from 'react';
+import { useMemo, lazy, Suspense, type CSSProperties, type ReactNode } from 'react';
 import type { Journal, Trade } from '../data/schema';
 import type { Filters } from '../core/filters';
 import type { analyze } from '../core/analyze';
 import { classicReport, classicWeekdays } from '../core/classic';
 import { KpiCard } from '../ui/KpiCard';
-import EquityTimeChart from '../ui/classic/EquityTimeChart';
+const EquityTimeChart = lazy(() => import('../ui/classic/EquityTimeChart'));
 import { formatValue } from '../ui/format';
 import vi from '../i18n/vi.json';
 import { analyze as calculate } from '../core/analyze';
 import { selectTrades } from '../core/filters';
+import { displayMetric } from '../core/displayMetrics';
+import type { FormatKind } from '../ui/format';
 const t = vi.s3;
 export function ClassicOverview({
   journal,
@@ -17,6 +19,10 @@ export function ClassicOverview({
   filters,
   onAdd,
   onFilters,
+  chart,
+  computedReport,
+  computedRollups,
+  computedDisplays,
 }: {
   journal: Journal;
   trades: Trade[];
@@ -24,20 +30,27 @@ export function ClassicOverview({
   filters: Filters;
   onAdd: () => void;
   onFilters: (f: Filters) => void;
+  chart?: ReactNode;
+  computedReport?: ReturnType<typeof classicReport>;
+  computedRollups?: { market: string; total: string | null; net: string | null }[];
+  computedDisplays?: Record<string, ReturnType<typeof displayMetric>>;
 }) {
   const report = useMemo(
-    () => classicReport({ journal, trades }, filters, 0),
-    [journal, trades, filters],
+    () => computedReport ?? classicReport({ journal, trades }, filters, 0, 5, 10, result),
+    [journal, trades, filters, result, computedReport],
   );
   const markets = ['', 'commodities', 'stocks', 'crypto', 'forex'];
   const rollups = useMemo(
     () =>
+      computedRollups ??
       ['commodities', 'stocks', 'crypto', 'forex'].map((market) => {
         const f = { ...filters, market };
-        const r = calculate(journal, selectTrades(trades, f, journal.id), f);
+        const r = calculate(journal, selectTrades(trades, f, journal.id), f, [], {
+          inference: false,
+        });
         return { market, total: r.metrics.total.value, net: r.metrics.net.value };
       }),
-    [journal, trades, filters],
+    [journal, trades, filters, computedRollups],
   );
   const daily = classicWeekdays(report.rows);
   const maximum = Math.max(1, ...daily.flatMap((d) => (d.pnl === null ? [] : [Math.abs(d.pnl)])));
@@ -91,36 +104,52 @@ export function ClassicOverview({
         ))}
       </div>
       <div className="kpi-grid">
-        {Object.entries(result.metrics).map(([id, metric]) => (
-          <KpiCard
-            key={id}
-            id={id as keyof typeof vi.metricHelp}
-            metric={metric}
-            currency={journal.currency}
-            demo={journal.isDemo}
-            minSample={journal.settings.minSample}
-          />
-        ))}
+        {Object.entries(result.metrics).map(([id, metric]) => {
+          const display =
+            computedDisplays?.[id] ??
+            displayMetric(
+              id,
+              metric,
+              result,
+              journal,
+              vi.metricHelp[id as keyof typeof vi.metricHelp].kind as FormatKind,
+            );
+          return (
+            <KpiCard
+              key={id}
+              id={id as keyof typeof vi.metricHelp}
+              metric={display.metric}
+              formatOverride={display.kind}
+              holding={journal.settings.holdingUnit}
+              currency={journal.currency}
+              demo={journal.isDemo}
+              minSample={journal.settings.minSample}
+            />
+          );
+        })}
       </div>
       <div className="dashboard-grid">
         <article className="panel panel-wide">
           <h2>{vi.shell.chart}</h2>
-          {report.complete ? (
-            <EquityTimeChart
-              currency={journal.currency}
-              percentEnabled={report.riskCount > 0}
-              percentLabel="Net / Tổng 1R (lệnh đủ R)"
-              moneyLabel={journal.currency}
-              ariaLabel={vi.shell.chart}
-              points={report.rows.map((r) => ({
-                date: r.date,
-                money: r.endBalance,
-                percent: r.riskPercent ?? 0,
-              }))}
-            />
-          ) : (
-            <p>{t.unknown}</p>
-          )}
+          {chart ??
+            (report.complete ? (
+              <Suspense fallback={<p>Đang mở biểu đồ…</p>}>
+                <EquityTimeChart
+                  currency={journal.currency}
+                  percentEnabled={report.riskCount > 0}
+                  percentLabel="Net / Tổng 1R (lệnh đủ R)"
+                  moneyLabel={journal.currency}
+                  ariaLabel={vi.shell.chart}
+                  points={report.rows.map((r) => ({
+                    date: r.date,
+                    money: r.endBalance,
+                    percent: r.riskPercent ?? 0,
+                  }))}
+                />
+              </Suspense>
+            ) : (
+              <p>{t.unknown}</p>
+            ))}
         </article>
         <article className="panel donut-panel">
           <h2>{t.outcome}</h2>

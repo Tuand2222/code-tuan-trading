@@ -38,10 +38,22 @@ export function tilt(trades: Trade[], errors: ErrorTag[]) {
   });
 }
 export function sessionFindings(journal: Journal, trades: Trade[], plan?: Plan) {
-  if (!plan?.sessionWindows.length && !plan?.maxTradesPerDay) return [];
+  if (
+    !plan?.sessionWindows.length &&
+    !plan?.maxTradesPerDay &&
+    !plan?.allowedSetupIds.length &&
+    !plan?.maxLossPerDay
+  )
+    return [];
   const counts = new Map<string, number>();
   const times = new Map<string, string[]>();
-  return trades
+  const findings: {
+    tradeId: string;
+    date: string;
+    count: number;
+    outside: boolean;
+    reason?: string;
+  }[] = trades
     .filter((t) => t.journalId === journal.id)
     .map((t) => ({
       t,
@@ -64,10 +76,55 @@ export function sessionFindings(journal: Journal, trades: Trade[], plan?: Plan) 
         !plan.sessionWindows.some((w) =>
           w.from <= w.to ? clock >= w.from && clock <= w.to : clock >= w.from || clock <= w.to,
         );
-      return outside || (plan?.maxTradesPerDay !== undefined && count > plan.maxTradesPerDay)
-        ? [{ tradeId: t.id, date, count, outside }]
+      const disallowed =
+        !!plan?.allowedSetupIds.length && (!t.setupId || !plan.allowedSetupIds.includes(t.setupId));
+      return outside ||
+        disallowed ||
+        (plan?.maxTradesPerDay !== undefined && count > plan.maxTradesPerDay)
+        ? [
+            {
+              tradeId: t.id,
+              date,
+              count,
+              outside,
+              reason: disallowed ? 'Setup ngoài Plan hoặc chưa gắn setup' : undefined,
+            },
+          ]
         : [];
     });
+  if (plan?.maxLossPerDay) {
+    const daily = new Map<string, { value: ReturnType<typeof D>; known: boolean }>();
+    const facts = trades.filter((t) => t.journalId === journal.id).map(tradeFacts),
+      byId = new Map(facts.map((f) => [f.id, f]));
+    for (const e of facts
+      .flatMap((f) => f.events)
+      .sort((a, b) => a.time.localeCompare(b.time) || a.id.localeCompare(b.id))) {
+      const date = formatInTimeZone(e.time, journal.timezone, 'yyyy-MM-dd'),
+        state = daily.get(date) ?? { value: D('0'), known: true },
+        f = byId.get(e.tradeId)!;
+      daily.set(date, state);
+      const value =
+        plan.maxLossPerDay.type === 'R'
+          ? e.net !== undefined && f.risk
+            ? dec(D(e.net).div(f.risk))
+            : undefined
+          : e.net;
+      if (value === undefined) {
+        state.known = false;
+        continue;
+      }
+      state.value = state.value.plus(value);
+      if (state.known && state.value.lte(D(plan.maxLossPerDay.value).neg()))
+        findings.push({
+          tradeId: e.tradeId,
+          date,
+          count: counts.get(date) ?? 0,
+          outside: false,
+          reason: 'Chạm ngưỡng lỗ/ngày: ' + dec(state.value) + ' ' + plan.maxLossPerDay.type,
+        });
+    }
+  }
+  return findings;
 }
 export function exitAnalysis(trade: Trade) {
   const f = tradeFacts(trade);
@@ -86,9 +143,21 @@ export function exitAnalysis(trade: Trade) {
     worst = trade.side === 'long' ? lo : hi;
   const mfe = best.minus(entry).mul(direction).mul(scale),
     mae = worst.minus(entry).mul(direction).mul(scale);
-  const planned = trade.plannedTP
-    ? D(trade.plannedTP).minus(entry).mul(direction).mul(scale)
-    : undefined;
+  const validPlan =
+    trade.plannedSL &&
+    trade.plannedTP &&
+    entry.minus(trade.plannedSL).mul(direction).gt(0) &&
+    D(trade.plannedTP).minus(entry).mul(direction).gt(0);
+  // Extrema contain no ordering information. Only the user's explicit observation
+  // establishes whether the original TP was reached before the original SL.
+  const planned =
+    !validPlan || !trade.otpHit
+      ? undefined
+      : trade.otpHit === 'yes'
+        ? D(trade.plannedTP!).minus(entry).abs().div(entry.minus(trade.plannedSL!).abs())
+        : D(trade.otpHit === 'no' ? '-1' : '0');
+  const tpDistance = validPlan ? D(trade.plannedTP!).minus(entry).mul(direction) : undefined;
+  const slDistance = validPlan ? entry.minus(trade.plannedSL!).mul(direction) : undefined;
   return {
     tradeId: trade.id,
     mfeR: dec(mfe),
@@ -97,14 +166,32 @@ export function exitAnalysis(trade: Trade) {
     efficiencyPercent: f.r !== undefined && mfe.gt(0) ? dec(D(f.r).div(mfe).mul(100)) : null,
     plannedR: planned ? dec(planned) : null,
     managementEffectR: planned && f.r !== undefined ? dec(D(f.r).minus(planned)) : null,
-    otpHit: trade.plannedTP
-      ? trade.side === 'long'
-        ? hi.gte(trade.plannedTP)
-        : lo.lte(trade.plannedTP)
+    otpHit: trade.otpHit ?? null,
+    updrawPercent: tpDistance
+      ? dec(best.minus(entry).mul(direction).div(tpDistance).mul(100))
       : null,
+    adversePercent: slDistance
+      ? dec(entry.minus(worst).mul(direction).div(slDistance).mul(100))
+      : null,
+    exitPercent: tpDistance ? dec(exit.minus(entry).mul(direction).div(tpDistance).mul(100)) : null,
   };
 }
-export type Dimension = 'symbol' | 'setupId' | 'market' | 'side';
+export type Dimension =
+  | 'symbol'
+  | 'setupId'
+  | 'market'
+  | 'side'
+  | 'entryHour'
+  | 'exitHour'
+  | 'halfHour'
+  | 'tenMinute'
+  | 'entryWeekday'
+  | 'exitWeekday'
+  | 'positionSize'
+  | 'weekday'
+  | 'holding'
+  | 'rBucket'
+  | 'errorTag';
 export function drilldown(
   journal: Journal,
   trades: Trade[],
@@ -113,14 +200,72 @@ export function drilldown(
 ) {
   const groups = new Map<string, Trade[]>();
   for (const t of trades.filter((t) => t.journalId === journal.id)) {
-    const key = JSON.stringify(dimensions.map((d) => t[d] ?? '(chưa gán)'));
-    groups.set(key, [...(groups.get(key) ?? []), t]);
+    const f = tradeFacts(t);
+    const value = (d: Dimension): string => {
+      if (d === 'symbol' || d === 'setupId' || d === 'market' || d === 'side')
+        return t[d] ?? '(chưa gán)';
+      if (d === 'errorTag') return [...t.errorTagIds].sort().join(', ') || '(không chip lỗi)';
+      if (d === 'positionSize') {
+        const q = Number(sum(t.legs.filter((l) => l.kind === 'in').map((l) => l.quantity)));
+        return q < 1
+          ? '< 1'
+          : q < 10
+            ? '1…<10'
+            : q < 100
+              ? '10…<100'
+              : q < 1000
+                ? '100…<1000'
+                : '≥ 1000';
+      }
+      if (d === 'rBucket')
+        return f.r === undefined
+          ? 'Thiếu 1R'
+          : Number(f.r) <= -1
+            ? '≤ −1R'
+            : Number(f.r) < 0
+              ? '−1…0R'
+              : Number(f.r) < 1
+                ? '0…1R'
+                : Number(f.r) < 2
+                  ? '1…2R'
+                  : Number(f.r) < 3
+                    ? '2…3R'
+                    : '≥ 3R';
+      if (d === 'holding')
+        return f.holdMinutes === undefined
+          ? 'Đang mở'
+          : f.holdMinutes < 60
+            ? '< 1 giờ'
+            : f.holdMinutes < 1440
+              ? '1…24 giờ'
+              : '≥ 1 ngày';
+      const time = d === 'entryHour' || d === 'entryWeekday' ? f.openTime : f.closeTime;
+      if (!time) return 'Đang mở';
+      if (d === 'weekday' || d === 'entryWeekday' || d === 'exitWeekday')
+        return formatInTimeZone(time, journal.timezone, 'EEEE');
+      const clock = formatInTimeZone(time, journal.timezone, 'HH:mm');
+      if (d === 'tenMinute')
+        return (
+          clock.slice(0, 3) + String(Math.floor(Number(clock.slice(3)) / 10) * 10).padStart(2, '0')
+        );
+      return d === 'halfHour'
+        ? clock.slice(0, 3) + (Number(clock.slice(3)) < 30 ? '00' : '30')
+        : clock.slice(0, 2) + ':00';
+    };
+    const key = JSON.stringify(dimensions.map(value));
+    const group = groups.get(key);
+    if (group) group.push(t);
+    else groups.set(key, [t]);
   }
-  return [...groups].map(([key, rows]) => ({
-    key,
-    tradeIds: rows.map((t) => t.id),
-    metrics: analyze(journal, rows, scope).metrics,
-  }));
+  return [...groups].map(([key, rows]) => {
+    const result = analyze(journal, rows, scope, [], { inference: false });
+    return {
+      key,
+      tradeIds: rows.map((t) => t.id),
+      metrics: result.metrics,
+      summary: result.overall,
+    };
+  });
 }
 export function ruleAssistant(
   journal: Journal,
@@ -166,37 +311,58 @@ export function monteCarlo(
   steps = 100,
   paths = 1000,
   milestone = 10,
+  options: { mode?: 'fixedR' | 'percent'; riskPercent?: number; ruin?: number } = {},
 ) {
+  const mode = options.mode ?? 'fixedR',
+    risk = options.riskPercent ?? 1,
+    ruin = options.ruin ?? (mode === 'percent' ? 50 : 20);
   if (
-    values.length < 2 ||
+    values.length < 20 ||
     values.some((v) => !Number.isFinite(v)) ||
     !Number.isInteger(seed) ||
     !Number.isInteger(steps) ||
-    steps < 1 ||
-    steps > 1000 ||
+    steps < 50 ||
+    steps > 500 ||
     !Number.isInteger(paths) ||
     paths < 100 ||
     paths > 1000 ||
-    !Number.isFinite(milestone)
+    !Number.isFinite(milestone) ||
+    !Number.isFinite(risk) ||
+    risk <= 0 ||
+    risk > 100 ||
+    !Number.isFinite(ruin) ||
+    ruin <= 0 ||
+    (mode === 'percent' && ruin > 100)
   )
     throw Error('INVALID_MONTE_CARLO');
   const random = mulberry32(seed),
     finals: number[] = [],
     drawdowns: number[] = [],
-    samples: number[][] = [];
+    samples: number[][] = [],
+    columns: number[][] = Array.from({ length: steps + 1 }, () => []);
+  let ruined = 0;
   for (let i = 0; i < paths; i++) {
     let equity = 0,
       peak = 0,
       dd = 0;
     const line = [0];
+    let hit = false;
+    columns[0].push(0);
     for (let j = 0; j < steps; j++) {
-      equity += values[Math.floor(random() * values.length)];
+      const r = values[Math.floor(random() * values.length)];
+      equity =
+        mode === 'percent'
+          ? Math.max(-100, equity + ((100 + equity) * risk * r) / 100)
+          : equity + r;
       peak = Math.max(peak, equity);
       dd = Math.max(dd, peak - equity);
+      if (equity <= -ruin) hit = true;
+      columns[j + 1].push(equity);
       if (i < 10) line.push(equity);
     }
     finals.push(equity);
     drawdowns.push(dd);
+    if (hit) ruined++;
     if (i < 10) samples.push(line);
   }
   const q = (xs: number[], p: number) =>
@@ -208,8 +374,20 @@ export function monteCarlo(
     steps,
     n: values.length,
     p05: q(finals, 0.05),
+    p25: q(finals, 0.25),
     median: q(finals, 0.5),
     p95: q(finals, 0.95),
+    p75: q(finals, 0.75),
+    mode,
+    unit: mode === 'percent' ? '%' : 'R',
+    riskPercent: risk,
+    ruin,
+    positiveProbability: finals.filter((v) => v > 0).length / paths,
+    ruinProbability: ruined / paths,
+    band: columns.map((xs) => {
+      xs.sort((a, b) => a - b);
+      return [0.05, 0.25, 0.5, 0.75, 0.95].map((p) => xs[Math.floor((xs.length - 1) * p)]);
+    }),
     drawdown95: q(drawdowns, 0.95),
     milestoneFrequency: finals.filter((v) => v >= milestone).length / paths,
     samples,

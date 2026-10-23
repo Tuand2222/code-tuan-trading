@@ -1,4 +1,6 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { readCalculation, cacheCalculation } from '../data/calculationCache';
+import type { classicReport } from '../core/classic';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { LedgerProvider, useLedger } from '../app/LedgerContext';
 import type { Trade } from '../data/schema';
 import {
@@ -9,7 +11,7 @@ import {
   type Filters,
 } from '../core/filters';
 import type { analyze } from '../core/analyze';
-import { journalAlerts, health } from '../core/journalSelectors';
+import type { journalAlerts, health } from '../core/journalSelectors';
 import { FilterBar } from '../ui/FilterBar';
 import { StateFrame } from '../ui/StateFrame';
 import { KpiCard } from '../ui/KpiCard';
@@ -26,6 +28,12 @@ import Debug from './Debug';
 import vi from '../i18n/vi.json';
 import { CommandPalette } from '../ui/CommandPalette';
 import { Welcome } from './Welcome';
+import { DisplayControls } from '../ui/DisplayControls';
+import { FifoImport } from './FifoImport';
+import { AutomaticBackup } from '../ui/DirectoryBackup';
+import { AppInstall } from '../ui/AppInstall';
+import type { displayMetric } from '../core/displayMetrics';
+const Valuation = lazy(() => import('./CompanyValuation'));
 const EquityChart = lazy(() =>
   import('../ui/EquityChart').then((m) => ({ default: m.EquityChart })),
 );
@@ -41,12 +49,13 @@ const t = vi.s3;
 export default function Workspace() {
   return (
     <LedgerProvider>
+      <AutomaticBackup />
       <Application />
     </LedgerProvider>
   );
 }
 function Application() {
-  const { data, revision, loading, error } = useLedger();
+  const { data, revision, cacheToken, loading, error } = useLedger();
   const [route, setRoute] = useState(() => parseHash(location.hash)),
     [menu, setMenu] = useState(false),
     [form, setForm] = useState<{ trade?: Trade; revision: number }>(),
@@ -63,27 +72,26 @@ function Application() {
     key: string;
     scope: string;
     result: ReturnType<typeof analyze>;
+    report: ReturnType<typeof classicReport>;
+    rollups: { market: string; total: string | null; net: string | null }[];
+    alerts: ReturnType<typeof journalAlerts>;
+    health: ReturnType<typeof health>;
+    compact: boolean;
+    displayMetrics: Record<string, ReturnType<typeof displayMetric>>;
     projections: Record<'money' | 'percent' | 'R', ReturnType<typeof analyze>['curve']>;
   }>();
-  const result = computed?.scope === scope ? computed.result : undefined;
+  const [calculationError, setCalculationError] = useState('');
+  const result =
+    computed?.scope === scope && (!computed.compact || route.page === 'overview')
+      ? computed.result
+      : undefined;
   const trades = journal ? selectTrades(data.trades, filters, journal.id) : [];
   const scopedTradeIds = new Set([
     ...(result?.closed.map((f) => f.id) ?? []),
     ...(result?.events.map((e) => e.tradeId) ?? []),
   ]);
-  const alerts = useMemo(() => {
-    const selected =
-      data.journals.find((j) => j.id === route.filters.journal && !j.archivedAt) ??
-      data.journals.find((j) => !j.archivedAt);
-    return selected
-      ? journalAlerts(
-          selected,
-          data.trades,
-          data.plans.find((p) => p.journalId === selected.id),
-        )
-      : [];
-  }, [data, route.filters.journal]);
-  const status = journal ? health(data, journal.id) : undefined;
+  const alerts = computed?.scope === scope ? computed.alerts : [];
+  const status = computed?.scope === scope ? computed.health : undefined;
   useEffect(() => {
     const hash = () => setRoute(parseHash(location.hash));
     window.addEventListener('hashchange', hash);
@@ -91,16 +99,52 @@ function Application() {
   }, []);
   useEffect(() => {
     if (!journal) return;
-    const worker = new Worker(new URL('../app/workspace.worker.ts', import.meta.url), {
-      type: 'module',
-    });
-    worker.onmessage = (e) => {
-      if (e.data.ok)
-        setComputed({ key, scope, result: e.data.result, projections: e.data.projections });
+    let active = true;
+    let worker: Worker | undefined;
+    const cacheKey =
+      import.meta.env.VITE_CALCULATION_BUILD +
+      '|' +
+      cacheToken +
+      '|' +
+      scope +
+      '|' +
+      (route.page === 'overview'
+        ? 'overview'
+        : ['edge', 'metrix', 'system'].includes(route.page)
+          ? 'inference'
+          : 'full');
+    void (async () => {
+      if (cacheToken) {
+        const cached = await readCalculation(cacheKey);
+        if (!active) return;
+        if (cached) {
+          setComputed({ ...(cached as NonNullable<typeof computed>), key, scope });
+          return;
+        }
+      }
+      worker = new Worker(new URL('../app/workspace.worker.ts', import.meta.url), {
+        type: 'module',
+      });
+      worker.onmessage = (e) => {
+        if (!active) return;
+        if (e.data.ok) {
+          setComputed({ ...e.data, key, scope });
+          if (cacheToken) void cacheCalculation(cacheKey, e.data);
+        } else setCalculationError('Không tính được dữ liệu: ' + e.data.error);
+      };
+      worker.onerror = () => {
+        if (active) setCalculationError('Không tải được bộ tính. Hãy tải lại ứng dụng.');
+      };
+      worker.postMessage({ data, filters: route.filters, page: route.page });
+    })();
+    return () => {
+      active = false;
+      worker?.terminate();
     };
-    worker.postMessage({ data, filters: route.filters });
-    return () => worker.terminate();
-  }, [data, journal, key, scope, route.filters]);
+  }, [data, journal, key, scope, route.filters, route.page, cacheToken]);
+  useEffect(() => {
+    if (!loading && !data.journals.length && !location.hash) location.hash = '#welcome';
+  }, [loading, data.journals.length]);
   const update = (f: Filters, page = route.page) => {
     window.location.assign(filterHash(page, f));
     setMenu(false);
@@ -168,21 +212,15 @@ function Application() {
       {vi.shell.nav.map((g) => (
         <div className="nav-group" key={g.name}>
           <h2>{g.name}</h2>
-          {g.links.map(([label, page]) =>
-            page === 'valuation' ? (
-              <a key={page} href="https://tuannhatky.fabledcoot2.chatgpt.site/#valuation">
-                {label} ↗
-              </a>
-            ) : (
-              <button
-                key={page}
-                className={route.page === page ? 'active' : ''}
-                onClick={() => go(page)}
-              >
-                {label}
-              </button>
-            ),
-          )}
+          {g.links.map(([label, page]) => (
+            <button
+              key={page}
+              className={route.page === page ? 'active' : ''}
+              onClick={() => go(page)}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       ))}
     </>
@@ -222,7 +260,9 @@ function Application() {
     ) : null;
   const chart =
     journal && computed?.key === key ? (
-      <EquityChart projections={computed.projections} journal={journal} />
+      <Suspense fallback={<p>Đang mở biểu đồ…</p>}>
+        <DeferredEquity projections={computed.projections} journal={journal} />
+      </Suspense>
     ) : null;
   let body = loading ? (
     <StateFrame kind="loading" />
@@ -233,6 +273,7 @@ function Application() {
   ) : (
     <>
       <FilterBar data={data} value={filters} onChange={update} />
+      <DisplayControls journal={journal} />
       {route.page === 'overview' ? (
         <>
           <Overview
@@ -242,8 +283,15 @@ function Application() {
             result={result}
             onAdd={() => openForm()}
             onFilters={update}
+            chart={chart}
+            computedReport={computed?.report}
+            computedRollups={computed?.rollups}
+            computedDisplays={computed?.displayMetrics}
           />
-          <AlertsPage alerts={alerts} onOpen={setDetail} />
+          <AlertsPage alerts={alerts.slice(0, 5)} onOpen={setDetail} />
+          {alerts.length > 5 && (
+            <button onClick={() => go('alerts')}>Xem tất cả {alerts.length} cảnh báo</button>
+          )}
           <section className="panel">
             <h2>{t.pending}</h2>
             <div className="actions">
@@ -256,7 +304,7 @@ function Application() {
             <button onClick={() => go('review')}>{t.notes} →</button>
           </section>
         </>
-      ) : route.page === 'advanced' ? (
+      ) : ['advanced', 'discipline', 'simulation', 'analytics'].includes(route.page) ? (
         <AdvancedWorkspace
           key={journal.id + scope}
           journal={journal}
@@ -264,6 +312,10 @@ function Application() {
           scope={{ from: filters.from || undefined, to: filters.to || undefined }}
           base={computed?.key === key ? result : undefined}
         />
+      ) : route.page === 'valuation' ? (
+        <Valuation />
+      ) : route.page === 'connections' ? (
+        <FifoImport journal={journal} />
       ) : route.page === 'journal' ? (
         <TradeTable
           trades={trades.filter((trade) => {
@@ -280,6 +332,7 @@ function Application() {
         <CalendarPage
           journal={journal}
           trades={trades}
+          scope={{ from: filters.from || undefined, to: filters.to || undefined }}
           onDay={(date) => update({ ...filters, from: date, to: date }, 'journal')}
         />
       ) : route.page === 'review' ? (
@@ -467,6 +520,7 @@ function Application() {
             </div>
           </div>
           {journal?.isDemo && <div className="demo-banner">{vi.status.demo}</div>}
+          <AppInstall />
           {status && (
             <div className="status-strip">
               <button onClick={() => go('alerts')}>
@@ -484,14 +538,14 @@ function Application() {
               </button>
             </div>
           )}
+          {calculationError && <p role="alert">{calculationError}</p>}
           {error && (
             <p role="alert">{String(error).includes('STALE_REVISION') ? t.conflict : t.error}</p>
           )}
           <Suspense fallback={<StateFrame kind="loading" />}>{body}</Suspense>
         </main>
         <footer>
-          {vi.app.brand} · {vi.shell.signed} ·{' '}
-          <a href="https://tuannhatky.fabledcoot2.chatgpt.site/">{t.oldSite}</a>
+          {vi.app.brand} · {vi.shell.signed} · <a href="/legacy">{t.oldSite}</a>
         </footer>
       </div>
       <nav className="bottom-nav" aria-label="Điều hướng di động">
@@ -529,4 +583,12 @@ function Application() {
       )}
     </div>
   );
+}
+function DeferredEquity(props: Parameters<typeof EquityChart>[0]) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setReady(true), 150);
+    return () => clearTimeout(timer);
+  }, []);
+  return ready ? <EquityChart {...props} /> : <p>Đang mở biểu đồ…</p>;
 }

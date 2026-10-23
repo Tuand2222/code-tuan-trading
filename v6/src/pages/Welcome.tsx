@@ -1,8 +1,55 @@
+import { useState } from 'react';
+import { useLedger } from '../app/LedgerContext';
 export function Welcome() {
+  const { repo, revision } = useLedger(),
+    [message, setMessage] = useState('');
   return (
     <section className="panel">
       <h2>Trading Plan Pro · Kỷ luật · Kiên định · Tăng trưởng</h2>
       <p>Nhật ký đa sổ trên thiết bị, phân tích từ dữ kiện, giả định được ghi nhãn rõ ràng.</p>
+      <div className="phase-grid">
+        <article>
+          <h3>Kỷ luật</h3>
+          <p>Lập Plan trước phiên, ghi chip ba khâu và giới hạn rủi ro.</p>
+        </article>
+        <article>
+          <h3>Kiên định</h3>
+          <p>Review từng lệnh, lưu ảnh và theo dõi Efficiency theo thời gian.</p>
+        </article>
+        <article>
+          <h3>Tăng trưởng</h3>
+          <p>Đối chiếu lợi thế theo setup, giữ giả định tách biệt với kết quả thực.</p>
+        </article>
+      </div>
+      <div className="actions">
+        <a className="button" href="#settings">
+          Tạo sổ của tôi
+        </a>
+        <a className="button" href="#connections">
+          Nhập dữ liệu giao dịch
+        </a>
+        <button
+          onClick={() =>
+            void import('../../tests/golden/fixture-30-trades.json?raw')
+              .then((m) => repo.importV3(m.default, revision))
+              .then(() => {
+                location.hash = '#overview';
+              })
+              .catch(() =>
+                setMessage('Sổ minh họa đã có hoặc dữ liệu thay đổi. Mở Tổng quan để xem.'),
+              )
+          }
+        >
+          Bắt đầu với 30 lệnh minh họa
+        </button>
+      </div>
+      {message && <p role="status">{message}</p>}
+      <h3>Bắt đầu trong 3 bước</h3>
+      <ol>
+        <li>Tạo sổ theo tiền tệ; nhập vốn và quy tắc phí phù hợp.</li>
+        <li>Nhập CSV khớp lệnh qua bộ ánh xạ hoặc nhập tay; đối chiếu bản xem trước.</li>
+        <li>Review, xem Tổng quan rồi tải backup và thử khôi phục.</li>
+      </ol>
       <h3>Câu hỏi thường gặp</h3>
       <details>
         <summary>Dữ liệu ở đâu?</summary>
@@ -27,15 +74,16 @@ export function Welcome() {
       <details>
         <summary>Binance hỗ trợ gì?</summary>
         <p>
-          Đường nhập thử nghiệm Position History có đủ giá, lượng và thời điểm, chỉ sổ USDT. Thiếu
-          phí/funding sẽ không có Net hoàn chỉnh. File thực cần được đối chiếu trước sử dụng.
+          Có bộ nhập CSV khớp lệnh FIFO cho Spot/Futures, ánh xạ cột và lưu mẫu. Phí khác tiền tệ sổ
+          cần quy đổi có bằng chứng trước khi nhập. Position History có bộ nhập riêng; luôn đối
+          chiếu bản xem trước và Net trước khi lưu.
         </p>
       </details>
       <h3>Changelog</h3>
       <p>
-        S3: journal, calendar, review và 24 KPI. Bản phát triển tiếp theo: recovery workspace, quản
-        lý sổ, vốn/dòng tiền, công cụ S5–S9. Trạng thái nghiệm thu chi tiết ghi trong tài liệu phát
-        hành.
+        Bổ sung nhập FIFO và hoàn tác có kiểm tra phụ thuộc, gộp lệnh, hồ sơ phí theo ngày, Plan,
+        OTP, Chartbook, phân tích đa cấp và Monte Carlo. Có PWA ngoại tuyến, báo cáo in/PDF và
+        backup kèm ảnh. Biểu đồ nến/replay chờ nguồn OHLC do người dùng lựa chọn.
       </p>
       <h3>Điều khoản sử dụng</h3>
       <p>

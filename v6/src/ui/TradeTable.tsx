@@ -15,6 +15,7 @@ import { useLedger } from '../app/LedgerContext';
 import { formatDate, formatValue } from './format';
 import { Modal } from './Modal';
 import vi from '../i18n/vi.json';
+import { mergeTrades } from '../data/mergeTrades';
 const t = vi.s3;
 const lifecycle = {
   open: t.opened,
@@ -46,6 +47,9 @@ export function TradeTable({
     revision: number;
   }>();
   const { revision } = useLedger();
+  const [selected, setSelected] = useState<string[]>([]),
+    [selectionRevision, setSelectionRevision] = useState(revision),
+    [confirmMerge, setConfirmMerge] = useState(false);
   const [columns, setColumns] = useState({ setup: true, risk: true, hold: true });
   const rows = useMemo(
     () =>
@@ -153,6 +157,28 @@ export function TradeTable({
         </details>
       </div>
       {error && <p role="alert">{error}</p>}
+      <div className="actions">
+        <label>
+          <input
+            type="checkbox"
+            checked={confirmMerge}
+            onChange={(e) => setConfirmMerge(e.target.checked)}
+          />
+          Gộp {selected.length} lệnh đã chọn; lưu nguồn gốc và mở lại review.
+        </label>
+        <button
+          disabled={busy || selected.length < 2 || !confirmMerge}
+          onClick={() =>
+            void action(async () => {
+              await mutate((s) => mergeTrades(s, selected), selectionRevision);
+              setSelected([]);
+              setConfirmMerge(false);
+            })
+          }
+        >
+          Gộp lệnh đã chọn
+        </button>
+      </div>
       <div
         ref={parent}
         className="table-scroll trade-scroll"
@@ -188,6 +214,20 @@ export function TradeTable({
               return (
                 <tr key={f.id} data-trade-id={f.id}>
                   <td>
+                    <input
+                      type="checkbox"
+                      aria-label={'Chọn gộp ' + trade.id}
+                      checked={selected.includes(trade.id)}
+                      onChange={(e) => {
+                        if (!selected.length) setSelectionRevision(revision);
+                        setSelected(
+                          e.target.checked
+                            ? [...selected, trade.id]
+                            : selected.filter((id) => id !== trade.id),
+                        );
+                        setConfirmMerge(false);
+                      }}
+                    />
                     <button
                       aria-label={`${t.star} ${trade.symbol} ${trade.id}`}
                       aria-pressed={trade.starred}
@@ -202,7 +242,28 @@ export function TradeTable({
                     <small className="block">{trade.side === 'long' ? t.long : t.short}</small>
                   </td>
                   <td>{formatDate(f.closeTime ?? f.openTime, journal.timezone)}</td>
-                  <td>{lifecycle[tradeLifecycle(trade, data)]}</td>
+                  <td>
+                    {lifecycle[tradeLifecycle(trade, data)]}
+                    {trade.stageChips && (
+                      <small className="block">
+                        Tilt{' '}
+                        {(['entry', 'management', 'exit'] as const).reduce((sum, k) => {
+                          const chips = (trade.stageChips?.[k] ?? []).map((id) =>
+                            data.errorTags.find((e) => e.id === id),
+                          );
+                          return (
+                            sum +
+                            (chips.some((e) => e?.tone === 'neg')
+                              ? -1
+                              : chips.some((e) => e?.tone === 'pos')
+                                ? 1
+                                : 0)
+                          );
+                        }, 0)}{' '}
+                        / ±3
+                      </small>
+                    )}
+                  </td>
                   {columns.setup && (
                     <td>{data.setups.find((s) => s.id === trade.setupId)?.name ?? '—'}</td>
                   )}
@@ -217,6 +278,8 @@ export function TradeTable({
                         f.holdMinutes === undefined ? null : String(f.holdMinutes),
                         'duration',
                         journal.currency,
+                        false,
+                        journal.settings.holdingUnit,
                       )}
                     </td>
                   )}

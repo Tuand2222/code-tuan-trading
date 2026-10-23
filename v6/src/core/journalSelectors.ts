@@ -1,4 +1,5 @@
-import type { Journal, Trade, Plan, AlertRule } from '../data/schema';
+import type { Journal, Trade, Plan, AlertRule, CashFlow } from '../data/schema';
+import { dailyReturns } from './returns';
 import type { Snapshot } from '../data/snapshot';
 import { analyze, dayInZone } from './analyze';
 import { tradeFacts } from './trade';
@@ -19,8 +20,9 @@ export function journalAlerts(
   trades: Trade[],
   plan?: Plan,
   now = new Date().toISOString(),
+  base?: ReturnType<typeof analyze>,
 ): JournalAlert[] {
-  const result = analyze(journal, trades);
+  const result = base ?? analyze(journal, trades, {}, [], { inference: false });
   const rules = plan?.alertRules ?? [
     {
       id: 'default-loss',
@@ -121,20 +123,72 @@ export function journalAlerts(
   }
   return alerts;
 }
-export function calendarMonth(journal: Journal, trades: Trade[], month: string) {
-  const r = analyze(journal, trades, { from: month + '-01', to: month + '-31' });
+export function calendarMonth(
+  journal: Journal,
+  trades: Trade[],
+  month: string,
+  flows: CashFlow[] = [],
+  scope: { from?: string; to?: string } = {},
+) {
+  const r = analyze(
+    journal,
+    trades,
+    {
+      from: [month + '-01', scope.from ?? ''].sort().at(-1),
+      to: [month + '-31', scope.to ?? month + '-31'].sort()[0],
+    },
+    [],
+    {
+      inference: false,
+    },
+  );
+  const unit = journal.settings.displayUnit,
+    facts = new Map(
+      trades.filter((t) => t.journalId === journal.id).map((t) => [t.id, tradeFacts(t)]),
+    ),
+    returns =
+      unit === 'percent' ? dailyReturns(journal, trades, flows) : new Map<string, string | null>();
+  const dateCache = new Map<string, string>();
+  const dateOf = (time: string) => {
+    let date = dateCache.get(time);
+    if (!date) {
+      date = dayInZone(time, journal.timezone);
+      dateCache.set(time, date);
+    }
+    return date;
+  };
   const days = r.days.map((d) => ({
     ...d,
-    tradeIds: [
-      ...new Set(
-        r.events
-          .filter((e) => dayInZone(e.time, journal.timezone) === d.date)
-          .map((e) => e.tradeId),
-      ),
-    ],
+    net:
+      unit === 'money'
+        ? d.net
+        : unit === 'percent'
+          ? (returns.get(d.date) ?? null)
+          : (() => {
+              const events = r.events.filter((e) => dateOf(e.time) === d.date);
+              return events.every((e) => e.net !== undefined && facts.get(e.tradeId)?.risk)
+                ? sum(events.map((e) => dec(D(e.net!).div(facts.get(e.tradeId)!.risk!))))
+                : null;
+            })(),
+    tradeIds: [...new Set(r.events.filter((e) => dateOf(e.time) === d.date).map((e) => e.tradeId))],
     week: `${getISOWeekYear(new Date(d.date + 'T12:00:00Z'))}-W${String(getISOWeek(new Date(d.date + 'T12:00:00Z'))).padStart(2, '0')}`,
   }));
-  return { days, weeks: r.weeks, net: r.metrics.net.value };
+  const aggregate = (selected: typeof days) =>
+    selected.some((d) => d.net === null)
+      ? null
+      : unit === 'percent'
+        ? dec(
+            selected
+              .reduce((factor, d) => factor.mul(D(d.net!).div(100).plus(1)), D('1'))
+              .minus(1)
+              .mul(100),
+          )
+        : sum(selected.map((d) => d.net!));
+  return {
+    days,
+    weeks: r.weeks.map((w) => ({ ...w, net: aggregate(days.filter((d) => d.week === w.label)) })),
+    net: days.length ? aggregate(days) : null,
+  };
 }
 export function health(data: Snapshot, journalId: string) {
   const trades = data.trades.filter((t) => t.journalId === journalId);

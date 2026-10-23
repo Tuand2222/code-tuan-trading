@@ -1,9 +1,11 @@
 export function LinePlot({
   series,
   label,
+  background,
 }: {
   series: { name: string; values: (number | null)[]; color: string }[];
   label: string;
+  background?: number[];
 }) {
   const values = series.flatMap((s) =>
     s.values.filter((v): v is number => v !== null && Number.isFinite(v)),
@@ -23,6 +25,17 @@ export function LinePlot({
       >
         <title>{label}</title>
         <path d="M65 10V185H630" fill="none" stroke="currentColor" />
+        {background?.map((score, i) => (
+          <rect
+            key={i}
+            x={65 + (i / background.length) * 565}
+            y={10}
+            width={565 / background.length + 0.1}
+            height={175}
+            fill={score < 0 ? '#ba5566' : score > 0 ? '#237b62' : '#8999ad'}
+            opacity={0.12}
+          />
+        ))}
         <text x="2" y="20" fill="currentColor" fontSize="12">
           {max.toFixed(2)}
         </text>

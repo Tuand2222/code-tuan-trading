@@ -16,6 +16,9 @@ import { CashFlowSettings } from './CashFlowSettings';
 import { BinanceImport } from './BinanceImport';
 import { LegEditor } from './LegEditor';
 import { BackupSecurity } from './BackupSecurity';
+import { FeeProfiles } from './FeeProfiles';
+import { FifoImport } from './FifoImport';
+import { DirectoryBackup } from '../ui/DirectoryBackup';
 import vi from '../i18n/vi.json';
 const t = vi.s3;
 const download = (raw: string) => {
@@ -95,21 +98,27 @@ export function Settings({
   journal?: Journal;
   onCreated: (id: string) => void;
 }) {
-  const { repo, revision, busy } = useLedger(),
+  const { repo, revision, busy, data } = useLedger(),
     [message, setMessage] = useState(''),
     [last, setLast] = useState(''),
+    [backupCount, setBackupCount] = useState(0),
     [preview, setPreview] = useState<Awaited<ReturnType<typeof previewWorkspace>>>(),
     [raw, setRaw] = useState(''),
     [confirmed, setConfirmed] = useState(false),
     [previewRevision, setPreviewRevision] = useState(0);
   useEffect(() => {
     void viewRepository.meta.get('lastBackupAt').then((r) => setLast(r?.value ?? ''));
+    void viewRepository.meta
+      .get('backupTradeCount')
+      .then((r) => setBackupCount(Number(r?.value ?? 0)));
   }, []);
   async function exportFile() {
     try {
       download(await exportWorkspace(repo));
       const date = new Date().toISOString();
       await viewRepository.meta.put({ key: 'lastBackupAt', value: date });
+      await viewRepository.meta.put({ key: 'backupTradeCount', value: String(data.trades.length) });
+      setBackupCount(data.trades.length);
       setLast(date);
       setMessage(t.saved);
     } catch {
@@ -124,9 +133,8 @@ export function Settings({
         <h2>{t.settings}</h2>
         <p>{t.backupInfo}</p>
         <p>{last ? t.lastBackup + ': ' + formatDate(last, journal?.timezone) : t.backupNever}</p>
-        {days >= (journal?.settings.backupReminderDays ?? 7) && (
-          <p className="notice">{t.backupDue}</p>
-        )}
+        {(days >= (journal?.settings.backupReminderDays ?? 7) ||
+          data.trades.length - backupCount >= 20) && <p className="notice">{t.backupDue}</p>}
         <div className="actions">
           <button
             onClick={() =>
@@ -245,11 +253,14 @@ export function Settings({
       </section>
       {journal && <JournalSettings key={journal.id + ':' + revision} journal={journal} />}
       {journal && <CashFlowSettings key={journal.id} journal={journal} />}
+      {journal && <FeeProfiles key={'fees:' + journal.id} journal={journal} />}
+      {journal && <FifoImport key={'fifo:' + journal.id} journal={journal} />}
       {journal && <BinanceImport key={'import:' + journal.id} journal={journal} />}
       {journal && <LegEditor key={'legs:' + journal.id} journal={journal} />}
       <NewJournal onCreated={onCreated} />
       <JournalManagement onCreated={onCreated} />
       <BackupSecurity />
+      <DirectoryBackup />
       <section className="panel">
         <h2>{t.demo}</h2>
         <p>{t.demoHelp}</p>

@@ -3,11 +3,17 @@ import { analyze } from './analyze';
 import { D, dec } from './money';
 
 // Realized capital only. Flows at the same timestamp precede trading events.
-export function capitalReport(journal: Journal, trades: Trade[], flows: CashFlow[]) {
-  const events = analyze(journal, trades).events;
+export function capitalReport(
+  journal: Journal,
+  trades: Trade[],
+  flows: CashFlow[],
+  base?: ReturnType<typeof analyze>,
+) {
+  const events = (base ?? analyze(journal, trades, {}, [], { inference: false })).events;
   const timeline = [
     ...events.map((e) => ({
       id: e.id,
+      tradeId: e.tradeId,
       time: e.time,
       order: 1,
       pnl: e.net,
@@ -17,6 +23,7 @@ export function capitalReport(journal: Journal, trades: Trade[], flows: CashFlow
       .filter((f) => f.journalId === journal.id)
       .map((f) => ({
         id: f.id,
+        tradeId: undefined as string | undefined,
         time: f.date,
         order: 0,
         pnl: undefined as string | undefined,
@@ -45,6 +52,7 @@ export function capitalReport(journal: Journal, trades: Trade[], flows: CashFlow
     }
     return {
       id: e.id,
+      tradeId: e.tradeId,
       time: e.time,
       balance: known ? dec(balance) : null,
       twrPercent: validReturn ? dec(factor.minus(1).mul(100)) : null,

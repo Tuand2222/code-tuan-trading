@@ -70,6 +70,18 @@ label.check {
 .block {
   display: block;
 }
+.trade-scroll td:first-child {
+  min-width: 100px;
+  white-space: nowrap;
+}
+.trade-scroll input[type='checkbox'] {
+  display: inline-block;
+  width: 20px;
+  min-height: 20px;
+  height: 20px;
+  margin: 0 8px 0 0;
+  vertical-align: middle;
+}
 .trade-id {
   overflow-wrap: anywhere;
   font-family: ui-monospace, monospace;
