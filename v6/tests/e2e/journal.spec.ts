@@ -14,7 +14,9 @@ async function seed(page: Page) {
   await page.getByRole('button', { name: 'Nạp và sao lưu bản gốc' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Đã lưu dữ liệu' })).toBeVisible();
 }
-test('audit: unknown fees do not render a weekday PnL bar or a false zero', async ({ page }) => {
+test('audit: unknown fees remain missing in the quantitative sample and drawdown', async ({
+  page,
+}) => {
   await seed(page);
   await page.goto('/#journal');
   await page
@@ -38,12 +40,12 @@ test('audit: unknown fees do not render a weekday PnL bar or a false zero', asyn
   await dialog.getByRole('button', { name: 'Lưu giao dịch', exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await page.goto('/#overview');
-  const tuesday = page
-    .locator('.bar-column')
-    .filter({ has: page.getByText('T3', { exact: true }) });
-  await expect(tuesday.locator('.bar-value')).toHaveText('—');
-  await expect(tuesday.locator('.bar')).toHaveCount(0);
-  await expect(page.locator('.kpi-grid > *')).toHaveCount(24);
+  await expect(page.locator('.quant-cards > article')).toHaveCount(6);
+  await expect(
+    page.getByRole('article', { name: 'Sụt giảm tối đa', exact: true }).locator('.quant-value'),
+  ).toHaveText('—');
+  await page.getByRole('button', { name: 'Đối chiếu dữ liệu thiếu (1)', exact: true }).click();
+  await expect(page.getByRole('dialog')).toContainText('UNKNOWN');
 });
 test('audit: journal configuration clone and archive preserve original trades', async ({
   page,
@@ -98,7 +100,7 @@ test('audit: cashflows reconcile capital, persist edits and preserve trading Net
   await capital.getByRole('button', { name: /^Xóa dòng tiền/ }).click();
   await capital.getByRole('button', { name: 'Xác nhận xóa dòng tiền', exact: true }).click();
   await expect(capital).toContainText('103.302.290 đ');
-  await page.goto('/#overview');
+  await page.goto('/#workspace');
   await expect(page.getByRole('article', { name: 'Lợi nhuận ròng', exact: true })).toContainText(
     '3.302.290',
   );
@@ -231,6 +233,8 @@ test('QT02/QT03 one ledger: add, preview, inline edit, star, review and reload r
   await dialog.getByRole('button', { name: 'Lưu giao dịch', exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await page.getByRole('button', { name: 'Tổng quan', exact: true }).click();
+  const activeJournal = await page.getByLabel('Sổ nhật ký', { exact: true }).inputValue();
+  await page.goto('/#workspace?journal=' + encodeURIComponent(activeJournal));
   await expect(page.getByRole('article', { name: 'Lợi nhuận ròng', exact: true })).toContainText(
     '+1.00 USDT',
   );
@@ -243,13 +247,10 @@ test('S3 F01–F10, T-R1, classic modes and full restore verification preserve t
   await seed(page);
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto('/#overview');
-  await expect(page.getByTestId('kpi-card')).toHaveCount(24);
-  await expect(page.getByRole('article', { name: 'Lợi nhuận ròng', exact: true })).toContainText(
-    '+3.302.290 đ',
-  );
+  await expect(page.locator('.quant-cards > article')).toHaveCount(6);
   await expect(
-    page.getByRole('article', { name: 'Chuỗi hiện tại (+ thắng / − thua)', exact: true }),
-  ).toContainText('lệnh thắng');
+    page.getByRole('article', { name: 'Kỳ vọng mỗi lệnh', exact: true }).locator('.quant-value'),
+  ).toHaveText('0,32 R');
   await page.screenshot({ path: info.outputPath('s3-overview-dark.png'), fullPage: true });
   await page.emulateMedia({ colorScheme: 'light' });
   await page.screenshot({ path: info.outputPath('s3-overview-light.png'), fullPage: true });

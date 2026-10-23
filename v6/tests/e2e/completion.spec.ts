@@ -47,9 +47,11 @@ test('FIFO mapping, exact fees, duplicate import and rollback survive reload', a
   await page.goto('/#journal?journal=' + encodeURIComponent(id));
   await expect(page.locator('[data-trade-id]')).toHaveCount(0);
 });
-test('global R and holding units persist across overview and calendar', async ({ page }) => {
+test('global R and holding units persist across the full workspace and calendar', async ({
+  page,
+}) => {
   await seed(page);
-  await page.goto('/#overview');
+  await page.goto('/#workspace');
   await page.getByLabel('Đơn vị hiển thị toàn sổ', { exact: true }).selectOption('R');
   await expect(page.getByLabel('Đơn vị hiển thị toàn sổ', { exact: true })).toBeEnabled();
   await page.getByLabel('Thời gian giữ lệnh toàn sổ', { exact: true }).selectOption('minutes');

@@ -37,9 +37,7 @@ const Valuation = lazy(() => import('./CompanyValuation'));
 const EquityChart = lazy(() =>
   import('../ui/EquityChart').then((m) => ({ default: m.EquityChart })),
 );
-const Overview = lazy(() =>
-  import('./ClassicOverview').then((m) => ({ default: m.ClassicOverview })),
-);
+const QuantOverview = lazy(() => import('./QuantOverview'));
 const OldMetrix = lazy(() => import('../ui/classic/TradingMetrix'));
 const OldSystem = lazy(() => import('../ui/classic/SystemTracker'));
 const AdvancedWorkspace = lazy(() =>
@@ -58,6 +56,7 @@ function Application() {
   const { data, revision, cacheToken, loading, error } = useLedger();
   const [route, setRoute] = useState(() => parseHash(location.hash)),
     [menu, setMenu] = useState(false),
+    [advancedFilters, setAdvancedFilters] = useState(false),
     [form, setForm] = useState<{ trade?: Trade; revision: number }>(),
     [detail, setDetail] = useState(''),
     [mode, setMode] = useState<'classic' | 'extended'>('classic'),
@@ -279,38 +278,22 @@ function Application() {
     <StateFrame kind="loading" />
   ) : (
     <>
-      <FilterBar data={data} value={filters} onChange={update} />
-      <DisplayControls journal={journal} />
+      {(route.page !== 'overview' || advancedFilters) && (
+        <FilterBar data={data} value={filters} onChange={update} />
+      )}
+      {route.page !== 'overview' && <DisplayControls journal={journal} />}
       {route.page === 'overview' ? (
-        <>
-          <Overview
-            journal={journal}
-            trades={data.trades}
-            filters={filters}
-            result={result}
-            onAdd={() => openForm()}
-            onFilters={update}
-            chart={chart}
-            computedReport={computed?.report}
-            computedRollups={computed?.rollups}
-            computedDisplays={computed?.displayMetrics}
-          />
-          <AlertsPage alerts={alerts.slice(0, 5)} onOpen={setDetail} />
-          {alerts.length > 5 && (
-            <button onClick={() => go('alerts')}>Xem tất cả {alerts.length} cảnh báo</button>
-          )}
-          <section className="panel">
-            <h2>{t.pending}</h2>
-            <div className="actions">
-              {result.queue.slice(0, 5).map((item) => (
-                <button key={item.id} onClick={() => setDetail(item.id)}>
-                  {data.trades.find((x) => x.id === item.id)?.symbol} · {item.id}
-                </button>
-              ))}
-            </div>
-            <button onClick={() => go('review')}>{t.notes} →</button>
-          </section>
-        </>
+        <QuantOverview
+          key={journal.id}
+          journal={journal}
+          trades={trades}
+          allTrades={data.trades}
+          setups={data.setups}
+          filters={filters}
+          onFilters={update}
+          onAdvancedFilters={() => setAdvancedFilters(!advancedFilters)}
+          onOpen={setDetail}
+        />
       ) : ['advanced', 'discipline', 'simulation', 'analytics'].includes(route.page) ? (
         <AdvancedWorkspace
           key={journal.id + scope}
@@ -457,7 +440,7 @@ function Application() {
       </section>
     );
   return (
-    <div className="app-shell">
+    <div className={'app-shell' + (route.page === 'overview' ? ' v6-quant-mode' : '')}>
       <a
         className="skip"
         href="#main-content"
@@ -525,17 +508,25 @@ function Application() {
           aria-busy={loading || (!!journal && computed?.key !== key)}
         >
           <div className="page-heading">
-            <span className="eyebrow">{vi.shell.stage}</span>
-            <h1>{title}</h1>
-            <p>{vi.shell.subtitle}</p>
+            <span className="eyebrow">
+              {route.page === 'overview' ? 'V6 · PHÂN TÍCH ĐỊNH LƯỢNG' : vi.shell.stage}
+            </span>
+            <h1>{route.page === 'overview' ? 'Lợi thế & chất lượng hệ thống' : title}</h1>
+            <p>
+              {route.page === 'overview'
+                ? 'Kiểm chứng kết quả, hiệu suất thoát lệnh và rủi ro theo R.'
+                : vi.shell.subtitle}
+            </p>
             <div className="actions">
               <button onClick={() => go('advanced')}>Phân tích nâng cao</button>
               <CommandPalette go={go} />
             </div>
           </div>
-          {journal?.isDemo && <div className="demo-banner">{vi.status.demo}</div>}
+          {journal?.isDemo && route.page !== 'overview' && (
+            <div className="demo-banner">{vi.status.demo}</div>
+          )}
           <AppInstall />
-          {status && (
+          {status && route.page !== 'overview' && (
             <div className="status-strip">
               <button onClick={() => go('alerts')}>
                 {alerts.length} {t.alerts}

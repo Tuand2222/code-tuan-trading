@@ -72,7 +72,7 @@ test('S5 multi-leg editing preserves exact Net across partial exits and reload',
   await page.reload();
   await page.getByLabel('Lệnh nhiều khớp', { exact: true }).selectOption(id!);
   await expect(page.getByLabel('Loại khớp 3', { exact: true })).toHaveValue('out');
-  await page.goto('/#overview');
+  await page.goto('/#workspace');
   await expect(page.getByRole('article', { name: 'Lợi nhuận ròng', exact: true })).toContainText(
     '3.302.290',
   );
