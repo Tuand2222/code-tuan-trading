@@ -45,6 +45,46 @@ progress,
 .topbar h1 {
   font-size: 20px;
 }
+.topbar > div:nth-child(2) {
+  min-width: 0;
+  flex: 1;
+}
+.workspace-switch {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 4px;
+  white-space: nowrap;
+}
+.workspace-switch > span {
+  margin-right: 4px;
+  color: var(--muted-2);
+  font-size: 11px;
+}
+.workspace-switch a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted-2);
+  background: var(--panel-2);
+  font-size: 12px;
+  text-decoration: none;
+}
+.workspace-switch a[aria-current="page"] {
+  border-color: #a67c32;
+  color: #f6c86c;
+  background: rgba(235, 166, 45, 0.12);
+  font-weight: 700;
+}
+.workspace-switch a:hover,
+.workspace-switch a:focus-visible {
+  border-color: #f6c86c;
+  color: #f6c86c;
+}
 .sidebar {
   width: 242px;
 }
@@ -563,6 +603,17 @@ progress,
   .topbar {
     padding: 12px;
     min-height: 68px;
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+  .topbar > .workspace-switch {
+    flex-basis: 100%;
+  }
+  .workspace-switch > span {
+    margin-right: auto;
+  }
+  .workspace-switch a {
+    min-height: 44px;
   }
   .topbar p,
   .command-trigger {

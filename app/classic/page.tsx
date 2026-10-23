@@ -4908,6 +4908,11 @@ export default function Home() {
               <Plus size={16} /> <span>Thêm lệnh</span>
             </button>
           </div>
+          <nav className="workspace-switch" aria-label="Chuyển giao diện">
+            <span>Giao diện</span>
+            <a href="/classic#overview" aria-current="page">Classic</a>
+            <a href="/v6/#overview">v6</a>
+          </nav>
         </header>
         <div className="content-area">
           <section className="hub-notice" aria-label="Chọn không gian làm việc">

@@ -499,6 +499,13 @@ function Application() {
                 ))}
             </select>
           </label>
+          <nav className="workspace-switch" aria-label="Chuyển giao diện">
+            <span>Giao diện</span>
+            <a href="/classic#overview">Classic</a>
+            <a href="/v6/#overview" aria-current="page">
+              v6
+            </a>
+          </nav>
           <button className="local-state" onClick={() => go('settings')}>
             ● {vi.shell.local}
           </button>
