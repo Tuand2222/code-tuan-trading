@@ -15,6 +15,7 @@ const localBindingConfig = {
   main: "./worker/index.ts",
   assets: { binding: "ASSETS", run_worker_first: ["/", "/index.html", "/v6", "/v6/*"] },
   compatibility_flags: ["nodejs_compat"],
+  triggers: { crons: ["5 * * * *"] },
   d1_databases: d1
     ? [
         {

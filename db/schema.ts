@@ -27,6 +27,7 @@ export const trades = sqliteTable(
     risk: real("risk").notNull().default(0),
     pnl: real("pnl").notNull().default(0),
     fees: real("fees").notNull().default(0),
+    swap: real("swap").notNull().default(0),
     quantity: real("quantity").notNull().default(0),
     entryPrice: real("entry_price").notNull().default(0),
     stopLoss: real("stop_loss").notNull().default(0),
@@ -36,16 +37,34 @@ export const trades = sqliteTable(
     psychology: text("psychology").notNull().default("Đồng bộ"),
     note: text("note").notNull().default(""),
     durationMin: integer("duration_min").notNull().default(0),
-    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    openedAt: text("opened_at"),
+    closedAt: text("closed_at"),
+    dedupHash: text("dedup_hash"),
+    semanticHash: text("semantic_hash"),
+    sourceType: text("source_type").notNull().default("MANUAL"),
+    rawPayloadJson: text("raw_payload_json"),
+    version: integer("version").notNull().default(1),
+    deletedAt: text("deleted_at"),
+    mae: real("mae"),
+    mfe: real("mfe"),
+    rulesJson: text("rules_json"),
+    recordKind: text("record_kind").notNull().default("position"),
+    feesKnown: integer("fees_known", { mode: "boolean" })
+      .notNull()
+      .default(true),
+    pnlKnown: integer("pnl_known", { mode: "boolean" }).notNull().default(true),
+    riskKnown: integer("risk_known", { mode: "boolean" })
+      .notNull()
+      .default(true),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
   },
   (table) => [
     index("trades_user_id_date_idx").on(table.userId, table.date),
     index("trades_user_date_idx").on(table.userEmail, table.date),
-    uniqueIndex("trades_external_unique").on(
-      table.userEmail,
-      table.source,
-      table.externalId,
-    ),
+    uniqueIndex("trades_dedup_unique").on(table.userId, table.dedupHash),
+    index("trades_semantic_idx").on(table.userId, table.semanticHash),
   ],
 );
 
@@ -60,7 +79,9 @@ export const tradeImages = sqliteTable(
     filename: text("filename").notNull(),
     contentType: text("content_type").notNull(),
     sizeBytes: integer("size_bytes").notNull(),
-    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
   },
   (table) => [
     index("trade_images_user_id_trade_idx").on(table.userId, table.tradeId),
@@ -82,8 +103,14 @@ export const brokerConnections = sqliteTable(
     webhookTokenHash: text("webhook_token_hash"),
     status: text("status").notNull().default("configured"),
     lastSyncAt: text("last_sync_at"),
-    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    syncCursorJson: text("sync_cursor_json"),
+    retryAfter: text("retry_after"),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
   },
   (table) => [
     index("connections_user_id_idx").on(table.userId),
@@ -97,6 +124,42 @@ export const brokerConnections = sqliteTable(
   ],
 );
 
+export const tradeAudit = sqliteTable(
+  "trade_audit",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    tradeId: text("trade_id"),
+    batchId: text("batch_id").notNull(),
+    action: text("action").notNull(),
+    detailsJson: text("details_json").notNull(),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [index("trade_audit_user_idx").on(t.userId, t.createdAt)],
+);
+
+export const reportPreferences = sqliteTable("report_preferences", {
+  userId: text("user_id").primaryKey(),
+  settingsJson: text("settings_json").notNull(),
+  destinationCiphertext: text("destination_ciphertext"),
+  updatedAt: text("updated_at").notNull(),
+});
+export const reportJobs = sqliteTable(
+  "report_jobs",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    period: text("period").notNull(),
+    status: text("status").notNull(),
+    objectKey: text("object_key"),
+    error: text("error"),
+    createdAt: text("created_at").notNull(),
+  },
+  (t) => [uniqueIndex("report_jobs_period_unique").on(t.userId, t.period)],
+);
+
 export const user = sqliteTable(
   "user",
   {
@@ -108,8 +171,9 @@ export const user = sqliteTable(
       .notNull(),
     image: text("image"),
     phoneNumber: text("phone_number"),
-    phoneNumberVerified: integer("phone_number_verified", { mode: "boolean" })
-      .default(false),
+    phoneNumberVerified: integer("phone_number_verified", {
+      mode: "boolean",
+    }).default(false),
     legacyClaimedAt: integer("legacy_claimed_at", { mode: "timestamp" }),
     createdAt: integer("created_at", { mode: "timestamp" })
       .$defaultFn(() => new Date())
@@ -162,8 +226,12 @@ export const account = sqliteTable(
     accessToken: text("access_token"),
     refreshToken: text("refresh_token"),
     idToken: text("id_token"),
-    accessTokenExpiresAt: integer("access_token_expires_at", { mode: "timestamp" }),
-    refreshTokenExpiresAt: integer("refresh_token_expires_at", { mode: "timestamp" }),
+    accessTokenExpiresAt: integer("access_token_expires_at", {
+      mode: "timestamp",
+    }),
+    refreshTokenExpiresAt: integer("refresh_token_expires_at", {
+      mode: "timestamp",
+    }),
     scope: text("scope"),
     password: text("password"),
     createdAt: integer("created_at", { mode: "timestamp" })

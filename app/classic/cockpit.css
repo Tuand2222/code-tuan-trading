@@ -1,0 +1,678 @@
+:root {
+  --profit: #10b981;
+  --loss: #f43f5e;
+  --neutral: #64748b;
+  --warning: #f59e0b;
+  --danger: #dc2626;
+  --green: #10b981;
+  --red: #f43f5e;
+}
+body {
+  font-family: var(--font-geist-sans), "Be Vietnam Pro", system-ui, sans-serif;
+  line-height: 1.45;
+  font-synthesis: none;
+}
+label {
+  line-height: 1.25;
+}
+.ticker {
+  letter-spacing: 0.03em;
+}
+.ticker,
+.cockpit-kpis strong,
+td,
+progress,
+.sizing-result strong {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-feature-settings:
+    "zero" 1,
+    "ss01" 1;
+}
+[data-colors="accessible"] {
+  --profit: #2563eb;
+  --loss: #ea580c;
+  --green: #2563eb;
+  --red: #ea580c;
+}
+.content-area {
+  padding: 16px 24px;
+}
+.topbar {
+  min-height: 76px;
+  padding: 16px 24px;
+}
+.topbar h1 {
+  font-size: 20px;
+}
+.sidebar {
+  width: 242px;
+}
+.main-content {
+  margin-left: 242px;
+}
+.brand {
+  height: 116px;
+}
+.sidebar nav button {
+  font-size: 12px;
+}
+.hub-notice {
+  margin-bottom: 10px;
+  padding: 10px 14px !important;
+  font-size: 11px;
+}
+.hub-notice p {
+  margin: 3px 0;
+}
+.demo-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+.demo-banner > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.demo-banner .demo-actions {
+  flex: 0 0 auto;
+}
+.demo-banner p,
+.demo-banner .demo-icon {
+  display: none;
+}
+.demo-banner strong {
+  font-size: 12px;
+}
+.demo-banner span {
+  font-size: 10px;
+}
+.demo-actions a {
+  display: none;
+}
+.sticky-scope {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.sticky-scope label {
+  display: grid;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--muted-2);
+}
+.sticky-scope input,
+.sticky-scope select {
+  height: 34px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 5px 8px;
+}
+.sticky-scope button {
+  min-height: 34px;
+}
+.risk-cockpit {
+  --profit: #10b981;
+  --loss: #f43f5e;
+  display: grid;
+  gap: 12px;
+}
+.risk-cockpit[data-colors="accessible"] {
+  --profit: #2563eb;
+  --loss: #ea580c;
+}
+.cockpit-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.cockpit-heading h2 {
+  font-size: 21px;
+  margin: 3px 0;
+}
+.cockpit-heading p {
+  margin: 0;
+  color: var(--muted-2);
+  font-size: 11px;
+}
+.cockpit-kpis {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+.cockpit-kpis article {
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: linear-gradient(150deg, #172622, #111920 80%);
+  border-radius: 10px;
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.cockpit-kpis span {
+  font-size: 11px;
+  color: #b0bfc5;
+}
+.cockpit-kpis strong {
+  font-size: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cockpit-kpis small {
+  font-size: 10px;
+  color: #85969f;
+}
+.risk-budget {
+  background: #10231f;
+  border: 1px solid #245748;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.risk-budget > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+.risk-budget > div:first-child span {
+  color: #acc4bb;
+}
+.risk-budget progress {
+  width: 100%;
+  height: 8px;
+  display: block;
+  margin: 9px 0;
+  accent-color: var(--profit);
+  background: #233a35;
+  border: 0;
+  border-radius: 8px;
+}
+.risk-budget progress::-webkit-progress-bar {
+  background: #233a35;
+  border-radius: 8px;
+}
+.risk-budget progress::-webkit-progress-value {
+  background: var(--profit);
+  border-radius: 8px;
+}
+.risk-budget.amber,
+.risk-budget.warning {
+  border-color: #8a5b13;
+  background: #2a2012;
+}
+.risk-budget.amber progress::-webkit-progress-value,
+.risk-budget.warning progress::-webkit-progress-value {
+  background: var(--warning);
+}
+.risk-budget.danger,
+.risk-budget.critical {
+  background: #32191e;
+  border-color: var(--danger);
+}
+.risk-budget.danger progress::-webkit-progress-value,
+.risk-budget.critical progress::-webkit-progress-value {
+  background: var(--danger);
+}
+.risk-budget-facts {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 11px;
+}
+.risk-budget small {
+  display: block;
+  margin-top: 6px;
+  color: #a3b3b5;
+  font-size: 10px;
+}
+.risk-budget p {
+  margin: 8px 0 0;
+  font-size: 12px;
+}
+.cockpit-panel,
+.cockpit-settings {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  background: #121a21;
+  min-width: 0;
+}
+.cockpit-panel h2,
+.cockpit-panel h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+.cockpit-panel p,
+.cockpit-settings p {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #9cacb8;
+}
+.cockpit-panel header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.cockpit-panel small {
+  color: #8fa0ad;
+  font-size: 11px;
+}
+.cockpit-panel input,
+.cockpit-panel select,
+.cockpit-settings input,
+.cockpit-settings select,
+.cockpit-panel textarea {
+  width: 100%;
+  border: 1px solid #35424d;
+  background: #0c131a;
+  color: #e0ebed;
+  border-radius: 6px;
+  padding: 8px;
+  min-width: 0;
+  min-height: 36px;
+}
+.cockpit-panel label,
+.cockpit-settings label {
+  display: grid;
+  gap: 6px;
+  font-size: 11px;
+  color: #aebcc7;
+}
+.cockpit-panel textarea {
+  min-height: 95px;
+}
+.cockpit-settings summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: #c0d0d4;
+}
+.cockpit-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+.cockpit-check {
+  display: flex !important;
+  align-items: center;
+  gap: 9px !important;
+  margin: 12px 0;
+  line-height: 1.45 !important;
+}
+.cockpit-check input {
+  width: 16px !important;
+  height: 16px;
+  min-height: 0 !important;
+  accent-color: var(--profit);
+}
+.sizing-result {
+  border-left: 3px solid var(--profit);
+  background: #0c2220;
+  padding: 14px;
+  margin: 12px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.risk-warning {
+  color: #ffc76a !important;
+  border-left: 3px solid #f59e0b;
+  padding-left: 12px;
+  font-size: 12px;
+}
+.cockpit-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 230px;
+}
+.cockpit-chart svg text {
+  fill: #9aadb8;
+  font-size: 12px;
+}
+.cockpit-chart svg circle {
+  cursor: pointer;
+}
+.cockpit-chart svg circle:focus {
+  outline: 2px solid #fff;
+}
+.cockpit-chart header label {
+  display: flex;
+  align-items: center;
+}
+.cockpit-chart header select {
+  width: auto;
+}
+.underwater-label {
+  font-size: 11px;
+  color: #8fa2ad;
+}
+.cockpit-chart .underwater-label + svg {
+  max-height: 92px;
+}
+.cockpit-table-wrap {
+  overflow: auto;
+}
+.cockpit-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.cockpit-panel th {
+  text-align: left;
+  color: #93a6b2;
+  font-weight: 500;
+  height: 32px;
+  padding: 4px 8px;
+}
+.cockpit-panel td {
+  height: 32px;
+  padding: 4px 8px;
+  border-top: 1px solid #26323c;
+}
+.cockpit-panel td:first-child {
+  font-size: 10px;
+}
+.cockpit-matrices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.cockpit-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 12px;
+}
+.cockpit-calendar button {
+  min-height: 78px;
+  border: 1px solid #263542;
+  background: #0c141d;
+  border-radius: 6px;
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  padding: 8px;
+  color: #93a5b5;
+  min-width: 0;
+}
+.cockpit-calendar button.positive {
+  background: #102720;
+  border-color: #234d40;
+}
+.cockpit-calendar button.negative {
+  background: #301a23;
+  border-color: #58303f;
+}
+.cockpit-calendar b {
+  font-size: 11px;
+}
+.cockpit-calendar strong {
+  font-size: 13px;
+  color: #d4e3e8;
+}
+.cockpit-calendar small {
+  font-size: 10px;
+}
+.cockpit-calendar em {
+  color: var(--loss);
+  font-size: 10px;
+}
+.governance-center {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.report-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.queue-item {
+  padding: 12px;
+  border: 1px solid #8a5b13;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+.queue-item button {
+  margin: 5px;
+  font-size: 12px;
+}
+.command-trigger {
+  font-size: 11px;
+  white-space: nowrap;
+  display: flex;
+  gap: 8px;
+}
+.command-trigger kbd {
+  color: #aabbc4;
+  border: 1px solid #40505e;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+.command-dialog {
+  width: min(540px, 90vw);
+  padding: 20px;
+  background: #121d27;
+  border: 1px solid #3b4c5b;
+  border-radius: 14px;
+  max-height: 80vh;
+  overflow: auto;
+}
+.command-dialog header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.command-dialog h2 {
+  font-size: 18px;
+}
+.command-dialog input {
+  width: 100%;
+  background: #0a131c;
+  color: #fff;
+  border: 1px solid #3b4c5b;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 10px 0;
+}
+.command-dialog > button {
+  display: block;
+  text-align: left;
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  background: none;
+  color: #c9d9df;
+  border-radius: 6px;
+}
+.command-dialog > button:hover {
+  background: #20343f;
+}
+.command-dialog header button {
+  background: none;
+  border: 0;
+  font-size: 24px;
+  color: #c9d9df;
+}
+@media (min-width: 1280px) {
+  .risk-cockpit[data-mode="overview"] {
+    grid-template-columns: 1.1fr 1fr;
+  }
+  .risk-cockpit[data-mode="overview"] > .cockpit-heading,
+  .risk-cockpit[data-mode="overview"] > .cockpit-kpis,
+  .risk-cockpit[data-mode="overview"] > .risk-budget,
+  .risk-cockpit[data-mode="overview"] > .cockpit-settings,
+  .risk-cockpit[data-mode="overview"] > .calendar-panel {
+    grid-column: 1/-1;
+  }
+  .risk-cockpit[data-mode="overview"] > .cockpit-heading {
+    order: 0;
+  }
+  .risk-cockpit[data-mode="overview"] > .cockpit-kpis {
+    order: 1;
+  }
+  .risk-cockpit[data-mode="overview"] > .risk-budget {
+    order: 2;
+  }
+  .risk-cockpit[data-mode="overview"] > .cockpit-settings {
+    order: 3;
+  }
+  .risk-cockpit[data-mode="overview"] > .cockpit-chart {
+    order: 4;
+  }
+  .risk-cockpit[data-mode="overview"] > .recent-panel {
+    order: 5;
+  }
+  .risk-cockpit[data-mode="overview"] > .calendar-panel {
+    order: 6;
+  }
+}
+@media (max-width: 1200px) {
+  .cockpit-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .command-trigger kbd {
+    display: none;
+  }
+  .top-actions .data-state-chip {
+    display: none;
+  }
+}
+@media (max-width: 900px) {
+  .sidebar {
+    width: 242px;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .content-area {
+    padding: 12px;
+  }
+  .topbar {
+    padding: 12px;
+    min-height: 68px;
+  }
+  .topbar p,
+  .command-trigger {
+    display: none;
+  }
+  .cockpit-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .cockpit-kpis strong {
+    font-size: 17px;
+  }
+  .cockpit-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cockpit-matrices {
+    grid-template-columns: 1fr;
+  }
+  .cockpit-heading {
+    align-items: start;
+  }
+  .cockpit-heading h2 {
+    font-size: 19px;
+  }
+  .cockpit-heading button {
+    font-size: 11px;
+    max-width: 160px;
+  }
+  .cockpit-calendar {
+    gap: 3px;
+  }
+  .cockpit-calendar button {
+    padding: 5px;
+    min-height: 63px;
+  }
+  .cockpit-calendar strong {
+    font-size: 10px;
+  }
+  .cockpit-calendar small {
+    font-size: 8px;
+  }
+  .hub-notice {
+    display: none;
+  }
+  .sticky-scope {
+    gap: 6px;
+  }
+  .sticky-scope input {
+    max-width: 170px;
+  }
+}
+@media (max-width: 480px) {
+  .cockpit-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cockpit-form {
+    grid-template-columns: 1fr;
+  }
+  .risk-budget > div:first-child {
+    flex-direction: column;
+  }
+  .cockpit-heading {
+    flex-direction: column;
+  }
+  .cockpit-heading button {
+    max-width: none;
+    width: 100%;
+  }
+  .cockpit-calendar small {
+    display: none;
+  }
+  .top-actions select {
+    min-width: 0;
+    width: 100px;
+  }
+  .topbar h1 {
+    font-size: 16px;
+  }
+  .cockpit-panel {
+    padding: 12px;
+  }
+  .sticky-scope label:first-child {
+    flex: 1;
+  }
+  .sticky-scope label:first-child input {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+.quick-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.risk-cockpit {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+@media (max-width: 480px) {
+  .demo-banner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .demo-banner .demo-actions {
+    width: 100%;
+    margin: 0;
+  }
+  .demo-banner > div:nth-child(2) {
+    width: 100%;
+  }
+}

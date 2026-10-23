@@ -128,6 +128,8 @@ test('imports a real PDF through the packaged PDF worker and only previews until
     timeout: 45000,
   });
   await expect(page.locator('.binance-preview-panel')).toContainText('BTCUSDT');
+  await expect(page.getByRole('button', { name: 'Thêm 1 giao dịch', exact: true })).toBeDisabled();
+  await page.getByLabel('Tỷ giá nhập về VNĐ', { exact: true }).fill('25000');
   await expect(page.getByRole('button', { name: 'Thêm 1 giao dịch', exact: true })).toBeEnabled();
 });
 test('restored multi-account importer retains its account, history, mapping and health tools', async ({

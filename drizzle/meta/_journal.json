@@ -36,6 +36,13 @@
       "when": 1786417156984,
       "tag": "0004_broken_darwin",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1792710000000,
+      "tag": "0005_unified_risk_governance",
+      "breakpoints": true
     }
   ]
 }

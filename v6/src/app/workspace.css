@@ -11,7 +11,9 @@
   color: var(--text);
   background: var(--bg);
   color-scheme: dark;
-  font-family: Inter, system-ui, sans-serif;
+  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  font-synthesis: none;
+  line-height: 1.45;
 }
 body {
   margin: 0;
@@ -686,4 +688,14 @@ caption {
 .restored-tools a:focus-visible {
   background: var(--surface-2, #edf2f5);
   text-decoration: underline;
+}
+
+.workspace td,
+.workspace input[type='number'],
+.kpi-card strong {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-feature-settings:
+    'zero' 1,
+    'ss01' 1;
 }

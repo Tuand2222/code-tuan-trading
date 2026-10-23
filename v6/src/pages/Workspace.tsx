@@ -224,8 +224,9 @@ function Application() {
         </div>
       ))}
       <div className="nav-group restored-tools">
-        <h2>CÔNG CỤ WEB TRƯỚC</h2>
-        <a href="/classic">Web trước · đầy đủ</a>
+        <h2>BUỒNG LÁI & CÔNG CỤ</h2>
+        <a href="/classic#overview">Buồng lái rủi ro & báo cáo mới</a>
+        <a href="/classic#risk">Khối lượng & checklist trước lệnh</a>
         <a href="/classic#connections">Kết nối sàn & đồng bộ</a>
         <a href="/legacy#connections">Nhập nâng cao · MT4/MT5</a>
       </div>
