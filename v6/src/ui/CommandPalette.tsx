@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 export function CommandPalette({ go }: { go: (page: string) => void }) {
   const dialog = useRef<HTMLDialogElement>(null),
     input = useRef<HTMLInputElement>(null);
@@ -41,30 +42,33 @@ export function CommandPalette({ go }: { go: (page: string) => void }) {
   return (
     <>
       <button onClick={open}>Tìm lệnh · Ctrl+K</button>
-      <dialog ref={dialog} aria-label="Bảng lệnh">
-        <label>
-          Tìm chức năng
-          <input
-            ref={input}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                const value = e.currentTarget.value.toLocaleLowerCase('vi');
-                const match = commands.find((c) => c[0].toLocaleLowerCase('vi').includes(value));
-                if (match) choose(match[1]);
-              }
-            }}
-          />
-        </label>
-        {filtered.map(([name, page]) => (
-          <p key={page}>
-            <button onClick={() => choose(page)}>{name}</button>
-          </p>
-        ))}
-        <button onClick={() => dialog.current?.close()}>Đóng bảng lệnh</button>
-      </dialog>
+      {createPortal(
+        <dialog ref={dialog} aria-label="Bảng lệnh">
+          <label>
+            Tìm chức năng
+            <input
+              ref={input}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  const value = e.currentTarget.value.toLocaleLowerCase('vi');
+                  const match = commands.find((c) => c[0].toLocaleLowerCase('vi').includes(value));
+                  if (match) choose(match[1]);
+                }
+              }}
+            />
+          </label>
+          {filtered.map(([name, page]) => (
+            <p key={page}>
+              <button onClick={() => choose(page)}>{name}</button>
+            </p>
+          ))}
+          <button onClick={() => dialog.current?.close()}>Đóng bảng lệnh</button>
+        </dialog>,
+        document.body,
+      )}
     </>
   );
 }
