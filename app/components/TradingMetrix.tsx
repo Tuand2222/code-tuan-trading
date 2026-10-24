@@ -2,35 +2,9 @@
 
 import { useMemo, useState, type CSSProperties } from "react";
 import EquityTimeChart, { type EquityChartPoint, type EquityReferenceLine } from "./EquityTimeChart";
+import { useLedger } from './LedgerContext';
+import { classicReport } from '../../lib/trading/selectors/classic';
 import { normalizeNumericInput, selectNumericInput } from "./numeric-input";
-
-type MetrixTrade = {
-  id: string;
-  date: string;
-  symbol: string;
-  side: "Buy" | "Sell";
-  risk: number;
-  pnl: number;
-  discipline: number;
-  durationMin: number;
-  fees?: number;
-  source?: string;
-};
-
-type DailyRow = {
-  date: string;
-  trades: number;
-  buys: number;
-  sells: number;
-  pnl: number;
-  risk: number;
-  fees: number;
-  startBalance: number;
-  endBalance: number;
-  lowestBalance: number;
-  dailyDrawdown: number;
-  maxLossLimit: number;
-};
 
 const VND = new Intl.NumberFormat("vi-VN", {
   style: "currency",
@@ -70,25 +44,6 @@ function positivePercent(value: string, fallback: number) {
   return Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 100) : fallback;
 }
 
-function streaks(trades: MetrixTrade[]) {
-  let win = 0;
-  let loss = 0;
-  let maxWin = 0;
-  let maxLoss = 0;
-  for (const trade of trades) {
-    if (trade.pnl > 0) {
-      win += 1;
-      loss = 0;
-      maxWin = Math.max(maxWin, win);
-    } else if (trade.pnl < 0) {
-      loss += 1;
-      win = 0;
-      maxLoss = Math.max(maxLoss, loss);
-    }
-  }
-  return { maxWin, maxLoss };
-}
-
 function ObjectiveCard({
   label,
   value,
@@ -118,7 +73,8 @@ function ObjectiveCard({
   );
 }
 
-export default function TradingMetrix({ trades }: { trades: MetrixTrade[] }) {
+export default function TradingMetrix() {
+  const {derived,filters}=useLedger();
   const [initialCapitalInput, setInitialCapitalInput] = useState("200000000");
   const [profitTargetInput, setProfitTargetInput] = useState("10");
   const [maxDailyLossInput, setMaxDailyLossInput] = useState("5");
@@ -132,130 +88,16 @@ export default function TradingMetrix({ trades }: { trades: MetrixTrade[] }) {
     maximum: positivePercent(maxLossInput, 10),
   };
 
-  const report = useMemo(() => {
-    const ordered = [...trades].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
-    const grouped = new Map<string, MetrixTrade[]>();
-    for (const trade of ordered) grouped.set(trade.date, [...(grouped.get(trade.date) ?? []), trade]);
-
-    let balance = initialCapital;
-    let allTimePeak = initialCapital;
-    let maximumDrawdown = 0;
-    let lowestBalance = initialCapital;
-    let anyDailyBreach = false;
-    let anyMaximumBreach = false;
-    const maximumAmount = initialCapital * rules.maximum / 100;
-    const dailyLimitAmount = initialCapital * rules.daily / 100;
-    const rows: DailyRow[] = [];
-
-    for (const [date, dayTrades] of grouped) {
-      const startBalance = balance;
-      const maxLossLimit = initialCapital - maximumAmount;
-      let intradayBalance = startBalance;
-      let intradayLow = startBalance;
-      let pnl = 0;
-      let risk = 0;
-      let fees = 0;
-      for (const trade of dayTrades) {
-        pnl += trade.pnl;
-        risk += trade.risk;
-        fees += trade.fees ?? 0;
-        intradayBalance += trade.pnl;
-        intradayLow = Math.min(intradayLow, intradayBalance);
-        allTimePeak = Math.max(allTimePeak, intradayBalance);
-        maximumDrawdown = Math.max(maximumDrawdown, allTimePeak - intradayBalance);
-        lowestBalance = Math.min(lowestBalance, intradayBalance);
-      }
-      balance = intradayBalance;
-      const dailyDrawdown = Math.max(0, startBalance - intradayLow);
-      if (dailyDrawdown > dailyLimitAmount) anyDailyBreach = true;
-      if (intradayLow < maxLossLimit) anyMaximumBreach = true;
-      rows.push({
-        date,
-        trades: dayTrades.length,
-        buys: dayTrades.filter((trade) => trade.side === "Buy").length,
-        sells: dayTrades.filter((trade) => trade.side === "Sell").length,
-        pnl,
-        risk,
-        fees,
-        startBalance,
-        endBalance: balance,
-        lowestBalance: intradayLow,
-        dailyDrawdown,
-        maxLossLimit,
-      });
-    }
-
-    const wins = ordered.filter((trade) => trade.pnl > 0);
-    const losses = ordered.filter((trade) => trade.pnl < 0);
-    const grossProfit = wins.reduce((sum, trade) => sum + trade.pnl, 0);
-    const grossLoss = Math.abs(losses.reduce((sum, trade) => sum + trade.pnl, 0));
-    const net = balance - initialCapital;
-    const totalRisk = ordered.reduce((sum, trade) => sum + trade.risk, 0);
-    const positiveDays = rows.filter((row) => row.pnl > 0);
-    const bestDay = positiveDays.length ? Math.max(...positiveDays.map((row) => row.pnl)) : 0;
-    const worstDailyDrawdown = rows.length ? Math.max(...rows.map((row) => row.dailyDrawdown)) : 0;
-    const currentMaxLossLimit = initialCapital - maximumAmount;
-    const maxLossUsed = rows.length
-      ? Math.max(0, ...rows.map((row) => maximumAmount - (row.lowestBalance - row.maxLossLimit)))
-      : 0;
-    const symbolMap = new Map<string, { symbol: string; pnl: number; trades: number; wins: number }>();
-    for (const trade of ordered) {
-      const item = symbolMap.get(trade.symbol) ?? { symbol: trade.symbol, pnl: 0, trades: 0, wins: 0 };
-      item.pnl += trade.pnl;
-      item.trades += 1;
-      item.wins += trade.pnl > 0 ? 1 : 0;
-      symbolMap.set(trade.symbol, item);
-    }
-    const symbols = [...symbolMap.values()].sort((a, b) => b.pnl - a.pnl);
-    const absoluteDailySum = rows.reduce((sum, row) => sum + Math.abs(row.pnl), 0);
-    const largestAbsoluteDay = rows.length ? Math.max(...rows.map((row) => Math.abs(row.pnl))) : 0;
-    const consistency = absoluteDailySum ? Math.max(0, (1 - largestAbsoluteDay / absoluteDailySum) * 100) : 0;
-    const streak = streaks(ordered);
-
-    return {
-      ordered,
-      rows,
-      balance,
-      net,
-      grossProfit,
-      grossLoss,
-      totalRisk,
-      wins,
-      losses,
-      profitFactor: grossLoss ? grossProfit / grossLoss : grossProfit > 0 ? 99 : 0,
-      expectancy: ordered.length ? net / ordered.length : 0,
-      averageRR: ordered.length ? ordered.reduce((sum, trade) => sum + (trade.risk ? trade.pnl / trade.risk : 0), 0) / ordered.length : 0,
-      averageWin: wins.length ? grossProfit / wins.length : 0,
-      averageLoss: losses.length ? grossLoss / losses.length : 0,
-      biggestWin: wins.length ? Math.max(...wins.map((trade) => trade.pnl)) : 0,
-      biggestLoss: losses.length ? Math.min(...losses.map((trade) => trade.pnl)) : 0,
-      averageDuration: ordered.length ? ordered.reduce((sum, trade) => sum + trade.durationMin, 0) / ordered.length : 0,
-      averageDiscipline: ordered.length ? ordered.reduce((sum, trade) => sum + trade.discipline, 0) / ordered.length : 0,
-      maximumDrawdown,
-      lowestBalance,
-      worstDailyDrawdown,
-      anyDailyBreach,
-      anyMaximumBreach,
-      currentMaxLossLimit,
-      maxLossUsed,
-      maximumAmount,
-      dailyLimitAmount,
-      bestDay,
-      consistency,
-      symbols,
-      streak,
-    };
-  }, [trades, initialCapital, rules.daily, rules.maximum]);
-
+  const report = useMemo(() => classicReport(derived!.result,filters,initialCapital,rules.daily,rules.maximum),[derived,filters,initialCapital,rules.daily,rules.maximum]);
   const targetAmount = initialCapital * rules.target / 100;
   const profitProgress = targetAmount ? report.net / targetAmount * 100 : 0;
   const dailyUsage = report.dailyLimitAmount ? report.worstDailyDrawdown / report.dailyLimitAmount * 100 : 0;
   const maximumUsage = report.maximumAmount ? report.maxLossUsed / report.maximumAmount * 100 : 0;
-  const winRate = report.ordered.length ? report.wins.length / report.ordered.length * 100 : 0;
+
   const returnPercent = initialCapital ? report.net / initialCapital * 100 : 0;
-  const sourceCount = new Set(report.ordered.map((trade) => trade.source ?? "Thủ công")).size;
-  const firstDate = report.ordered.at(0)?.date;
-  const lastDate = report.ordered.at(-1)?.date;
+  const sourceCount = new Set(report.ordered.map((trade) => trade.platform)).size;
+  const firstDate = report.rows.at(0)?.date;
+  const lastDate = report.rows.at(-1)?.date;
   const pageSize = 8;
   const pageCount = Math.max(1, Math.ceil(report.rows.length / pageSize));
   const safePage = Math.min(dailyPage, pageCount - 1);
@@ -273,24 +115,8 @@ export default function TradingMetrix({ trades }: { trades: MetrixTrade[] }) {
     { label: "Giới hạn", money: report.currentMaxLossLimit, percent: -rules.maximum, color: "rgba(255,85,116,.68)" },
   ], [initialCapital, report.currentMaxLossLimit, rules.maximum, rules.target, targetAmount]);
 
-  const advancedStats = [
-    ["Tổng số giao dịch", String(report.ordered.length)],
-    ["Tỷ lệ thắng", `${winRate.toFixed(1)}%`],
-    ["Profit factor", report.profitFactor >= 99 ? "∞" : report.profitFactor.toFixed(2)],
-    ["Kỳ vọng / lệnh", compactCash(report.expectancy)],
-    ["Kỳ vọng theo R", `${report.averageRR.toFixed(2)}R`],
-    ["Lãi trung bình", compactCash(report.averageWin)],
-    ["Lỗ trung bình", compactCash(-report.averageLoss)],
-    ["Lệnh thắng lớn nhất", compactCash(report.biggestWin)],
-    ["Lệnh thua lớn nhất", compactCash(report.biggestLoss)],
-    ["Chuỗi thắng dài nhất", `${report.streak.maxWin} lệnh`],
-    ["Chuỗi thua dài nhất", `${report.streak.maxLoss} lệnh`],
-    ["Thời gian giữ TB", report.averageDuration >= 1440 ? `${(report.averageDuration / 1440).toFixed(1)} ngày` : `${Math.round(report.averageDuration)} phút`],
-    ["Sụt giảm tối đa", compactCash(-report.maximumDrawdown)],
-    ["ROI / tổng rủi ro", `${(report.totalRisk ? report.net / report.totalRisk * 100 : 0).toFixed(1)}%`],
-    ["Điểm kỷ luật", `${report.averageDiscipline.toFixed(0)}%`],
-    ["Độ nhất quán", `${report.consistency.toFixed(0)}%`],
-  ];
+  const advancedStats = [...report.stats,['Độ nhất quán',report.consistency===undefined?'—':(report.consistency ?? 0).toFixed(0)+'%']];
+  if(!report.complete) return <section className="hub-notice" role="status">Chưa thể tính Balance và giới hạn rủi ro vì phạm vi có dữ liệu Net chưa xác định. Kiểm tra tab Sức khỏe dữ liệu.</section>;
 
   return (
     <div className="metrix-shell">
@@ -298,7 +124,7 @@ export default function TradingMetrix({ trades }: { trades: MetrixTrade[] }) {
         <div>
           <span className="metrix-kicker"><i /> TUAN TRADING METRIX</span>
           <h2>Đánh giá hiệu suất & giới hạn rủi ro</h2>
-          <p>Dữ liệu được tính trực tiếp từ nhật ký giao dịch đã ghi nhận.</p>
+          <p>Dùng chung sổ v3 và bộ lọc với Nhật ký. Balance tính theo từng sự kiện đã thực hiện, gồm chốt từng phần.</p>
         </div>
         <div className="metrix-controls">
           <label>
@@ -320,6 +146,7 @@ export default function TradingMetrix({ trades }: { trades: MetrixTrade[] }) {
         </div>
       </section>
 
+      <p className="panel-copy">R: {report.riskCount}/{report.ordered.length} lệnh có rủi ro hợp lệ · Kỷ luật: {report.reviewedCount}/{report.ordered.length} lệnh đã review. Giới hạn dựa trên vốn mô phỏng, chưa gồm P/L đang mở.</p>
       <section className="metrix-account-strip">
         <div><span>Ngày giao dịch</span><strong>{report.rows.length} ngày</strong><small>Tự động đếm từ nhật ký</small></div>
         <div><span>Vốn mô phỏng</span><strong>{cash(initialCapital)}</strong><small>Tiền tệ: VND</small></div>
@@ -345,7 +172,7 @@ export default function TradingMetrix({ trades }: { trades: MetrixTrade[] }) {
             <div className="metrix-objective-head"><span>Trading Days</span><i aria-label="Tự động cập nhật">↻</i></div>
             <strong>{report.rows.length} ngày</strong>
             <div className="metrix-progress"><b style={{ width: "100%" }} /></div>
-            <div className="metrix-objective-foot"><small>Ngày có ít nhất một giao dịch</small><em>{report.ordered.length} lệnh · tự động</em></div>
+            <div className="metrix-objective-foot"><small>Ngày có sự kiện tài chính</small><em>{report.ordered.length} lệnh · tự động</em></div>
           </article>
         </div>
       </section>
@@ -354,7 +181,7 @@ export default function TradingMetrix({ trades }: { trades: MetrixTrade[] }) {
         <article className="metrix-panel metrix-chart-panel">
           <div className="metrix-panel-head">
             <div><span>ACCOUNT EQUITY</span><h3>Đường cong Balance</h3></div>
-            <small>Trục kép · thời gian thực từ journal</small>
+            <small>Trục kép · số dư đã thực hiện</small>
           </div>
           <div className="metrix-chart-summary"><span>Hiện tại <strong>{cash(report.balance)} · {percent(returnPercent)}</strong></span><span className="target">Mục tiêu <strong>{cash(initialCapital + targetAmount)} · +{rules.target}%</strong></span><span className="limit">Giới hạn <strong>{cash(report.currentMaxLossLimit)} · −{rules.maximum}%</strong></span></div>
           <EquityTimeChart
@@ -373,7 +200,7 @@ export default function TradingMetrix({ trades }: { trades: MetrixTrade[] }) {
             <div><span>Daily loss còn lại</span><strong>{cash(Math.max(0, report.dailyLimitAmount - report.worstDailyDrawdown))}</strong></div>
             <div><span>Max loss còn lại</span><strong>{cash(Math.max(0, report.maximumAmount - report.maxLossUsed))}</strong></div>
             <div><span>Max drawdown thực tế</span><strong className="negative-text">{compactCash(-report.maximumDrawdown)}</strong></div>
-            <div><span>Độ nhất quán</span><strong>{report.consistency.toFixed(0)}%</strong></div>
+            <div><span>Độ nhất quán</span><strong>{(report.consistency ?? 0).toFixed(0)}%</strong></div>
           </div>
           <p>Giới hạn được ước tính từ các lệnh đã đóng. Equity thời gian thực và P/L vị thế mở cần dữ liệu live từ broker.</p>
         </aside>
@@ -400,7 +227,7 @@ export default function TradingMetrix({ trades }: { trades: MetrixTrade[] }) {
         <div className="metrix-table-wrap"><table className="metrix-table"><thead><tr><th>Ngày</th><th>Giao dịch</th><th>Mua / Bán</th><th>Rủi ro</th><th>Phí</th><th>Kết quả ngày</th><th>Balance cuối ngày</th><th>Daily loss dùng</th><th>Trạng thái</th></tr></thead><tbody>
           {pageRows.map((row) => {
             const usage = report.dailyLimitAmount ? row.dailyDrawdown / report.dailyLimitAmount * 100 : 0;
-            return <tr key={row.date}><td><strong>{DATE.format(new Date(`${row.date}T12:00:00`))}</strong></td><td>{row.trades}</td><td><span className="metrix-side buy">{row.buys} B</span><span className="metrix-side sell">{row.sells} S</span></td><td>{compactCash(row.risk)}</td><td>{compactCash(-row.fees)}</td><td className={row.pnl >= 0 ? "positive-text" : "negative-text"}>{compactCash(row.pnl)}</td><td>{cash(row.endBalance)}</td><td><div className="metrix-mini-progress"><i><b className={usage >= 75 ? "warn" : ""} style={{ width: `${clamp(usage)}%` }} /></i><span>{usage.toFixed(0)}%</span></div></td><td><span className={`metrix-day-status ${usage > 100 || row.lowestBalance < row.maxLossLimit ? "failed" : "ok"}`}>{usage > 100 || row.lowestBalance < row.maxLossLimit ? "Vi phạm" : "Đạt"}</span></td></tr>;
+            return <tr key={row.date}><td><strong>{DATE.format(new Date(`${row.date}T12:00:00`))}</strong></td><td>{row.trades}</td><td><span className="metrix-side buy">{row.buys} B</span><span className="metrix-side sell">{row.sells} S</span></td><td>{row.riskCount?compactCash(row.risk):"—"}<small> ({row.riskCount}/{row.trades})</small></td><td>{row.fees===undefined?"—":compactCash(-row.fees)}</td><td className={row.pnl >= 0 ? "positive-text" : "negative-text"}>{compactCash(row.pnl)}</td><td>{cash(row.endBalance)}</td><td><div className="metrix-mini-progress"><i><b className={usage >= 75 ? "warn" : ""} style={{ width: `${clamp(usage)}%` }} /></i><span>{usage.toFixed(0)}%</span></div></td><td><span className={`metrix-day-status ${usage > 100 || row.lowestBalance < row.maxLossLimit ? "failed" : "ok"}`}>{usage > 100 || row.lowestBalance < row.maxLossLimit ? "Vi phạm" : "Đạt"}</span></td></tr>;
           })}
         </tbody></table></div>
         <div className="metrix-pagination"><span>Hiển thị {pageRows.length} / {report.rows.length} ngày</span><div><button disabled={safePage === 0} onClick={() => setDailyPage(Math.max(0, safePage - 1))}>‹</button><strong>{safePage + 1} / {pageCount}</strong><button disabled={safePage >= pageCount - 1} onClick={() => setDailyPage(Math.min(pageCount - 1, safePage + 1))}>›</button></div></div>

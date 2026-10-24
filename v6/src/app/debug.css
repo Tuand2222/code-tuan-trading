@@ -1,0 +1,153 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #e5edf5;
+  background: #0d121a;
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+.debug-shell {
+  max-width: 1100px;
+  margin: auto;
+  padding: 24px;
+}
+h1 {
+  font-size: clamp(24px, 5vw, 36px);
+}
+header {
+  margin-bottom: 24px;
+}
+header span {
+  color: #eabb60;
+}
+p {
+  line-height: 1.6;
+  color: #b9c8d7;
+}
+section {
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid #354457;
+  border-radius: 14px;
+  background: #141e2a;
+}
+label {
+  display: block;
+  margin: 16px 0;
+}
+input,
+select,
+button {
+  font: inherit;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #52667c;
+}
+input[type='checkbox'] {
+  min-height: 24px;
+  min-width: 24px;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+input[type='file'] {
+  display: block;
+  margin-top: 12px;
+  width: 100%;
+}
+button {
+  background: #edbd5b;
+  color: #15191f;
+  font-weight: 700;
+  margin: 8px 12px 8px 0;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+a {
+  color: #eabd63;
+}
+select {
+  display: block;
+  margin-top: 10px;
+  width: 100%;
+}
+.table-wrap {
+  overflow: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #354457;
+}
+thead th {
+  color: #eabd63;
+}
+td {
+  font-variant-numeric: tabular-nums;
+}
+.notice {
+  padding: 14px;
+  border-left: 4px solid #edbd5b;
+  background: #28303d;
+}
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding-top: 12px;
+}
+@media (max-width: 500px) {
+  .debug-shell {
+    padding: 14px;
+  }
+  section {
+    padding: 14px;
+  }
+  button {
+    width: 100%;
+    margin-right: 0;
+  }
+  th,
+  td {
+    padding: 9px;
+    font-size: 13px;
+  }
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #152233;
+    background: #f4f7fa;
+    color-scheme: light;
+  }
+  section {
+    background: #fff;
+  }
+  p {
+    color: #394b60;
+  }
+  a,
+  thead th,
+  header span {
+    color: #745215;
+  }
+  .notice {
+    background: #fff3d7;
+  }
+}

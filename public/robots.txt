@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://trading-plan-pro.tuann7260.chatgpt.site/sitemap.xml
+Sitemap: https://tuannhatky.fabledcoot2.chatgpt.site/sitemap.xml

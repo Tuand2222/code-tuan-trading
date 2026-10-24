@@ -1,0 +1,67 @@
+.cloud-archive {
+  max-width: 1080px;
+}
+.cloud-archive > p {
+  max-width: 80ch;
+  line-height: 1.7;
+}
+.cloud-archive dl {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) 2fr;
+  gap: 12px;
+  margin: 24px 0;
+}
+.cloud-archive dt {
+  font-weight: 600;
+}
+.cloud-archive dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.cloud-archive label {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+}
+.cloud-archive select {
+  max-width: 100%;
+  width: 100%;
+}
+.cloud-archive .actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+.cloud-archive li {
+  overflow-wrap: anywhere;
+  margin: 8px 0;
+}
+.cloud-archive section {
+  margin: 24px 0;
+  padding: 16px;
+  border: 1px solid var(--border, #8886);
+  border-radius: 12px;
+}
+.cloud-archive h3 {
+  margin-top: 28px;
+}
+.cloud-archive button,
+.cloud-archive a {
+  font-size: 14px;
+}
+.cloud-archive [role='alert'] {
+  color: var(--negative, #b42318);
+}
+@media (max-width: 600px) {
+  .cloud-archive dl {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .cloud-archive dd {
+    margin-bottom: 12px;
+  }
+  .cloud-archive .actions > * {
+    width: 100%;
+  }
+}

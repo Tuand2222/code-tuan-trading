@@ -1,36 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useLedger } from './LedgerContext';
+import { classicYear } from '../../lib/trading/selectors/classic';
 import { normalizeNumericInput, selectNumericInput } from "./numeric-input";
 
-type TrackerTrade = {
-  id: string;
-  date: string;
-  risk: number;
-  pnl: number;
-  discipline: number;
-};
-
-type YearStats = {
-  year: number;
-  hasData: boolean;
-  total: number;
-  net: number;
-  winRate: number;
-  avgGainR: number;
-  avgLossR: number;
-  winLossRatio: number;
-  returnPercent: number;
-  profitFactor: number;
-  expectedR: number;
-  top15Share: number;
-  bottomR: number;
-  paretoRatio: number;
-  maxDrawdownPercent: number;
-  recoveryFactor: number;
-  discipline: number;
-};
-
+type YearStats = ReturnType<typeof classicYear>;
 const VND = new Intl.NumberFormat("vi-VN", {
   style: "currency",
   currency: "VND",
@@ -64,62 +39,6 @@ function compactCash(value: number) {
   return `${sign}${Math.round(absolute)}`;
 }
 
-function calculateYear(year: number, trades: TrackerTrade[], capital: number): YearStats {
-  const source = trades
-    .filter((trade) => Number(trade.date.slice(0, 4)) === year)
-    .sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
-  if (!source.length) {
-    return { year, hasData: false, total: 0, net: 0, winRate: 0, avgGainR: 0, avgLossR: 0, winLossRatio: 0, returnPercent: 0, profitFactor: 0, expectedR: 0, top15Share: 0, bottomR: 0, paretoRatio: 0, maxDrawdownPercent: 0, recoveryFactor: 0, discipline: 0 };
-  }
-
-  const wins = source.filter((trade) => trade.pnl > 0);
-  const losses = source.filter((trade) => trade.pnl < 0);
-  const grossProfit = wins.reduce((sum, trade) => sum + trade.pnl, 0);
-  const grossLoss = Math.abs(losses.reduce((sum, trade) => sum + trade.pnl, 0));
-  const net = grossProfit - grossLoss;
-  const winnerRs = wins.map((trade) => trade.risk ? trade.pnl / trade.risk : 0);
-  const loserRs = losses.map((trade) => trade.risk ? trade.pnl / trade.risk : 0);
-  const avgGainR = winnerRs.length ? winnerRs.reduce((sum, value) => sum + value, 0) / winnerRs.length : 0;
-  const avgLossR = loserRs.length ? loserRs.reduce((sum, value) => sum + value, 0) / loserRs.length : 0;
-  const allRs = source.map((trade) => trade.risk ? trade.pnl / trade.risk : 0).sort((a, b) => b - a);
-  const topCount = Math.max(1, Math.ceil(source.length * .15));
-  const topRs = allRs.slice(0, topCount);
-  const bottomRs = allRs.slice(topCount);
-  const topTrades = [...source].sort((a, b) => b.pnl - a.pnl).slice(0, topCount);
-  const topProfit = topTrades.reduce((sum, trade) => sum + Math.max(0, trade.pnl), 0);
-  const topNetR = topRs.reduce((sum, value) => sum + value, 0);
-  const bottomNetR = bottomRs.reduce((sum, value) => sum + value, 0);
-
-  let equity = 0;
-  let peak = 0;
-  let maxDrawdown = 0;
-  for (const trade of source) {
-    equity += trade.pnl;
-    peak = Math.max(peak, equity);
-    maxDrawdown = Math.max(maxDrawdown, peak - equity);
-  }
-
-  return {
-    year,
-    hasData: true,
-    total: source.length,
-    net,
-    winRate: wins.length / source.length * 100,
-    avgGainR,
-    avgLossR,
-    winLossRatio: avgLossR ? Math.abs(avgGainR / avgLossR) : 0,
-    returnPercent: capital ? net / capital * 100 : 0,
-    profitFactor: grossLoss ? grossProfit / grossLoss : grossProfit > 0 ? 99 : 0,
-    expectedR: allRs.reduce((sum, value) => sum + value, 0) / source.length,
-    top15Share: grossProfit ? topProfit / grossProfit * 100 : 0,
-    bottomR: bottomRs.length ? bottomNetR / bottomRs.length : 0,
-    paretoRatio: bottomNetR ? Math.abs(topNetR / bottomNetR) : 0,
-    maxDrawdownPercent: capital ? maxDrawdown / capital * 100 : 0,
-    recoveryFactor: maxDrawdown ? net / maxDrawdown : 0,
-    discipline: source.reduce((sum, trade) => sum + trade.discipline, 0) / source.length,
-  };
-}
-
 const METRICS: Array<{
   key: keyof YearStats;
   label: string;
@@ -133,7 +52,7 @@ const METRICS: Array<{
   { key: "avgLossR", label: "Average loss", hint: "Mức lỗ R trung bình của các lệnh thua.", format: (value) => `${value.toFixed(2)}R` },
   { key: "winLossRatio", label: "Win / Loss size", hint: "Tỷ lệ độ lớn lệnh thắng trung bình so với lệnh thua.", format: (value) => `${value.toFixed(2)}x` },
   { key: "returnPercent", label: "Return on reference capital", hint: "Lợi nhuận ròng chia cho vốn tham chiếu.", format: (value) => `${value >= 0 ? "+" : ""}${value.toFixed(2)}%` },
-  { key: "profitFactor", label: "Profit Factor", hint: "Tổng lãi chia tổng lỗ tuyệt đối.", format: (value) => value >= 99 ? "∞" : value.toFixed(2), highlight: true },
+  { key: "profitFactor", label: "Profit Factor", hint: "Tổng lãi chia tổng lỗ tuyệt đối.", format: (value) => value === Infinity ? "∞" : value.toFixed(2), highlight: true },
   { key: "expectedR", label: "Expected value / trade", hint: "Kỳ vọng R trung bình trên mỗi giao dịch.", format: (value) => `${value >= 0 ? "+" : ""}${value.toFixed(2)}R` },
   { key: "top15Share", label: "% gross profit from top 15%", hint: "Tỷ trọng tổng lãi đến từ 15% lệnh tốt nhất.", format: (value) => `${value.toFixed(1)}%` },
   { key: "bottomR", label: "Average R of bottom 85%", hint: "R trung bình của phần còn lại sau khi loại 15% lệnh tốt nhất.", format: (value) => `${value >= 0 ? "+" : ""}${value.toFixed(2)}R` },
@@ -143,7 +62,8 @@ const METRICS: Array<{
   { key: "discipline", label: "Discipline score", hint: "Điểm tuân thủ checklist trung bình.", format: (value) => `${value.toFixed(0)}%` },
 ];
 
-export default function SystemTracker({ trades, onOpenJournal }: { trades: TrackerTrade[]; onOpenJournal: () => void }) {
+export default function SystemTracker({ onOpenJournal }: { onOpenJournal: () => void }) {
+  const {derived,filters}=useLedger();
   const currentYear = new Date().getFullYear();
   const [startYear, setStartYear] = useState(currentYear);
   const [endYear, setEndYear] = useState(currentYear + 9);
@@ -188,14 +108,15 @@ export default function SystemTracker({ trades, onOpenJournal }: { trades: Track
   };
 
   const years = useMemo(() => Array.from({ length: endYear - startYear + 1 }, (_, index) => startYear + index), [startYear, endYear]);
-  const annual = useMemo(() => years.map((year) => calculateYear(year, trades, capital)), [years, trades, capital]);
+  const annual = useMemo(() => years.map((year) => classicYear(year, derived!.result, filters, capital)), [years, derived, filters, capital]);
   const yearsWithData = annual.filter((item) => item.hasData);
   const focus = annual.find((item) => item.year === currentYear) ?? annual[0];
   const average = (key: keyof YearStats) => {
-    if (!yearsWithData.length) return 0;
-    return yearsWithData.reduce((sum, item) => sum + Number(item[key]), 0) / yearsWithData.length;
+    const values=yearsWithData.map(item=>item[key]).filter((v):v is number=>typeof v==='number'&&Number.isFinite(v));
+    return values.length?values.reduce((s,v)=>s+v,0)/values.length:null;
   };
-  const maxNet = Math.max(...annual.map((item) => Math.abs(item.net)), 1);
+  const formatted=(metric:typeof METRICS[number],value:unknown)=>typeof value==='number'?metric.format(value):'—';
+  const maxNet = Math.max(...annual.map(item=>Math.abs(item.net??0)),1);
 
   return (
     <div className="system-shell">
@@ -216,16 +137,16 @@ export default function SystemTracker({ trades, onOpenJournal }: { trades: Track
       <section className="system-summary">
         <article><span>Năm tiêu điểm</span><strong>{focus?.year}</strong><small className={focus?.year === currentYear ? "live" : ""}>{focus?.year === currentYear && <i />}{focus?.year === currentYear ? "Đang cập nhật" : "Theo khoảng đã chọn"}</small></article>
         <article><span>Giao dịch đã ghi</span><strong>{focus?.total ?? 0}</strong><small>Tự đồng bộ từ journal</small></article>
-        <article><span>Win rate</span><strong>{focus?.hasData ? `${focus.winRate.toFixed(1)}%` : "—"}</strong><small>Năm {focus?.year}</small></article>
-        <article><span>Profit Factor</span><strong className="gold-text">{focus?.hasData ? focus.profitFactor >= 99 ? "∞" : focus.profitFactor.toFixed(2) : "—"}</strong><small>Gross profit / gross loss</small></article>
-        <article><span>Kỳ vọng</span><strong className={(focus?.expectedR ?? 0) >= 0 ? "positive-text" : "negative-text"}>{focus?.hasData ? `${focus.expectedR >= 0 ? "+" : ""}${focus.expectedR.toFixed(2)}R` : "—"}</strong><small>Mỗi giao dịch</small></article>
-        <article><span>Lợi nhuận ròng</span><strong className={(focus?.net ?? 0) >= 0 ? "positive-text" : "negative-text"}>{focus?.hasData ? compactCash(focus.net) : "—"}</strong><small>Vốn: {VND.format(capital)}</small></article>
+        <article><span>Win rate</span><strong>{focus?.winRate!=null ? `${focus.winRate.toFixed(1)}%` : "—"}</strong><small>Năm {focus?.year}</small></article>
+        <article><span>Profit Factor</span><strong className="gold-text">{focus?.profitFactor!=null ? focus.profitFactor === Infinity ? "∞" : focus.profitFactor.toFixed(2) : "—"}</strong><small>Gross profit / gross loss</small></article>
+        <article><span>Kỳ vọng</span><strong className={(focus?.expectedR ?? 0) >= 0 ? "positive-text" : "negative-text"}>{focus?.expectedR!=null ? `${focus.expectedR >= 0 ? "+" : ""}${focus.expectedR.toFixed(2)}R` : "—"}</strong><small>R: {focus?.riskCount}/{focus?.total} lệnh · Review: {focus?.reviewedCount}/{focus?.total}</small></article>
+        <article><span>Lợi nhuận ròng</span><strong className={(focus?.net ?? 0) >= 0 ? "positive-text" : "negative-text"}>{focus?.net!=null ? compactCash(focus.net) : "—"}</strong><small>Vốn: {VND.format(capital)}</small></article>
       </section>
 
       <section className="system-panel system-trend-panel">
         <div className="system-panel-head"><div><span>YEARLY PULSE</span><h3>Nhịp hiệu suất dài hạn</h3></div><div className="system-legend"><span><i className="up" /> Lãi</span><span><i className="down" /> Lỗ</span><span><i className="empty" /> Chờ dữ liệu</span></div></div>
         <div className="system-year-bars">
-          {annual.map((item) => <div key={item.year} className={item.hasData ? "has-data" : "future"}><span>{item.hasData ? compactCash(item.net) : "—"}</span><div><i className={item.net >= 0 ? "up" : "down"} style={{ height: item.hasData ? `${Math.max(12, Math.abs(item.net) / maxNet * 100)}%` : "8%" }} /></div><strong>{item.year}</strong><small>{item.hasData ? `${item.total} lệnh` : "Future"}</small></div>)}
+          {annual.map((item) => <div key={item.year} className={item.hasData ? "has-data" : "future"}><span>{item.hasData ? item.net===null?"—":compactCash(item.net) : "—"}</span><div><i className={(item.net??0) >= 0 ? "up" : "down"} style={{ height: item.hasData ? `${Math.max(12, Math.abs(item.net??0) / maxNet * 100)}%` : "8%" }} /></div><strong>{item.year}</strong><small>{item.hasData ? `${item.total} lệnh` : "Future"}</small></div>)}
         </div>
       </section>
 
@@ -234,10 +155,10 @@ export default function SystemTracker({ trades, onOpenJournal }: { trades: Track
         <div className="system-table-wrap">
           <table className="system-table">
             <thead><tr><th>Chỉ số</th>{annual.map((item) => <th key={item.year} className={item.year === currentYear ? "current" : ""}>{item.year}{item.year === currentYear && <small>NOW</small>}</th>)}<th className="average">Avg.</th></tr></thead>
-            <tbody>{METRICS.map((metric) => <tr key={metric.key} className={metric.highlight ? "highlight" : ""}><th title={metric.hint}>{metric.label}<i>i</i></th>{annual.map((item) => <td key={item.year} className={`${item.year === currentYear ? "current" : ""} ${item.hasData && Number(item[metric.key]) < 0 ? "negative" : ""}`}>{item.hasData ? metric.format(Number(item[metric.key])) : "—"}</td>)}<td className="average">{yearsWithData.length ? metric.format(average(metric.key)) : "—"}</td></tr>)}</tbody>
+            <tbody>{METRICS.map((metric) => <tr key={metric.key} className={metric.highlight ? "highlight" : ""}><th title={metric.hint}>{metric.label}<i>i</i></th>{annual.map((item) => <td key={item.year} className={`${item.year === currentYear ? "current" : ""} ${item.hasData && Number(item[metric.key]) < 0 ? "negative" : ""}`}>{item.hasData ? formatted(metric,item[metric.key]) : "—"}</td>)}<td className="average">{yearsWithData.length ? formatted(metric,average(metric.key)) : "—"}</td></tr>)}</tbody>
           </table>
         </div>
-        <div className="system-footnote"><span>PAST PERFORMANCE DOES NOT GUARANTEE FUTURE RESULTS</span><small>Các chỉ số tương lai sẽ được tự động điền khi giao dịch mới được thêm hoặc đồng bộ vào Nhật ký. Dữ liệu hiện tại chỉ phản ánh lệnh đã ghi nhận.</small></div>
+        <div className="system-footnote"><span>PAST PERFORMANCE DOES NOT GUARANTEE FUTURE RESULTS</span><small>R chỉ tính trên lệnh có rủi ro hợp lệ; kỷ luật chỉ tính lệnh đã review. Avg. chỉ lấy các năm có giá trị hữu hạn. Các chỉ số tương lai sẽ được tự động điền khi giao dịch mới được thêm hoặc đồng bộ vào Nhật ký. Dữ liệu hiện tại chỉ phản ánh lệnh đã ghi nhận.</small></div>
       </section>
     </div>
   );

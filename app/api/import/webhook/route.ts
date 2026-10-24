@@ -4,6 +4,8 @@ import { brokerConnections, trades } from "../../../../db/schema";
 import { decryptBrokerSecrets } from "../../../../lib/broker-crypto";
 import { routeError } from "../../../../lib/server-auth";
 
+import { ingestTrades } from "../../../../lib/server-ingestion";
+
 type IncomingTrade = Record<string, unknown>;
 type TradeInsert = typeof trades.$inferInsert;
 
@@ -24,7 +26,14 @@ const MARKETS = new Map<string, string>([
   ["crypto", "Crypto"],
   ["coin", "Crypto"],
 ]);
-const WEBHOOK_PROVIDERS = new Set(["webhook", "vps", "ssi", "tcx", "mt5", "cqg"]);
+const WEBHOOK_PROVIDERS = new Set([
+  "webhook",
+  "vps",
+  "ssi",
+  "tcx",
+  "mt5",
+  "cqg",
+]);
 const PROVIDER_DEFAULTS: Record<string, { market: string; source: string }> = {
   vps: { market: "Chứng khoán", source: "VPS" },
   ssi: { market: "Chứng khoán", source: "SSI FastConnect" },
@@ -42,8 +51,13 @@ function normalizeKey(value: unknown) {
 }
 
 async function sha256Hex(value: string) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(value),
+  );
+  return [...new Uint8Array(digest)]
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 function numberValue(value: unknown) {
@@ -58,7 +72,9 @@ function parseTimestamp(raw: unknown, fallback = Date.now()) {
 }
 
 function parseTime(value: IncomingTrade) {
-  return parseTimestamp(value.closedAt ?? value.closeTime ?? value.time ?? value.date);
+  return parseTimestamp(
+    value.closedAt ?? value.closeTime ?? value.time ?? value.date,
+  );
 }
 
 function sessionFor(timestamp: number) {
@@ -74,19 +90,22 @@ function normalizeTrade(
   fxRate: number,
 ): TradeInsert {
   const externalId = String(
-    value.externalId
-      ?? value.tradeId
-      ?? value.dealId
-      ?? value.executionId
-      ?? value.matchId
-      ?? value.orderId
-      ?? value.orderID
-      ?? value.ticket
-      ?? value.id
-      ?? "",
+    value.externalId ??
+      value.tradeId ??
+      value.dealId ??
+      value.executionId ??
+      value.matchId ??
+      value.orderId ??
+      value.orderID ??
+      value.ticket ??
+      value.id ??
+      "",
   ).trim();
-  const symbol = String(value.symbol ?? value.ticker ?? value.instrument ?? "").trim().toUpperCase();
-  if (!externalId || !symbol) throw new Error("Invalid trade: externalId and symbol are required");
+  const symbol = String(value.symbol ?? value.ticker ?? value.instrument ?? "")
+    .trim()
+    .toUpperCase();
+  if (!externalId || !symbol)
+    throw new Error("Invalid trade: externalId and symbol are required");
   const providerDefault = PROVIDER_DEFAULTS[connection.provider];
   const suppliedMarket = value.market ?? value.assetClass;
   const market = suppliedMarket
@@ -95,15 +114,20 @@ function normalizeTrade(
   if (!market) throw new Error("Invalid trade market");
 
   const timestamp = parseTime(value);
-  const pnl = numberValue(value.pnl ?? value.profit ?? value.realizedPnl) * fxRate;
+  const pnl =
+    numberValue(value.pnl ?? value.profit ?? value.realizedPnl) * fxRate;
   const suppliedRisk = numberValue(value.risk ?? value.plannedRisk) * fxRate;
   const setup = String(value.setup ?? "").trim() || "Chưa phân loại";
   const source = providerDefault?.source ?? `Webhook · ${connection.label}`;
   const openedAt = parseTimestamp(value.openedAt ?? value.openTime, Number.NaN);
-  const closedAt = parseTimestamp(value.closedAt ?? value.closeTime, Number.NaN);
-  const durationMin = Number.isFinite(openedAt) && Number.isFinite(closedAt)
-    ? Math.max(0, Math.round((closedAt - openedAt) / 60000))
-    : Math.max(0, numberValue(value.durationMin));
+  const closedAt = parseTimestamp(
+    value.closedAt ?? value.closeTime,
+    Number.NaN,
+  );
+  const durationMin =
+    Number.isFinite(openedAt) && Number.isFinite(closedAt)
+      ? Math.max(0, Math.round((closedAt - openedAt) / 60000))
+      : Math.max(0, numberValue(value.durationMin));
   const reviewNotes = [
     suppliedRisk > 0 ? "" : "Rủi ro dự kiến cần review",
     setup === "Chưa phân loại" ? "Setup cần phân loại" : "",
@@ -119,19 +143,35 @@ function normalizeTrade(
     accountId: connection.id,
     date: new Date(timestamp).toISOString().slice(0, 10),
     symbol,
-    side: normalizeKey(value.side ?? value.type).includes("sell") || normalizeKey(value.side ?? value.type).includes("ban") ? "Sell" : "Buy",
+    side:
+      normalizeKey(value.side ?? value.type).includes("sell") ||
+      normalizeKey(value.side ?? value.type).includes("ban")
+        ? "Sell"
+        : "Buy",
     session: String(value.session ?? sessionFor(timestamp)),
     setup,
     timeframe: String(value.timeframe ?? "Auto"),
-    risk: suppliedRisk > 0 ? suppliedRisk : Math.max(Math.abs(pnl), 1),
+    risk: suppliedRisk,
+    riskKnown: suppliedRisk > 0,
+    rawPayloadJson: JSON.stringify(value),
+    openedAt: Number.isFinite(openedAt)
+      ? new Date(openedAt).toISOString()
+      : null,
+    closedAt: new Date(timestamp).toISOString(),
     pnl,
-    fees: Math.abs(numberValue(value.fees ?? value.fee ?? value.commission) * fxRate),
-    quantity: Math.abs(numberValue(value.quantity ?? value.qty ?? value.volume)),
+    fees: Math.abs(
+      numberValue(value.fees ?? value.fee ?? value.commission) * fxRate,
+    ),
+    quantity: Math.abs(
+      numberValue(value.quantity ?? value.qty ?? value.volume),
+    ),
     entryPrice: numberValue(value.entryPrice ?? value.openPrice ?? value.price),
     exitPrice: numberValue(value.exitPrice ?? value.closePrice ?? value.price),
     discipline: Math.max(0, Math.min(100, numberValue(value.discipline))),
     psychology: String(value.psychology ?? "Chưa review"),
-    note: [String(value.note ?? "").trim(), ...reviewNotes].filter(Boolean).join(" · "),
+    note: [String(value.note ?? "").trim(), ...reviewNotes]
+      .filter(Boolean)
+      .join(" · "),
     durationMin,
   };
 }
@@ -139,7 +179,9 @@ function normalizeTrade(
 export async function POST(request: Request) {
   try {
     const authorization = request.headers.get("authorization") ?? "";
-    const token = authorization.startsWith("Bearer ") ? authorization.slice(7).trim() : "";
+    const token = authorization.startsWith("Bearer ")
+      ? authorization.slice(7).trim()
+      : "";
     if (!token) return new Response("Unauthorized", { status: 401 });
 
     const tokenHash = await sha256Hex(token);
@@ -149,12 +191,16 @@ export async function POST(request: Request) {
       .where(eq(brokerConnections.webhookTokenHash, tokenHash))
       .limit(1);
     if (
-      !connection
-      || !WEBHOOK_PROVIDERS.has(connection.provider)
-      || (connection.provider !== "webhook" && connection.accountType !== "push")
-    ) return new Response("Unauthorized", { status: 401 });
+      !connection ||
+      !WEBHOOK_PROVIDERS.has(connection.provider) ||
+      (connection.provider !== "webhook" && connection.accountType !== "push")
+    )
+      return new Response("Unauthorized", { status: 401 });
 
-    const body = (await request.json()) as { trade?: IncomingTrade; trades?: IncomingTrade[] } | IncomingTrade[] | IncomingTrade;
+    const body = (await request.json()) as
+      | { trade?: IncomingTrade; trades?: IncomingTrade[] }
+      | IncomingTrade[]
+      | IncomingTrade;
     const input = Array.isArray(body)
       ? body
       : Array.isArray(body.trades)
@@ -162,19 +208,19 @@ export async function POST(request: Request) {
         : body.trade
           ? [body.trade]
           : [body];
-    if (!input.length || input.length > 500) throw new Error("Invalid trade batch; use 1 to 500 rows");
-    const secrets = await decryptBrokerSecrets(connection.credentialsCiphertext);
+    if (!input.length || input.length > 500)
+      throw new Error("Invalid trade batch; use 1 to 500 rows");
+    const secrets = await decryptBrokerSecrets(
+      connection.credentialsCiphertext,
+    );
     const fxRate = ["mt5", "cqg"].includes(connection.provider)
       ? Math.max(1, Number(secrets.fxRate) || 1)
       : 1;
-    const rows = input.map((trade) => normalizeTrade(trade, connection, fxRate));
-    const inserted = await getDb().insert(trades).values(rows).onConflictDoNothing().returning();
-    const now = new Date().toISOString();
-    await getDb()
-      .update(brokerConnections)
-      .set({ status: "connected", lastSyncAt: now, updatedAt: now })
-      .where(eq(brokerConnections.id, connection.id));
-    return Response.json({ imported: inserted.length, scanned: rows.length, lastSyncAt: now });
+    const rows = input.map((trade) =>
+      normalizeTrade(trade, connection, fxRate),
+    );
+    const result = await ingestTrades(rows, "WEBHOOK", { id: connection.id });
+    return Response.json({ ...result, lastSyncAt: new Date().toISOString() });
   } catch (error) {
     return routeError(error);
   }
