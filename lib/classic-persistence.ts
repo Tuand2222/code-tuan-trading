@@ -73,7 +73,7 @@ export async function flushQueue(owner: string, onChange?: () => void) {
       if (!response.ok) {
         if (response.status === 409) {
           const body = await response.clone().json().catch(() => null);
-          if (body?.code === "ACCOUNT_CHANGED") break;
+          if (body && typeof body === "object" && "code" in body && body.code === "ACCOUNT_CHANGED") break;
         }
         await db().queue.update(item.id, {
           status: "conflict",
