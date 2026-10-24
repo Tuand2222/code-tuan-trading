@@ -19,9 +19,9 @@ test('FIFO mapping, exact fees, duplicate import and rollback survive reload', a
   await create.getByLabel('Tên sổ', { exact: true }).fill('FIFO USDT');
   await create.getByLabel('Đơn vị tiền của sổ', { exact: true }).selectOption('USDT');
   await create.getByRole('button', { name: 'Tạo sổ giao dịch', exact: true }).click();
-  await expect(page).toHaveURL(/#journal/);
+  await expect(page).toHaveURL(/#evidence/);
   const id = await page.getByLabel('Sổ nhật ký', { exact: true }).inputValue();
-  await page.goto('/#connections?journal=' + encodeURIComponent(id));
+  await page.goto('/#settings?journal=' + encodeURIComponent(id));
   const csv =
     'Trade ID,Symbol,Date(UTC),Side,Price,Quantity,Fee,Fee Coin\n9,BTCUSDT,2026-01-01 01:00:00,BUY,10,2,0.2,USDT\n10,BTCUSDT,2026-01-02 01:00:00,SELL,15,1,0.1,USDT';
   const upload = async () => {
@@ -44,27 +44,28 @@ test('FIFO mapping, exact fees, duplicate import and rollback survive reload', a
   await page.getByText(/fills.csv · 2 mới/).click();
   await page.getByRole('button', { name: 'Hoàn tác FIFO fills.csv', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('Đã hoàn tác FIFO.');
-  await page.goto('/#journal?journal=' + encodeURIComponent(id));
+  await page.goto('/#evidence?journal=' + encodeURIComponent(id));
   await expect(page.locator('[data-trade-id]')).toHaveCount(0);
 });
-test('global R and holding units persist across the full workspace and calendar', async ({
-  page,
-}) => {
+test('global quant units persist while legacy cash dashboards are removed', async ({ page }) => {
   await seed(page);
-  await page.goto('/#workspace');
-  await page.getByLabel('Đơn vị hiển thị toàn sổ', { exact: true }).selectOption('R');
-  await expect(page.getByLabel('Đơn vị hiển thị toàn sổ', { exact: true })).toBeEnabled();
-  await page.getByLabel('Thời gian giữ lệnh toàn sổ', { exact: true }).selectOption('minutes');
-  await expect(page.getByLabel('Thời gian giữ lệnh toàn sổ', { exact: true })).toBeEnabled();
-  await page.goto('/#calendar');
-  await expect(page.getByLabel('Đơn vị hiển thị toàn sổ', { exact: true })).toHaveValue('R');
-  await page.getByLabel('Tháng', { exact: true }).fill('2026-10');
-  await expect(page.locator('.calendar-table')).toContainText('R');
+  await page.goto('/#overview');
+  await page.getByRole('button', { name: '⚙ Cài đặt V6', exact: true }).click();
+  await page.getByLabel('Đơn vị toàn trang', { exact: true }).selectOption('money');
   await page.reload();
-  await expect(page.getByLabel('Thời gian giữ lệnh toàn sổ', { exact: true })).toHaveValue(
-    'minutes',
+  await page.getByRole('button', { name: '⚙ Cài đặt V6', exact: true }).click();
+  await expect(page.getByLabel('Đơn vị toàn trang', { exact: true })).toHaveValue('money');
+  await page.goto('/#workspace');
+  await expect(page.getByRole('link', { name: 'Mở chức năng tại Classic ↗' })).toHaveAttribute(
+    'href',
+    '/classic#analytics',
   );
+  await expect(page.getByTestId('kpi-card')).toHaveCount(0);
+  await page.goto('/#evidence');
+  await expect(page.locator('[data-trade-id]')).toHaveCount(30);
+  await expect(page.getByTestId('source-reconciliation')).toContainText('+3.302.290 đ');
 });
+
 test('planned images, explicit missed R and transfer to real journal preserve the plan', async ({
   page,
 }) => {
@@ -95,7 +96,7 @@ test('planned images, explicit missed R and transfer to real journal preserve th
   await dialog.getByRole('button', { name: 'Lưu giao dịch', exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await expect(page.getByRole('heading', { name: /PLAN · .* · taken/ })).toBeVisible();
-  await page.goto('/#journal');
+  await page.goto('/#evidence');
   await expect(page.locator('[data-trade-id]').filter({ hasText: 'PLAN' })).toHaveCount(1);
 });
 test('valuation runs inside the consolidated app with accessible local interface', async ({
@@ -108,7 +109,11 @@ test('valuation runs inside the consolidated app with accessible local interface
       external.push(r.url());
   });
   await page.goto('/#valuation');
-  await expect(page.locator('.vlab-shell')).toBeVisible();
+  await expect(page.locator('.vlab-shell')).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Mở chức năng tại Classic ↗' })).toHaveAttribute(
+    'href',
+    '/classic#valuation',
+  );
   const audit = await new AxeBuilder({ page }).analyze();
   expect(audit.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? ''))).toEqual(
     [],

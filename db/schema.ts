@@ -8,6 +8,70 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
+export const journalCloudHeads = sqliteTable("journal_cloud_heads", {
+  ownerId: text("owner_id").primaryKey(),
+  revision: integer("revision").notNull().default(0),
+  mutationId: text("mutation_id").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+export const classicArchiveQueue = sqliteTable(
+  "classic_archive_queue",
+  {
+    ownerId: text("owner_id").notNull(),
+    recordKey: text("record_key").notNull(),
+    token: text("token").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (t) => [
+    uniqueIndex("classic_archive_queue_owner_key").on(t.ownerId, t.recordKey),
+    index("classic_archive_queue_order").on(
+      t.ownerId,
+      t.updatedAt,
+      t.recordKey,
+    ),
+  ],
+);
+export const journalCloudRecords = sqliteTable(
+  "journal_cloud_records",
+  {
+    ownerId: text("owner_id").notNull(),
+    recordKey: text("record_key").notNull(),
+    collection: text("collection").notNull(),
+    recordId: text("record_id").notNull(),
+    period: text("period"),
+    revision: integer("revision").notNull(),
+    hash: text("hash").notNull(),
+    deleted: integer("deleted").notNull().default(0),
+    objectKey: text("object_key").notNull(),
+    sizeBytes: integer("size_bytes").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (t) => [
+    uniqueIndex("journal_cloud_owner_key").on(t.ownerId, t.recordKey),
+    index("journal_cloud_owner_period").on(t.ownerId, t.period, t.recordKey),
+  ],
+);
+export const journalCloudVersions = sqliteTable(
+  "journal_cloud_versions",
+  {
+    ownerId: text("owner_id").notNull(),
+    recordKey: text("record_key").notNull(),
+    revision: integer("revision").notNull(),
+    hash: text("hash").notNull(),
+    deleted: integer("deleted").notNull().default(0),
+    objectKey: text("object_key").notNull(),
+    sizeBytes: integer("size_bytes").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (t) => [
+    uniqueIndex("journal_cloud_version_unique").on(
+      t.ownerId,
+      t.recordKey,
+      t.revision,
+    ),
+  ],
+);
+
 export const trades = sqliteTable(
   "trades",
   {

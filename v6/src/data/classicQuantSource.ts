@@ -1,9 +1,11 @@
+import { fetchAllTrades } from '../../../lib/read-trades';
 import { z } from 'zod';
 import type { QuantObservation } from '../core/quantLab';
 import { D, dec } from '../core/money';
 const finite = z.number().finite();
-const receipt = z.object({
+export const receipt = z.object({
   id: z.string().min(1).max(256),
+  userId: z.string().optional(),
   symbol: z.string().min(1).max(80),
   date: z.iso.date(),
   market: z.string().optional(),
@@ -20,6 +22,11 @@ const receipt = z.object({
   mae: finite.nullish(),
   mfe: finite.nullish(),
   recordKind: z.string().optional(),
+  quantity: finite.optional(),
+  multiplier: finite.optional(),
+  version: z.number().int().optional(),
+  note: z.string().optional(),
+  side: z.string().optional(),
 });
 const markets: Record<string, string> = {
   'Chứng khoán': 'stocks',
@@ -71,6 +78,8 @@ export function classicObservations(input: unknown[]) {
         entryTimeKnown: !!t.openedAt,
         exitTimeKnown: !!t.closedAt,
         exitDate: t.date,
+        quantity: t.quantity && t.quantity > 0 ? String(t.quantity) : undefined,
+        multiplier: t.multiplier && t.multiplier > 0 ? String(t.multiplier) : undefined,
       },
     ];
   });
@@ -91,12 +100,13 @@ export async function readClassicQuantSource() {
   const user = session.map((s) => s?.user?.id).find(Boolean);
   if (user) {
     try {
-      const r = await fetch('/api/trades', { cache: 'no-store' });
+      const r = await fetchAllTrades({ headers: { 'X-Journal-Owner': user } });
       if (r.ok) {
         const payload = (await r.json()) as { trades?: unknown[] };
         if (Array.isArray(payload.trades) && payload.trades.length)
           return {
             ...classicObservations(payload.trades),
+            receipts: payload.trades.map((r) => ({ ...(r as object), userId: user })),
             source: 'Classic · tài khoản đang đăng nhập',
             isDemo: false,
           };
@@ -107,11 +117,18 @@ export async function readClassicQuantSource() {
   }
   const raw = localStorage.getItem('tuan-trader-trades' + (user ? ':' + user : ''));
   if (!raw)
-    return { observations: [], skipped: 0, source: 'Classic · trên thiết bị', isDemo: false };
+    return {
+      observations: [],
+      receipts: [] as unknown[],
+      skipped: 0,
+      source: 'Classic · trên thiết bị',
+      isDemo: false,
+    };
   const input: unknown = JSON.parse(raw);
   if (!Array.isArray(input) || input.length > 100000) throw Error('Dữ liệu Classic không hợp lệ.');
   return {
     ...classicObservations(input),
+    receipts: input,
     source: 'Classic · bản lưu trên thiết bị',
     isDemo: localStorage.getItem('tuan-trader-demo-mode-v1' + (user ? ':' + user : '')) === 'true',
   };

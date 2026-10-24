@@ -11,7 +11,9 @@ export function QuantPanel({
   count,
   onInspect,
   children,
+  unit,
 }: {
+  unit?: string;
   title: string;
   help: QuantHelpKey;
   count: string;
@@ -23,7 +25,7 @@ export function QuantPanel({
       <header>
         <h2>
           {title}
-          <QuantHelp id={help} />
+          <QuantHelp id={help} unit={unit} />
         </h2>
         {onInspect ? (
           <button className="quant-count" onClick={onInspect}>
@@ -86,13 +88,14 @@ export function QuantHistogram({
   const max = Math.max(1, ...bins.map((b) => Math.max(b.ids.length, b.normal)));
   return (
     <QuantPanel
-      title="Phân phối kết quả R"
+      unit={report.unitLabel}
+      title={'Phân phối kết quả ' + report.unitLabel}
       help="distribution"
       count={stats.n + ' lệnh'}
       onInspect={() =>
         inspect(
           report.rows.filter((r) => r.r !== null).map((r) => r.id),
-          'Phân phối kết quả R',
+          'Phân phối kết quả ' + report.unitLabel,
         )
       }
     >
@@ -105,7 +108,7 @@ export function QuantHistogram({
             max={max}
             left={bins[0].from}
             right={bins.at(-1)!.to}
-            x="Kết quả (R)"
+            x={'Kết quả (' + report.unitLabel + ')'}
             y="Số lệnh"
           >
             {bins.map((b, i) => (
@@ -116,10 +119,12 @@ export function QuantHistogram({
                 y={100 - (b.ids.length / max) * 100 + '%'}
                 height={(b.ids.length / max) * 100 + '%'}
                 fill={(b.from + b.to) / 2 < 0 ? 'var(--q-negative)' : 'var(--q-positive)'}
-                onClick={() => inspect(b.ids, qNumber(b.from) + ' đến ' + qNumber(b.to) + ' R')}
+                onClick={() =>
+                  inspect(b.ids, qNumber(b.from) + ' đến ' + qNumber(b.to) + ' ' + report.unitLabel)
+                }
               >
                 <title>
-                  {qNumber(b.from)}…{qNumber(b.to)} R · {b.ids.length} lệnh
+                  {qNumber(b.from)}…{qNumber(b.to)} {report.unitLabel} · {b.ids.length} lệnh
                 </title>
               </rect>
             ))}
@@ -160,7 +165,9 @@ export function QuantHistogram({
                     qNumber(b.from, 1) +
                     '…' +
                     qNumber(b.to, 1) +
-                    ' R · Xem lệnh từ ' +
+                    ' ' +
+                    report.unitLabel +
+                    ' · Xem lệnh từ ' +
                     qNumber(b.from) +
                     ' đến ' +
                     qNumber(b.to)
@@ -186,12 +193,13 @@ export function QuantScatter({
 }) {
   const rows = report.excursions,
     getX = (r: (typeof rows)[number]) => (kind === 'mfe' ? r.mfeR! : r.maeR!);
-  const maxX = Math.max(1, ...rows.map(getX)),
-    minY = Math.min(0, ...rows.map((r) => r.r!)),
-    maxY = Math.max(1, ...rows.map((r) => r.r!));
+  const maxX = rows.reduce((n, r) => Math.max(n, getX(r)), 1),
+    minY = rows.reduce((n, r) => Math.min(n, r.r!), 0),
+    maxY = rows.reduce((n, r) => Math.max(n, r.r!), 1);
   const shown = rows.filter((_, i) => i % Math.max(1, Math.ceil(rows.length / 900)) === 0);
   return (
     <QuantPanel
+      unit={report.unitLabel}
       title={kind === 'mfe' ? 'Hiệu suất chốt lời' : 'Chịu nhiệt của lệnh'}
       help={kind}
       count={rows.length + '/' + report.rows.length + ' lệnh'}
@@ -214,8 +222,8 @@ export function QuantScatter({
             max={maxY}
             left={0}
             right={maxX}
-            x={kind.toUpperCase() + ' (R)'}
-            y="R thực hiện"
+            x={kind.toUpperCase() + ' (' + report.unitLabel + ')'}
+            y={report.unitLabel + ' thực hiện'}
           >
             {kind === 'mfe' && (
               <line
@@ -237,7 +245,8 @@ export function QuantScatter({
                 onClick={() => inspect([r.id], r.symbol)}
               >
                 <title>
-                  {r.symbol} · {kind.toUpperCase()} {qNumber(getX(r))}R · {qNumber(r.r)}R
+                  {r.symbol} · {kind.toUpperCase()} {qNumber(getX(r))} {report.unitLabel} ·{' '}
+                  {qNumber(r.r)} {report.unitLabel}
                 </title>
               </circle>
             ))}
@@ -266,6 +275,7 @@ export function QuantHeatmap({
   const cells = new Map(report.heat.map((c) => [c.weekday + ':' + c.minute, c]));
   return (
     <QuantPanel
+      unit={report.unitLabel}
       title="Kỳ vọng theo thời điểm"
       help="heat"
       count={report.heat.reduce((n, c) => n + c.ids.length, 0) + ' lệnh có giờ'}
@@ -275,7 +285,9 @@ export function QuantHeatmap({
       ) : (
         <div className="quant-heat-scroll">
           <table className="quant-heat">
-            <caption>Khung {minutes} phút · mỗi ô: kỳ vọng R / số lệnh</caption>
+            <caption>
+              Khung {minutes} phút · mỗi ô: kỳ vọng {report.unitLabel} / số lệnh
+            </caption>
             <thead>
               <tr>
                 <th>Giờ</th>
@@ -337,8 +349,8 @@ export function QuantLine({
       ? report.curve.map((r) => (r.dd === null ? null : -r.dd))
       : report.rolling.map((r) => r.sqn);
   const known = values.filter((x): x is number => x !== null),
-    min = Math.min(0, ...known),
-    max = Math.max(1, ...known);
+    min = known.reduce((n, v) => Math.min(n, v), 0),
+    max = known.reduce((n, v) => Math.max(n, v), 1);
   const segments: string[] = [];
   let current = '';
   values.forEach((v, i) => {
@@ -353,7 +365,8 @@ export function QuantLine({
   if (current) segments.push(current);
   return (
     <QuantPanel
-      title={kind === 'dd' ? 'Sụt giảm theo R' : 'SQN trượt 30 lệnh'}
+      unit={report.unitLabel}
+      title={kind === 'dd' ? 'Sụt giảm theo ' + report.unitLabel : 'SQN trượt 30 lệnh'}
       help={kind === 'dd' ? 'dd' : 'rolling'}
       count={values.length + ' lệnh'}
       onInspect={() =>
@@ -372,7 +385,7 @@ export function QuantLine({
           left={1}
           right={values.length}
           x="Thứ tự lệnh đóng"
-          y={kind === 'dd' ? 'Drawdown (R)' : 'SQN'}
+          y={kind === 'dd' ? 'Drawdown (' + report.unitLabel + ')' : 'SQN'}
         >
           <svg
             viewBox="0 0 100 100"
@@ -395,7 +408,9 @@ export function QuantLine({
         </Axes>
       )}
       {kind === 'dd' && !report.complete && (
-        <p className="quant-footnote">Đường dừng tại lệnh thiếu R đầu tiên.</p>
+        <p className="quant-footnote">
+          Đường dừng tại lệnh thiếu dữ liệu quy đổi hoặc giờ đóng đầu tiên.
+        </p>
       )}
     </QuantPanel>
   );

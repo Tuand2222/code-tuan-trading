@@ -16,6 +16,17 @@ export const quantSettingsSchema = z.object({
   baselineMode: z.enum(['money', 'percent']).default('money'),
   baseline: z.number().min(0).max(1e15).default(0),
   riskPercent: z.number().min(0).max(100).default(1),
+  unit: z.enum(['R', 'money', 'percent', 'pips', 'ticks']).default('R'),
+  instruments: z
+    .record(
+      z.string(),
+      z.object({
+        pipSize: z.number().positive().optional(),
+        tickSize: z.number().positive().optional(),
+        multiplier: z.number().positive().optional(),
+      }),
+    )
+    .default({}),
 });
 export type QuantSettings = z.infer<typeof quantSettingsSchema>;
 export const defaultQuantSettings = () => quantSettingsSchema.parse({});
@@ -34,6 +45,8 @@ export interface QuantObservation {
   entryTimeKnown?: boolean;
   exitTimeKnown?: boolean;
   exitDate?: string;
+  quantity?: string;
+  multiplier?: string;
 }
 export function observeTrades(trades: Trade[]): QuantObservation[] {
   return trades
@@ -74,6 +87,10 @@ export function observeTrades(trades: Trade[]): QuantObservation[] {
           risk: f.risk ?? null,
           mfe,
           mae,
+          quantity: dec(
+            t.legs.filter((l) => l.kind === 'out').reduce((n, l) => n.plus(l.quantity), D('0')),
+          ),
+          multiplier: t.multiplier ?? '1',
         },
       ];
     });
@@ -128,7 +145,7 @@ export function sqnLabel(value: number | null, n: number) {
             ? 'Xuất sắc'
             : 'Cần kiểm tra mẫu';
 }
-export function quantReport(
+function rReport(
   input: QuantObservation[],
   settings: QuantSettings,
   timezone: string,
@@ -290,6 +307,93 @@ export function quantReport(
     skew,
     kurtosis,
     simulated: prefs.frictionR > 0 || (prefs.assumeMissingRisk && rows.some((r) => r.assumed)),
+  };
+}
+export function quantReport(
+  input: QuantObservation[],
+  settings: QuantSettings,
+  timezone: string,
+  scope: { from?: string; to?: string } = {},
+) {
+  const s = quantSettingsSchema.parse(settings),
+    base = rReport(input, s, timezone, scope);
+  const unitLabel = { R: 'R', money: 'tiền', percent: '% vốn đầu', pips: 'Pips', ticks: 'Ticks' }[
+    s.unit
+  ];
+  if (s.unit === 'R')
+    return {
+      ...base,
+      unitLabel,
+      rStats: base.stats,
+      missingUnit: base.rows.filter((r) => r.r === null).length,
+    };
+  const baseById = new Map(base.rows.map((r) => [r.id, r]));
+  const mapped = input.map((o) => {
+    const cfg = s.instruments[o.symbol.toUpperCase()];
+    const step = s.unit === 'pips' ? cfg?.pipSize : cfg?.tickSize;
+    const denominator =
+      s.unit === 'money'
+        ? D('1')
+        : s.unit === 'percent'
+          ? s.capital > 0
+            ? D(String(s.capital)).div(100)
+            : null
+          : step && o.quantity && D(o.quantity).gt(0) && (o.multiplier || cfg?.multiplier)
+            ? D(o.quantity)
+                .mul(o.multiplier ?? cfg!.multiplier!)
+                .mul(step)
+            : null;
+    const original = baseById.get(o.id);
+    const friction =
+      s.frictionR > 0 && original?.riskUsed ? D(original.riskUsed).mul(s.frictionR) : D('0');
+    const knownFriction = s.frictionR === 0 || !!original?.riskUsed;
+    const convert = (value: string | null, charge = false) =>
+      value !== null && denominator && knownFriction
+        ? dec(
+            D(value)
+              .minus(charge ? friction : 0)
+              .div(denominator),
+          )
+        : null;
+    return {
+      ...o,
+      gross: convert(o.gross, true),
+      net: convert(o.net, true),
+      mfe: convert(o.mfe),
+      mae: convert(o.mae),
+      risk: '1',
+    };
+  });
+  const display = rReport(
+    mapped,
+    { ...s, frictionR: 0, assumeMissingRisk: false },
+    timezone,
+    scope,
+  );
+  const originalById = new Map(base.rows.map((r) => [r.id, r]));
+  return {
+    ...display,
+    unitLabel,
+    rStats: base.stats,
+    rolling: base.rolling,
+    stats: {
+      ...display.stats,
+      sqn: base.stats.sqn,
+      sqnN: base.stats.sqnN,
+      sharpe: base.stats.sharpe,
+      sortino: base.stats.sortino,
+    },
+    rows: display.rows.map((r) => ({
+      ...r,
+      risk: originalById.get(r.id)?.risk ?? null,
+      riskUsed: originalById.get(r.id)?.riskUsed ?? null,
+      assumed: originalById.get(r.id)?.assumed ?? false,
+    })),
+    missingUnit: display.rows.filter((r) => r.r === null).length,
+    missingRisk: base.missingRisk,
+    missingCosts: base.missingCosts,
+    assumed: base.assumed,
+    simulated: base.simulated,
   };
 }
 export type QuantReport = ReturnType<typeof quantReport>;

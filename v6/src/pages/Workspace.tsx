@@ -1,5 +1,4 @@
 import { readCalculation, cacheCalculation } from '../data/calculationCache';
-import type { classicReport } from '../core/classic';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { LedgerProvider, useLedger } from '../app/LedgerContext';
 import type { Trade } from '../data/schema';
@@ -14,32 +13,19 @@ import type { analyze } from '../core/analyze';
 import type { journalAlerts, health } from '../core/journalSelectors';
 import { FilterBar } from '../ui/FilterBar';
 import { StateFrame } from '../ui/StateFrame';
-import { KpiCard } from '../ui/KpiCard';
 import { TradeForm } from '../ui/TradeForm';
 import { TradeTable, TradeDrawer } from '../ui/TradeTable';
-import { CalendarPage } from './CalendarPage';
-import { ReviewPage } from './ReviewPage';
-import { Playbook } from './Playbook';
 import { Settings } from './Settings';
-import { AlertsPage, RiskPage, EdgePage, RollingPage } from './AnalysisPages';
-import { ClassicProvider } from '../ui/classic/LedgerContext';
-import { formatDate } from '../ui/format';
+import { AlertsPage, EdgePage } from './AnalysisPages';
+import CloudArchive, { CloudAutoSync, CloudOwnerGuard } from './CloudArchive';
 import Debug from './Debug';
 import vi from '../i18n/vi.json';
 import { CommandPalette } from '../ui/CommandPalette';
 import { Welcome } from './Welcome';
-import { DisplayControls } from '../ui/DisplayControls';
-import { FifoImport } from './FifoImport';
 import { AutomaticBackup } from '../ui/DirectoryBackup';
 import { AppInstall } from '../ui/AppInstall';
-import type { displayMetric } from '../core/displayMetrics';
-const Valuation = lazy(() => import('./CompanyValuation'));
-const EquityChart = lazy(() =>
-  import('../ui/EquityChart').then((m) => ({ default: m.EquityChart })),
-);
+import { formatValue } from '../ui/format';
 const QuantOverview = lazy(() => import('./QuantOverview'));
-const OldMetrix = lazy(() => import('../ui/classic/TradingMetrix'));
-const OldSystem = lazy(() => import('../ui/classic/SystemTracker'));
 const AdvancedWorkspace = lazy(() =>
   import('./AdvancedWorkspace').then((m) => ({ default: m.AdvancedWorkspace })),
 );
@@ -47,8 +33,11 @@ const t = vi.s3;
 export default function Workspace() {
   return (
     <LedgerProvider>
-      <AutomaticBackup />
-      <Application />
+      <CloudOwnerGuard>
+        <AutomaticBackup />
+        <CloudAutoSync />
+        <Application />
+      </CloudOwnerGuard>
     </LedgerProvider>
   );
 }
@@ -58,9 +47,7 @@ function Application() {
     [menu, setMenu] = useState(false),
     [advancedFilters, setAdvancedFilters] = useState(false),
     [form, setForm] = useState<{ trade?: Trade; revision: number }>(),
-    [detail, setDetail] = useState(''),
-    [mode, setMode] = useState<'classic' | 'extended'>('classic'),
-    [holding, setHolding] = useState<'minutes' | 'hours' | 'days'>('hours');
+    [detail, setDetail] = useState('');
   const journal =
     data.journals.find((j) => j.id === route.filters.journal && !j.archivedAt) ??
     data.journals.find((j) => !j.archivedAt);
@@ -71,13 +58,9 @@ function Application() {
     key: string;
     scope: string;
     result: ReturnType<typeof analyze>;
-    report: ReturnType<typeof classicReport>;
-    rollups: { market: string; total: string | null; net: string | null }[];
     alerts: ReturnType<typeof journalAlerts>;
     health: ReturnType<typeof health>;
     compact: boolean;
-    displayMetrics: Record<string, ReturnType<typeof displayMetric>>;
-    projections: Record<'money' | 'percent' | 'R', ReturnType<typeof analyze>['curve']>;
   }>();
   const [calculationError, setCalculationError] = useState('');
   const result =
@@ -165,7 +148,7 @@ function Application() {
         return;
       if (e.key.toLowerCase() === 'n') {
         e.preventDefault();
-        setForm({ revision });
+        location.href = '/classic#journal';
       }
       if (e.key === '/') {
         e.preventDefault();
@@ -196,7 +179,7 @@ function Application() {
                     : route.page === 'edge'
                       ? t.edge
                       : route.page === 'risk'
-                        ? vi.shell.nav[2].links[3][0]
+                        ? 'Rủi ro'
                         : route.page === 'debug'
                           ? vi.shell.backup
                           : route.page === 'glossary'
@@ -231,49 +214,10 @@ function Application() {
       </div>
     </>
   );
-  const cards =
-    result && journal ? (
-      <>
-        <div className="section-title">
-          <h2>{vi.shell.analysis}</h2>
-          <label>
-            {vi.shell.timeUnit}
-            <select
-              aria-label={vi.shell.timeUnit}
-              value={holding}
-              onChange={(e) => setHolding(e.target.value as typeof holding)}
-            >
-              <option value="hours">Giờ</option>
-              <option value="minutes">Phút</option>
-              <option value="days">Ngày</option>
-            </select>
-          </label>
-        </div>
-        <div className="kpi-grid">
-          {Object.entries(result.metrics).map(([id, metric]) => (
-            <KpiCard
-              key={id}
-              id={id as keyof typeof vi.metricHelp}
-              metric={metric}
-              currency={journal.currency}
-              demo={journal.isDemo}
-              minSample={journal.settings.minSample}
-              holding={holding}
-            />
-          ))}
-        </div>
-      </>
-    ) : null;
-  const chart =
-    journal && computed?.key === key ? (
-      <Suspense fallback={<p>Đang mở biểu đồ…</p>}>
-        <DeferredEquity projections={computed.projections} journal={journal} />
-      </Suspense>
-    ) : null;
   let body = loading ? (
     <StateFrame kind="loading" />
   ) : !journal ? (
-    <Settings onCreated={(id) => update({ ...filters, journal: id }, 'journal')} />
+    <Settings onCreated={(id) => update({ ...filters, journal: id }, 'evidence')} />
   ) : !result ? (
     <StateFrame kind="loading" />
   ) : (
@@ -281,7 +225,6 @@ function Application() {
       {(route.page !== 'overview' || advancedFilters) && (
         <FilterBar data={data} value={filters} onChange={update} />
       )}
-      {route.page !== 'overview' && <DisplayControls journal={journal} />}
       {route.page === 'overview' ? (
         <QuantOverview
           key={journal.id}
@@ -302,37 +245,29 @@ function Application() {
           scope={{ from: filters.from || undefined, to: filters.to || undefined }}
           base={computed?.key === key ? result : undefined}
         />
-      ) : route.page === 'valuation' ? (
-        <Valuation />
-      ) : route.page === 'connections' ? (
-        <FifoImport journal={journal} />
-      ) : route.page === 'journal' ? (
-        <TradeTable
-          trades={trades.filter((trade) => {
-            const fact = result.closed.find((f) => f.id === trade.id);
-            return (
-              fact || trade.status === 'open' || result.events.some((e) => e.tradeId === trade.id)
-            );
-          })}
-          journal={journal}
-          onOpen={setDetail}
-          onEdit={openForm}
-        />
-      ) : route.page === 'calendar' ? (
-        <CalendarPage
-          journal={journal}
-          trades={trades}
-          scope={{ from: filters.from || undefined, to: filters.to || undefined }}
-          onDay={(date) => update({ ...filters, from: date, to: date }, 'journal')}
-        />
-      ) : route.page === 'review' ? (
-        <ReviewPage journal={journal} result={result} onOpen={setDetail} />
-      ) : route.page === 'playbook' ? (
-        <Playbook journal={journal} />
+      ) : route.page === 'evidence' ? (
+        <>
+          <p data-testid="source-reconciliation">
+            Đối chiếu nguồn V6: {result.closed.length} lệnh đóng · Net{' '}
+            {formatValue(result.metrics.net.value, 'money', journal.currency, true)}. Đây là dữ liệu
+            phân tích được giữ lại từ V6 trước đây.
+          </p>
+          <TradeTable
+            trades={trades.filter((trade) => {
+              const fact = result.closed.find((f) => f.id === trade.id);
+              return (
+                fact || trade.status === 'open' || result.events.some((e) => e.tradeId === trade.id)
+              );
+            })}
+            journal={journal}
+            onOpen={setDetail}
+            onEdit={openForm}
+          />
+        </>
       ) : route.page === 'settings' ? (
         <Settings
           journal={journal}
-          onCreated={(id) => update({ ...filters, journal: id }, 'journal')}
+          onCreated={(id) => update({ ...filters, journal: id }, 'evidence')}
         />
       ) : route.page === 'alerts' ? (
         <AlertsPage alerts={alerts} onOpen={setDetail} />
@@ -343,75 +278,44 @@ function Application() {
             {t.riskMissing}: {status?.missingRisk} · {t.costCoverage}: {status?.knownCosts}/
             {status?.total} · {t.relink}: {status?.relink}
           </p>
-          <button onClick={() => go('journal')}>{t.healthOpen}</button>
+          <button onClick={() => go('evidence')}>{t.healthOpen}</button>
         </section>
       ) : route.page === 'edge' ? (
         <EdgePage journal={journal} result={result} />
-      ) : route.page === 'risk' ? (
-        <>
-          <RiskPage journal={journal} result={result} />
-          {chart}
-        </>
-      ) : route.page === 'metrix' || route.page === 'system' ? (
-        <>
-          <section className="panel">
-            <div className="chips">
-              <button aria-pressed={mode === 'classic'} onClick={() => setMode('classic')}>
-                {t.classic}
-              </button>
-              <button aria-pressed={mode === 'extended'} onClick={() => setMode('extended')}>
-                {t.extended}
-              </button>
-            </div>
-            <p>{t.sameLedger}</p>
-          </section>
-          {mode === 'classic' && journal.currency === 'VND' ? (
-            <ClassicProvider source={{ journal, trades: data.trades }} filters={filters}>
-              <div className="classic-scope">
-                {route.page === 'metrix' ? (
-                  <OldMetrix />
-                ) : (
-                  <OldSystem onOpenJournal={() => go('journal')} />
-                )}
-              </div>
-            </ClassicProvider>
-          ) : route.page === 'metrix' ? (
-            <>
-              {cards}
-              {chart}
-            </>
-          ) : (
-            <RollingPage result={result} />
-          )}
-          <p>
-            {t.latestImport}:{' '}
-            {data.batches.filter((b) => b.journalId === journal.id).at(-1)?.at
-              ? formatDate(
-                  data.batches.filter((b) => b.journalId === journal.id).at(-1)!.at,
-                  'Asia/Ho_Chi_Minh',
-                )
-              : '—'}
-          </p>
-        </>
-      ) : route.page === 'workspace' ? (
-        <>
-          <div className="phase-grid">
-            {vi.shell.phases.map((phase, i) => (
-              <article key={phase}>
-                <span className="eyebrow">{phase}</span>
-                <h3>{vi.shell.questions[i]}</h3>
-                <p>{vi.shell.phaseDescriptions[i]}</p>
-              </article>
-            ))}
-          </div>
-          {cards}
-          {chart}
-        </>
       ) : (
         <StateFrame kind="empty" description={vi.shell.pending} />
       )}
     </>
   );
+  if (route.page === 'cloud') body = <CloudArchive />;
+  const classicPages: Record<string, string> = {
+    workspace: 'analytics',
+    journal: 'journal',
+    calendar: 'calendar',
+    review: 'notes',
+    playbook: 'process',
+    risk: 'risk',
+    metrix: 'statistics',
+    system: 'system-tracker',
+    valuation: 'valuation',
+    connections: 'connections',
+    plans: 'process',
+    chartbook: 'notes',
+  };
+  if (classicPages[route.page])
+    body = (
+      <section className="panel">
+        <h2>Chức năng này được dùng chung tại Classic</h2>
+        <p>
+          V6 tập trung phân tích định lượng. Dữ liệu V6 trước đây vẫn được giữ và có thể đối chiếu
+          trong Dữ liệu phân tích.
+        </p>
+        <a href={'/classic#' + classicPages[route.page]}>Mở chức năng tại Classic ↗</a>
+        <p>
+          <button onClick={() => go('evidence')}>Đối chiếu dữ liệu V6 trước đây</button>
+        </p>
+      </section>
+    );
   if (route.page === 'debug') body = <Debug />;
   if (route.page === 'welcome') body = <Welcome />;
   if (route.page === 'glossary')
@@ -489,10 +393,15 @@ function Application() {
               v6
             </a>
           </nav>
-          <button className="local-state" onClick={() => go('settings')}>
-            ● {vi.shell.local}
+          <button className="local-state" onClick={() => go('cloud')}>
+            ● Cloud & sao lưu
           </button>
-          <button className="primary" onClick={() => (journal ? openForm() : go('settings'))}>
+          <button
+            className="primary"
+            onClick={() => {
+              location.href = '/classic#journal';
+            }}
+          >
             {t.add}
           </button>
         </header>
@@ -571,15 +480,17 @@ function Application() {
       </div>
       <nav className="bottom-nav" aria-label="Điều hướng di động">
         <button onClick={() => go('overview')}>{vi.shell.overview}</button>
-        <button onClick={() => go('journal')}>{vi.shell.journal}</button>
+        <button onClick={() => go('evidence')}>{vi.shell.journal}</button>
         <button
           className="primary"
-          onClick={() => (journal ? openForm() : go('settings'))}
+          onClick={() => {
+            location.href = '/classic#journal';
+          }}
           aria-label={t.add}
         >
           ＋
         </button>
-        <button onClick={() => go('metrix')}>{vi.shell.analysis}</button>
+        <button onClick={() => go('overview')}>{vi.shell.analysis}</button>
         <button onClick={() => setMenu(!menu)}>{vi.shell.menu}</button>
       </nav>
       {form && journal && (
@@ -604,12 +515,4 @@ function Application() {
       )}
     </div>
   );
-}
-function DeferredEquity(props: Parameters<typeof EquityChart>[0]) {
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    const timer = setTimeout(() => setReady(true), 150);
-    return () => clearTimeout(timer);
-  }, []);
-  return ready ? <EquityChart {...props} /> : <p>Đang mở biểu đồ…</p>;
 }

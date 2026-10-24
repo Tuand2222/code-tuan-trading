@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, sql, or, lt } from "drizzle-orm";
 import { getDb } from "../../../db";
 import { tradeAudit, trades } from "../../../db/schema";
 import {
@@ -11,10 +11,52 @@ import { ingestTrades } from "../../../lib/server-ingestion";
 
 type TradePayload = typeof trades.$inferInsert;
 
+function checkOwner(request: Request, owner: string) {
+  const expected = request.headers.get("X-Journal-Owner");
+  if (expected && expected !== owner)
+    throw Response.json({ code: "ACCOUNT_CHANGED", error: "Account changed; queued edits remain on the original device." }, { status: 409 });
+}
+
 function cleanTrade(
   value: Partial<TradePayload>,
   accountUser: AuthenticatedUser,
 ): TradePayload {
+  for (const key of [
+    "pnl",
+    "fees",
+    "swap",
+    "risk",
+    "quantity",
+    "entryPrice",
+    "exitPrice",
+    "stopLoss",
+    "takeProfit",
+    "mae",
+    "mfe",
+  ] as const) {
+    const n = value[key];
+    if (
+      n !== null &&
+      n !== undefined &&
+      (!Number.isFinite(Number(n)) ||
+        ([
+          "fees",
+          "risk",
+          "quantity",
+          "entryPrice",
+          "exitPrice",
+          "stopLoss",
+          "takeProfit",
+          "mae",
+          "mfe",
+        ].includes(key) &&
+          Number(n) < 0))
+    )
+      throw Error("Invalid trade amount: " + key);
+  }
+  for (const key of ["openedAt", "closedAt"] as const)
+    if (value[key] && !Number.isFinite(Date.parse(value[key]!)))
+      throw Error("Invalid trade timestamp");
   const market = String(value.market ?? "Hàng hóa");
   const source = String(value.source ?? "Thủ công");
   const symbol = String(value.symbol ?? "")
@@ -67,20 +109,60 @@ function cleanTrade(
 export async function GET(request: Request) {
   try {
     const accountUser = await requireUser(request);
+    checkOwner(request, accountUser.id);
+    const params = new URL(request.url).searchParams;
+    const limit = Math.min(
+      1000,
+      Math.max(1, Number(params.get("limit")) || 500),
+    );
+    const cursor = params.get("cursor");
+    let after: ReturnType<typeof or>;
+    if (cursor) {
+      const parts = JSON.parse(decodeURIComponent(atob(cursor))) as string[];
+      if (
+        parts.length !== 3 ||
+        parts.some((v) => typeof v !== "string" || v.length > 300)
+      )
+        throw Error("Invalid cursor");
+      const [date, created, id] = parts;
+      after = or(
+        lt(trades.date, date),
+        and(eq(trades.date, date), lt(trades.createdAt, created)),
+        and(
+          eq(trades.date, date),
+          eq(trades.createdAt, created),
+          lt(trades.id, id),
+        ),
+      );
+    }
     const rows = await getDb()
       .select()
       .from(trades)
       .where(
         and(
           eq(trades.userId, accountUser.id),
+          after,
           new URL(request.url).searchParams.get("trash") === "1"
             ? sql`${trades.deletedAt} >= ${new Date(Date.now() - 30 * 86400000).toISOString()}`
             : isNull(trades.deletedAt),
         ),
       )
-      .orderBy(desc(trades.date), desc(trades.createdAt))
-      .limit(5000);
-    return Response.json({ trades: rows });
+      .orderBy(desc(trades.date), desc(trades.createdAt), desc(trades.id))
+      .limit(limit + 1);
+    const page = rows.slice(0, limit),
+      last = page.at(-1);
+    return Response.json({
+      owner: accountUser.id,
+      trades: page,
+      next:
+        rows.length > limit && last
+          ? btoa(
+              encodeURIComponent(
+                JSON.stringify([last.date, last.createdAt, last.id]),
+              ),
+            )
+          : null,
+    });
   } catch (error) {
     return routeError(error);
   }
@@ -89,6 +171,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const accountUser = await requireUser(request);
+    checkOwner(request, accountUser.id);
     const body = (await request.json()) as {
       trade?: Partial<TradePayload>;
       trades?: Partial<TradePayload>[];
@@ -110,6 +193,7 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const accountUser = await requireUser(request);
+    checkOwner(request, accountUser.id);
     const body = (await request.json()) as { trade?: Partial<TradePayload> };
     const id = String(body.trade?.id ?? "").trim();
     if (!id) throw new Error("Trade id is required");
@@ -190,6 +274,7 @@ export async function PATCH(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const accountUser = await requireUser(request);
+    checkOwner(request, accountUser.id);
     const searchParams = new URL(request.url).searchParams;
     const id = searchParams.get("id");
     if (!id && searchParams.get("all") !== "1")

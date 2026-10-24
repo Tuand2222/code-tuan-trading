@@ -86,13 +86,34 @@ export const quantHelp = {
   ],
 } satisfies Record<string, string[]>;
 export type QuantHelpKey = keyof typeof quantHelp;
-export function QuantHelp({ id }: { id: QuantHelpKey }) {
+export function QuantHelp({ id, unit = 'R' }: { id: QuantHelpKey; unit?: string }) {
   const [open, setOpen] = useState(false),
     [pinned, setPinned] = useState(false);
   const [position, setPosition] = useState({ left: 12, top: 80 });
   const ref = useRef<HTMLDivElement>(null),
     timer = useRef<ReturnType<typeof setTimeout>>();
-  const content = quantHelp[id];
+  const original = quantHelp[id];
+  const formulas: Partial<Record<QuantHelpKey, string>> = {
+    expectancy: 'E(U) = ΣU / N',
+    pf: 'PF(U) = Σmax(U,0) / |Σmin(U,0)|',
+    dd: 'DD(U) = max(đỉnh ΣU − ΣU)',
+    recovery: 'Recovery(U) = ΣU / Max DD(U)',
+    distribution: 'U = (P&L được chọn − ma sát theo tiền) / mẫu số quy đổi',
+    heat: 'E(ô,U) = ΣU trong ô / N',
+    mfe: 'MFE(U) = thuận lợi theo tiền / mẫu số quy đổi',
+    mae: 'MAE(U) = bất lợi theo tiền / mẫu số quy đổi',
+    capture: 'Capture = mean(kết quả / MFE) × 100%',
+  };
+  const content =
+    unit === 'R' || !formulas[id]
+      ? original
+      : [
+          original[0].replace('theo R', 'theo ' + unit).replace('kết quả R', 'kết quả ' + unit),
+          `Đơn vị đang chọn: ${unit}. Các mẫu không đủ dữ liệu quy đổi được loại riêng.`,
+          formulas[id]!,
+          `U là ${unit}. Tiền dùng đơn vị sổ; % dùng vốn tham chiếu ban đầu; Pips/Ticks dùng khối lượng, hệ số nhân và bước giá đã cấu hình.`,
+          original[4],
+        ];
   const clear = () => {
     if (timer.current) clearTimeout(timer.current);
   };

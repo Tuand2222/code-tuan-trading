@@ -184,44 +184,29 @@
     ],
     "nav": [
       {
-        "name": "HÔM NAY",
+        "name": "PHÂN TÍCH V6",
         "links": [
-          ["Tổng quan", "overview"],
-          ["Kế hoạch & Lệnh dự kiến", "plans"]
-        ]
-      },
-      {
-        "name": "NHẬT KÝ",
-        "links": [
-          ["Nhật ký giao dịch", "journal"],
-          ["Lịch giao dịch", "calendar"],
-          ["Ghi chú & Review", "review"],
-          ["Chartbook", "chartbook"]
-        ]
-      },
-      {
-        "name": "PHÂN TÍCH",
-        "links": [
-          ["Không gian phân tích", "workspace"],
+          ["Tổng quan định lượng", "overview"],
+          ["Phân tích nâng cao", "advanced"],
           ["Lợi thế thống kê", "edge"],
-          ["Phân tích khoan sâu", "evaluator"],
-          ["Lợi nhuận & rủi ro", "risk"],
           ["Kỷ luật & Quản lý lệnh", "discipline"],
-          ["Trading MetriX", "metrix"],
-          ["Theo dõi hệ thống", "system"],
           ["Mô phỏng & What-if", "simulation"]
         ]
       },
       {
-        "name": "HỆ THỐNG",
+        "name": "DỮ LIỆU & KHÔI PHỤC",
         "links": [
-          ["Quy trình setup", "playbook"],
-          ["Định giá doanh nghiệp", "valuation"],
+          ["Dữ liệu phân tích", "evidence"],
+          ["Chất lượng dữ liệu", "health"],
+          ["Cloud & lịch sử phiên bản", "cloud"],
+          ["Cài đặt & nhập dữ liệu", "settings"]
+        ]
+      },
+      {
+        "name": "HƯỚNG DẪN",
+        "links": [
           ["Kiểm chứng & sao lưu", "debug"],
-          ["Chuẩn giao diện", "components"],
-          ["Thuật ngữ", "glossary"],
-          ["Cài đặt & sao lưu", "settings"],
-          ["Kết nối dữ liệu", "connections"]
+          ["Thuật ngữ", "glossary"]
         ]
       }
     ],

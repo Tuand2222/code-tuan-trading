@@ -56,7 +56,7 @@ test('quantitative V6 is responsive, explains metrics and persists simulations w
   await page.screenshot({ path: info.outputPath('v6-quant-light.png'), fullPage: true });
   expect(await snapshot(page)).toEqual(before);
 });
-test('Classic source is read-only, uses the same Net and does not merge or overwrite either ledger', async ({
+test('Reading the shared Classic source alone preserves both ledgers and uses canonical Net', async ({
   page,
 }) => {
   await seed(page);
@@ -87,7 +87,9 @@ test('Classic source is read-only, uses the same Net and does not merge or overw
   await expect(
     page.getByRole('article', { name: 'Kỳ vọng mỗi lệnh', exact: true }).locator('.quant-value'),
   ).toHaveText('1,76 R');
-  await expect(page.locator('.quant-source-note')).toContainText('giữ nguyên');
+  await expect(page.locator('.quant-source-note')).toContainText(
+    'Cùng giao dịch cloud với Classic',
+  );
   expect(await page.evaluate(() => localStorage.getItem('tuan-trader-trades'))).toBe(classic);
   expect(methods.every((m) => m === 'GET')).toBe(true);
   await page.getByLabel('Nguồn phân tích', { exact: true }).selectOption('v6');

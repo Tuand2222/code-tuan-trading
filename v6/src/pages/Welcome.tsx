@@ -6,7 +6,10 @@ export function Welcome() {
   return (
     <section className="panel">
       <h2>Trading Plan Pro · Kỷ luật · Kiên định · Tăng trưởng</h2>
-      <p>Nhật ký đa sổ trên thiết bị, phân tích từ dữ kiện, giả định được ghi nhãn rõ ràng.</p>
+      <p>
+        Nhật ký đa sổ có lưu cloud theo tài khoản, phân tích từ dữ kiện, giả định được ghi nhãn rõ
+        ràng.
+      </p>
       <div className="phase-grid">
         <article>
           <h3>Kỷ luật</h3>
@@ -54,8 +57,9 @@ export function Welcome() {
       <details>
         <summary>Dữ liệu ở đâu?</summary>
         <p>
-          IndexedDB của trình duyệt và origin đang dùng. Không có đăng nhập hoặc đồng bộ cloud. Hai
-          địa chỉ website có dữ liệu riêng.
+          Bản trên thiết bị dùng IndexedDB. Khi bật Cloud & lịch sử phiên bản, dữ liệu được lưu trên
+          máy chủ theo tài khoản, có lịch sử và bản sao tải về. Cần bật đồng bộ trước khi chuyển
+          thiết bị.
         </p>
       </details>
       <details>

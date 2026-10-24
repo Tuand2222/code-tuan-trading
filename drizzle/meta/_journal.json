@@ -43,6 +43,27 @@
       "when": 1792710000000,
       "tag": "0005_unified_risk_governance",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1792778971490,
+      "tag": "0006_flaky_mindworm",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1792781687546,
+      "tag": "0007_light_night_nurse",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1792783128670,
+      "tag": "0008_living_scalphunter",
+      "breakpoints": true
     }
   ]
 }

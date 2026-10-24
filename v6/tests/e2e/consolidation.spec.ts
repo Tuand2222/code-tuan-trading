@@ -19,6 +19,6 @@ test('merges original backup twice without duplicating trades or notes and expor
   await page.getByRole('button', { name: 'Xuất bản sao đầy đủ', exact: true }).click();
   const backup = await download;
   expect(await backup.path()).toBeTruthy();
-  await page.goto('/#journal');
+  await page.goto('/#evidence');
   await expect(page.locator('[data-trade-id]')).toHaveCount(30);
 });

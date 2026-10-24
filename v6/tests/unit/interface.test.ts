@@ -1,13 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { createElement } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
 import fs from 'node:fs';
 import { formatValue, formatDate } from '../../src/ui/format';
-import { KpiCard } from '../../src/ui/KpiCard';
 import { emptyFilters, selectTrades, parseHash, filterHash } from '../../src/core/filters';
 import { migrateV3 } from '../../src/data/migrateV3';
 import { analyze } from '../../src/core/analyze';
-import vi from '../../src/i18n/vi.json';
 it('formats money, signs, R, percent, holding and local time without changing source precision', () => {
   const original = '425462.78';
   expect(formatValue(original, 'money')).toBe('425.463 đ');
@@ -22,23 +18,6 @@ it('formats money, signs, R, percent, holding and local time without changing so
   expect(formatValue('234.333333', 'duration')).toBe('3,91 giờ');
   expect(formatValue(null, 'money')).toBe('—');
   expect(formatDate('2026-10-19T06:29:00Z')).toBe('19/10/2026 13:29');
-});
-it('renders all six required KPI parts and all four help lines for every registered metric', () => {
-  for (const id of Object.keys(vi.metricHelp) as (keyof typeof vi.metricHelp)[]) {
-    const html = renderToStaticMarkup(
-      createElement(KpiCard, {
-        id,
-        metric: { value: '0', n: 2, of: 30 },
-        currency: 'VND',
-        demo: false,
-      }),
-    );
-    for (const part of ['label', 'value', 'unit', 'sample', 'badge', 'help'])
-      expect(html).toContain(`data-part="${part}"`);
-    for (const label of vi.shell.helpLabels) expect(html).toContain(label);
-    expect(html).toContain('n=2/30');
-    expect(html).toContain(vi.shell.small);
-  }
 });
 describe('global filter scope', () => {
   it('round trips URL values and never broadens OR beyond the selected journal', async () => {

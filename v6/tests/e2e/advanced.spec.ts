@@ -24,7 +24,7 @@ test('S5 Binance preview/dedupe/rollback uses the canonical journal', async ({ p
   await create.getByLabel('Tên sổ', { exact: true }).fill('Binance USDT');
   await create.getByLabel('Đơn vị tiền của sổ', { exact: true }).selectOption('USDT');
   await create.getByRole('button', { name: 'Tạo sổ giao dịch', exact: true }).click();
-  await expect(page).toHaveURL(/#journal/);
+  await expect(page).toHaveURL(/#evidence/);
   const journalId = await page.getByLabel('Sổ nhật ký', { exact: true }).inputValue();
   const go = (route: string) =>
     page.goto('/#' + route + '?journal=' + encodeURIComponent(journalId));
@@ -37,7 +37,7 @@ test('S5 Binance preview/dedupe/rollback uses the canonical journal', async ({ p
   await expect(section).toContainText('3.92 USDT');
   await section.getByRole('button', { name: 'Xác nhận nhập Binance', exact: true }).click();
   await expect(section.getByRole('status')).toContainText('Đã nhập');
-  await go('journal');
+  await go('evidence');
   await expect(page.locator('[data-trade-id]')).toHaveCount(1);
   await expect(page.locator('[data-trade-id]')).toContainText('BTCUSDT');
   await go('settings');
@@ -46,7 +46,7 @@ test('S5 Binance preview/dedupe/rollback uses the canonical journal', async ({ p
   await expect(section.getByRole('button', { name: /^Hoàn tác batch/ })).toHaveCount(1);
   await section.getByRole('button', { name: /^Hoàn tác batch/ }).click();
   await expect(section.getByRole('status')).toContainText('Đã hoàn tác');
-  await go('journal');
+  await go('evidence');
   await expect(page.locator('[data-trade-id]')).toHaveCount(0);
 });
 test('S5 multi-leg editing preserves exact Net across partial exits and reload', async ({
@@ -72,8 +72,8 @@ test('S5 multi-leg editing preserves exact Net across partial exits and reload',
   await page.reload();
   await page.getByLabel('Lệnh nhiều khớp', { exact: true }).selectOption(id!);
   await expect(page.getByLabel('Loại khớp 3', { exact: true })).toHaveValue('out');
-  await page.goto('/#workspace');
-  await expect(page.getByRole('article', { name: 'Lợi nhuận ròng', exact: true })).toContainText(
+  await page.goto('/#evidence');
+  await expect(page.getByTestId('source-reconciliation')).toContainText(
     '3.302.290',
   );
 });
@@ -162,7 +162,7 @@ test('S9 encrypted backup restores with preview and offline preserves the ledger
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
   });
-  await page.goto('/#journal');
+  await page.goto('/#evidence');
   await page.reload();
   await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
   await context.setOffline(true);

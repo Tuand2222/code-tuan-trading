@@ -23,6 +23,12 @@ export interface RiskTrade {
   riskKnown?: boolean;
 }
 export interface RiskSettings {
+  cashFlows?: Array<{
+    id: string;
+    date: string;
+    type: "deposit" | "withdrawal";
+    amount: number;
+  }>;
   disciplineLock?: boolean;
   weeklyAutoPack?: boolean;
   exposures?: Array<{ id: string; group: string; side: string; risk: number }>;
@@ -72,6 +78,7 @@ export function analyzeRiskTrades(
   input: readonly RiskTrade[],
   capital = 0,
   timezone = "Asia/Ho_Chi_Minh",
+  cashFlows: NonNullable<RiskSettings["cashFlows"]> = [],
 ) {
   // Execution receipts are not closed positions. Never invent R or a win from a raw fill.
   const trades = input
@@ -111,8 +118,22 @@ export function analyzeRiskTrades(
     maxDDPercent = 0,
     hypothetical = capital;
   const balances: number[] = [];
+  const external = [...cashFlows].sort((a, b) => a.date.localeCompare(b.date));
+  let cashIndex = 0,
+    cashTotal = 0;
+  const applyCash = (until: string) => {
+    while (cashIndex < external.length && external[cashIndex].date <= until) {
+      const f = external[cashIndex++],
+        amount = f.type === "deposit" ? f.amount : -f.amount;
+      balance += amount;
+      peak += amount;
+      hypothetical += amount;
+      cashTotal += amount;
+    }
+  };
   let rolling = 0;
   const curve = known.map((trade, i) => {
+    applyCash(trade.date);
     const net = netPnl(trade);
     balance += net;
     peak = Math.max(peak, balance);
@@ -135,6 +156,7 @@ export function analyzeRiskTrades(
       sma20: i >= 19 ? rolling / 20 : null,
     };
   });
+  applyCash("9999-12-31");
   const sqn =
     averageR !== null && sdR
       ? (Math.sqrt(Math.min(r.length, 100)) * averageR) / sdR
@@ -207,7 +229,7 @@ export function analyzeRiskTrades(
     sessions: groups("session"),
     symbols: groups("symbol"),
     compliance: groups("compliance"),
-    hypotheticalNet: hypothetical - capital,
+    hypotheticalNet: hypothetical - capital - cashTotal,
     discipline: trades.length
       ? trades.reduce((s, t) => s + t.discipline, 0) / trades.length
       : null,
@@ -235,15 +257,23 @@ export function riskDesk(
   settings: RiskSettings,
   now = new Date(),
 ) {
+  const today = dayInZone(now, settings.timezone);
   const a = analyzeRiskTrades(
     trades,
     settings.initialCapital,
     settings.timezone,
+    (settings.cashFlows ?? []).filter((f) => f.date <= today),
   );
-  const today = dayInZone(now, settings.timezone);
   const events = trades
     .map((t) => ({ ...t, date: eventDay(t, settings.timezone) }))
     .filter((t) => !t.id.startsWith("cycle:"));
+  const flows = (settings.cashFlows ?? [])
+    .filter((f) => f.date <= today)
+    .sort((a, b) => a.date.localeCompare(b.date));
+  const signed = (f: (typeof flows)[number]) =>
+    f.type === "deposit" ? f.amount : -f.amount;
+  let flowIndex = 0,
+    flowTotal = 0;
   let realized = settings.initialCapital,
     realizedPeak = realized;
   for (const t of [...events].sort(
@@ -251,12 +281,28 @@ export function riskDesk(
       Date.parse(a.closedAt || a.date) - Date.parse(b.closedAt || b.date) ||
       a.id.localeCompare(b.id),
   )) {
+    while (flowIndex < flows.length && flows[flowIndex].date <= t.date) {
+      const n = signed(flows[flowIndex++]);
+      realized += n;
+      realizedPeak += n;
+      flowTotal += n;
+    }
     realized += netPnl(t);
     realizedPeak = Math.max(realizedPeak, realized);
   }
+  while (flowIndex < flows.length) {
+    const n = signed(flows[flowIndex++]);
+    realized += n;
+    realizedPeak += n;
+    flowTotal += n;
+  }
   const before = events
     .filter((t) => t.date < today)
-    .reduce((s, t) => s + netPnl(t), settings.initialCapital);
+    .reduce(
+      (s, t) => s + netPnl(t),
+      settings.initialCapital +
+        flows.filter((f) => f.date < today).reduce((s, f) => s + signed(f), 0),
+    );
   const dayNet = events
     .filter((t) => t.date === today)
     .reduce((s, t) => s + netPnl(t), 0);
@@ -272,7 +318,8 @@ export function riskDesk(
   const floor =
     settings.floorMode === "trailing"
       ? peak - (settings.initialCapital * settings.maxDrawdownPercent) / 100
-      : settings.initialCapital * (1 - settings.maxDrawdownPercent / 100);
+      : settings.initialCapital * (1 - settings.maxDrawdownPercent / 100) +
+        flowTotal;
   const dataComplete = events.every(
     (t) => t.feesKnown !== false && t.pnlKnown !== false,
   );

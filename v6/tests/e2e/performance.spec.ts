@@ -58,7 +58,7 @@ test('10,000-trade ledger imports, renders virtual journal and reloads', async (
   await expect(page.getByRole('status').filter({ hasText: 'Đã lưu dữ liệu' })).toBeVisible({
     timeout: 120000,
   });
-  await page.goto('/#journal');
+  await page.goto('/#evidence');
   await expect(page.locator('[data-trade-id]').first()).toBeVisible({ timeout: 120000 });
   const count = await page.locator('[data-trade-id]').count();
   expect(count).toBeGreaterThan(0);

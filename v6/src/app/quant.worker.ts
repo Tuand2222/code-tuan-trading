@@ -11,6 +11,7 @@ self.onmessage = (
     observations?: QuantObservation[];
     settings: QuantSettings;
     timezone: string;
+    currency?: string;
     scope: { from?: string; to?: string };
   }>,
 ) => {
@@ -18,12 +19,15 @@ self.onmessage = (
     const { settings, timezone, scope } = e.data;
     self.postMessage({
       ok: true,
-      report: quantReport(
-        e.data.observations ?? observeTrades(e.data.trades ?? []),
-        settings,
-        timezone,
-        scope,
-      ),
+      report: {
+        ...quantReport(
+          e.data.observations ?? observeTrades(e.data.trades ?? []),
+          settings,
+          timezone,
+          scope,
+        ),
+        ...(settings.unit === 'money' ? { unitLabel: e.data.currency ?? 'tiền' } : {}),
+      },
     });
   } catch (error) {
     self.postMessage({ ok: false, error: String(error) });

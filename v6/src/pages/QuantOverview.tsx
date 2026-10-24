@@ -21,6 +21,8 @@ import {
   qNumber,
 } from '../ui/QuantPlots';
 import { Modal } from '../ui/Modal';
+import { SharedReceiptEditor } from '../ui/SharedReceiptEditor';
+import { SharedCapital } from '../ui/SharedCapital';
 import vi from '../i18n/vi.json';
 import '../app/quant.css';
 const cardIds = ['expectancy', 'sqn', 'pf', 'capture', 'dd', 'recovery'] as const;
@@ -104,7 +106,7 @@ function SettingsDrawer({
     <dialog
       ref={ref}
       className="quant-drawer"
-      aria-labelledby="quant-settings-title"
+      aria-label="Cài đặt phân tích"
       onCancel={(e) => {
         e.preventDefault();
         close();
@@ -120,10 +122,29 @@ function SettingsDrawer({
         </button>
       </header>
       <p className="quant-drawer-note">
-        Tính lại ngay trên v6. Thiết lập này không sửa giao dịch gốc hoặc Classic.
+        Thiết lập phân tích không sửa giao dịch gốc. Vốn và hạn mức thực có nút lưu dùng chung
+        riêng.
       </p>
       <fieldset>
         <legend>Kết quả và chi phí</legend>
+        <label>
+          Đơn vị toàn trang
+          <select
+            aria-label="Đơn vị toàn trang"
+            value={s.unit}
+            onChange={(e) => set('unit', e.target.value as QuantSettings['unit'])}
+          >
+            <option value="R">R · rủi ro ban đầu</option>
+            <option value="money">Tiền · {currency}</option>
+            <option value="percent">% vốn tham chiếu ban đầu</option>
+            <option value="pips">Pips</option>
+            <option value="ticks">Ticks</option>
+          </select>
+        </label>
+        <p>
+          SQN và Sharpe/Sortino luôn tính theo R để so sánh chất lượng hệ thống. % dùng vốn tham
+          chiếu ban đầu, không phải lợi suất theo thời gian.
+        </p>
         <label>
           Cơ sở P&L
           <select
@@ -138,6 +159,71 @@ function SettingsDrawer({
         <p>
           Khoản giả định được trừ thêm trên mọi lệnh đủ R; không điền thay khoản phí đang thiếu.
         </p>
+      </fieldset>
+      <SharedCapital currency={currency} onReference={(capital) => set('capital', capital)} />
+      <fieldset>
+        <legend>Quy đổi Pips / Ticks theo mã</legend>
+        <p>
+          Nhập bước giá và hệ số nhân trên mỗi đơn vị khối lượng. Mã thiếu thông tin sẽ được báo
+          thiếu, không tự suy đoán.
+        </p>
+        {Object.entries(s.instruments).map(([symbol, cfg]) => (
+          <div key={symbol}>
+            <b>{symbol}</b>
+            {(['pipSize', 'tickSize', 'multiplier'] as const).map((k) => (
+              <label key={k}>
+                {k === 'pipSize'
+                  ? 'Kích thước Pip'
+                  : k === 'tickSize'
+                    ? 'Kích thước Tick'
+                    : 'Hệ số nhân mỗi đơn vị'}
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={cfg[k] ?? ''}
+                  onChange={(e) =>
+                    set('instruments', {
+                      ...s.instruments,
+                      [symbol]: {
+                        ...cfg,
+                        [k]: Number(e.target.value) > 0 ? Number(e.target.value) : undefined,
+                      },
+                    })
+                  }
+                />
+              </label>
+            ))}
+            <button
+              onClick={() =>
+                set(
+                  'instruments',
+                  Object.fromEntries(Object.entries(s.instruments).filter(([k]) => k !== symbol)),
+                )
+              }
+            >
+              Xóa cấu hình {symbol}
+            </button>
+          </div>
+        ))}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const form = e.currentTarget;
+            const symbol = String(new FormData(form).get('instrument') ?? '')
+              .trim()
+              .toUpperCase();
+            if (symbol)
+              set('instruments', { ...s.instruments, [symbol]: s.instruments[symbol] ?? {} });
+            form.reset();
+          }}
+        >
+          <label>
+            Mã cần quy đổi
+            <input name="instrument" maxLength={80} />
+          </label>
+          <button>Thêm mã</button>
+        </form>
       </fieldset>
       <fieldset>
         <legend>Động cơ thống kê</legend>
@@ -290,10 +376,21 @@ export default function QuantOverview({
   const [classic, setClassic] = useState<Awaited<ReturnType<typeof readClassicQuantSource>>>();
   const [sourceError, setSourceError] = useState(''),
     [sourceLoading, setSourceLoading] = useState(false);
+  const [editReceipt, setEditReceipt] = useState<unknown>();
+  const [refreshSource, setRefreshSource] = useState(0);
   const [saveError, setSaveError] = useState('');
   const [tab, setTab] = useState<'distribution' | 'exits' | 'risk'>('distribution');
   const [selection, setSelection] = useState<{ ids: string[]; title: string }>();
   const toolbar = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const reload = () =>
+      setPrefs((old) => {
+        const next = preferences(journal);
+        return JSON.stringify(old) === JSON.stringify(next) ? old : next;
+      });
+    window.addEventListener('v6-cloud-sync', reload);
+    return () => window.removeEventListener('v6-cloud-sync', reload);
+  }, [journal]);
   const change = (p: Preferences) => {
     setPrefs(p);
     try {
@@ -346,7 +443,7 @@ export default function QuantOverview({
       window.removeEventListener('storage', read);
       window.removeEventListener('focus', read);
     };
-  }, [source]);
+  }, [source, refreshSource]);
   const request = useMemo(
     () => ({
       trades,
@@ -418,10 +515,11 @@ export default function QuantOverview({
           : undefined,
       settings: request.settings,
       timezone: request.timezone,
+      currency: request.source === 'classic' ? 'VNĐ' : journal.currency,
       scope: { from: request.from, to: request.to },
     });
     return () => worker.terminate();
-  }, [request]);
+  }, [request, journal.currency]);
   const inspect = (ids: string[], title: string) => setSelection({ ids, title });
   const allMarkets =
     source === 'classic'
@@ -435,12 +533,18 @@ export default function QuantOverview({
         }))
       : setups.filter((s) => s.journalId === journal.id);
   const s = prefs.settings;
+  const unitLabel =
+    s.unit === 'money'
+      ? source === 'classic'
+        ? 'VNĐ'
+        : journal.currency
+      : (report?.unitLabel ?? 'R');
   const selectedIds = new Set(selection?.ids ?? []);
   const value = (id: Card) =>
     !report
       ? '—'
       : id === 'expectancy'
-        ? qNumber(report.stats.mean) + (report.stats.mean === null ? '' : ' R')
+        ? qNumber(report.stats.mean) + (report.stats.mean === null ? '' : ' ' + unitLabel)
         : id === 'sqn'
           ? qNumber(report.stats.sqn)
           : id === 'pf'
@@ -450,7 +554,7 @@ export default function QuantOverview({
             : id === 'capture'
               ? qNumber(report.capture, 1) + (report.capture === null ? '' : '%')
               : id === 'dd'
-                ? qNumber(report.maxDD) + (report.maxDD === null ? '' : ' R')
+                ? qNumber(report.maxDD) + (report.maxDD === null ? '' : ' ' + unitLabel)
                 : qNumber(report.recovery);
   const badge = (id: Card) =>
     !report
@@ -461,9 +565,9 @@ export default function QuantOverview({
           ? report.captureN + ' lệnh thắng có MFE'
           : id === 'dd' || id === 'recovery'
             ? report.complete
-              ? 'Toàn mẫu đủ R'
-              : 'Thiếu R hoặc giờ đóng'
-            : report.stats.n + '/' + report.rows.length + ' lệnh có R';
+              ? 'Toàn mẫu đủ ' + unitLabel
+              : 'Thiếu dữ liệu hoặc giờ đóng'
+            : report.stats.n + '/' + report.rows.length + ' lệnh có ' + unitLabel;
   return (
     <section className="quant-overview" aria-label="Phòng phân tích V6" aria-busy={calculating}>
       {(source === 'v6' ? journal.isDemo : classic?.isDemo) && (
@@ -486,7 +590,7 @@ export default function QuantOverview({
             }}
           >
             <option value="v6">Sổ v6 hiện tại</option>
-            <option value="classic">Classic · chỉ đọc</option>
+            <option value="classic">Sổ chung với Classic</option>
           </select>
         </label>
         <label>
@@ -543,7 +647,9 @@ export default function QuantOverview({
             {source === 'classic' ? (classic?.source ?? 'Đang đọc Classic') : journal.name}
           </span>
           <span>{report?.rows.length ?? '—'} lệnh đóng</span>
-          <span>{s.pnl === 'net' ? 'Net' : 'Gross'} / R</span>
+          <span>
+            {s.pnl === 'net' ? 'Net' : 'Gross'} / {unitLabel}
+          </span>
           <span>{s.dateBasis === 'exit' ? 'Theo ngày đóng' : 'Theo ngày vào'}</span>
           <span>{journal.timezone}</span>
           {source === 'v6' && <button onClick={onAdvancedFilters}>Bộ lọc nâng cao</button>}
@@ -551,7 +657,8 @@ export default function QuantOverview({
       </div>
       {source === 'classic' && (
         <p className="quant-source-note">
-          Classic được đọc riêng để phân tích. Giao diện, sổ v6 và dữ liệu Classic giữ nguyên.
+          Cùng giao dịch cloud với Classic. Bấm biểu đồ để đối chiếu và sửa dữ liệu thực; dữ liệu
+          khớp lệnh chi tiết của sổ V6 trước đây vẫn được giữ riêng.
           {classic?.skipped
             ? ` ${classic.skipped} phiếu khớp hoặc dòng không đủ cấu trúc được loại khỏi số lệnh đóng.`
             : ''}
@@ -589,7 +696,7 @@ export default function QuantOverview({
             >
               <header>
                 <h2>{cardNames[id]}</h2>
-                <QuantHelp id={id} />
+                <QuantHelp id={id} unit={unitLabel} />
               </header>
               <strong className="quant-value">{calculating ? '…' : value(id)}</strong>
               <span className="quant-badge">{badge(id)}</span>
@@ -609,8 +716,8 @@ export default function QuantOverview({
           </button>
         ))}
         <span>
-          {report?.stats.n ?? 0}/{report?.rows.length ?? 0} đủ R · {report?.excursions.length ?? 0}{' '}
-          có MAE/MFE
+          {report?.stats.n ?? 0}/{report?.rows.length ?? 0} đủ {unitLabel} ·{' '}
+          {report?.excursions.length ?? 0} có MAE/MFE
         </span>
       </div>
       {calculating && (
@@ -663,15 +770,27 @@ export default function QuantOverview({
         <button
           onClick={() =>
             inspect(
-              report?.rows.filter((r) => r.r === null).map((r) => r.id) ?? [],
+              report?.rows
+                .filter((r) => r.r === null || r.risk === null || r.net === null)
+                .map((r) => r.id) ?? [],
               'Lệnh chưa có R',
             )
           }
         >
-          Đối chiếu dữ liệu thiếu ({report?.rows.filter((r) => r.r === null).length ?? 0})
+          Đối chiếu dữ liệu thiếu (
+          {report?.rows.filter((r) => r.r === null || r.risk === null || r.net === null).length ??
+            0}
+          )
         </button>
         <a href="/classic#overview">Mở Classic để xem kế toán & vận hành ↗</a>
       </div>
+      {editReceipt !== undefined && (
+        <SharedReceiptEditor
+          value={editReceipt}
+          close={() => setEditReceipt(undefined)}
+          saved={() => setRefreshSource((n) => n + 1)}
+        />
+      )}
       {settingsOpen && (
         <SettingsDrawer
           prefs={prefs}
@@ -684,7 +803,7 @@ export default function QuantOverview({
         <Modal label="quant-selection-title" onClose={() => setSelection(undefined)}>
           <h2 id="quant-selection-title">{selection.title}</h2>
           <p>
-            {selection.ids.length} lệnh · {source === 'classic' ? 'Classic chỉ đọc' : 'Sổ v6'}
+            {selection.ids.length} lệnh · {source === 'classic' ? 'Sổ chung với Classic' : 'Sổ v6'}
           </p>
           <div className="table-scroll">
             <table>
@@ -692,9 +811,9 @@ export default function QuantOverview({
                 <tr>
                   <th>Mã</th>
                   <th>Ngày đóng (UTC)</th>
-                  <th>Kết quả (R)</th>
+                  <th>Kết quả ({unitLabel})</th>
                   <th>1R</th>
-                  {source === 'v6' && <th>Hồ sơ</th>}
+                  <th>Hồ sơ</th>
                 </tr>
               </thead>
               <tbody>
@@ -704,10 +823,30 @@ export default function QuantOverview({
                   .map((r) => (
                     <tr key={r.id}>
                       <td>{r.symbol}</td>
-                      <td>{r.closeTime.slice(0, 16).replace('T', ' ')}</td>
+                      <td>
+                        {r.exitTimeKnown === false
+                          ? r.exitDate + ' · chưa có giờ'
+                          : r.closeTime.slice(0, 16).replace('T', ' ')}
+                      </td>
                       <td>{qNumber(r.r)}</td>
                       <td>{r.assumed ? 'Giả định' : r.risk ? 'Ghi nhận' : 'Thiếu'}</td>
-                      {source === 'v6' && (
+                      {source === 'classic' ? (
+                        <td>
+                          <button
+                            onClick={() => {
+                              const row = classic?.receipts.find(
+                                (x) => !!x && typeof x === 'object' && 'id' in x && x.id === r.id,
+                              );
+                              if (row) {
+                                setSelection(undefined);
+                                setEditReceipt(row);
+                              }
+                            }}
+                          >
+                            Sửa sổ chung
+                          </button>
+                        </td>
+                      ) : (
                         <td>
                           <button
                             onClick={() => {

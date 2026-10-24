@@ -58,7 +58,7 @@ export async function flushQueue(owner: string, onChange?: () => void) {
       try {
         response = await fetch(item.url, {
           method: item.method,
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "X-Journal-Owner": item.owner },
           body: item.body === undefined ? undefined : JSON.stringify(item.body),
         });
       } catch {
@@ -71,6 +71,10 @@ export async function flushQueue(owner: string, onChange?: () => void) {
       )
         break;
       if (!response.ok) {
+        if (response.status === 409) {
+          const body = await response.clone().json().catch(() => null);
+          if (body?.code === "ACCOUNT_CHANGED") break;
+        }
         await db().queue.update(item.id, {
           status: "conflict",
           error: (await response.text()).slice(0, 400),

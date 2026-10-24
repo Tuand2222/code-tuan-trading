@@ -17,7 +17,7 @@ const bodySchema = z
     ledger: z.string(),
     views: z.array(view).max(1000),
     preferences: z.array(meta).max(1000),
-    devicePreferences: z.array(devicePreferenceSchema).max(2).optional(),
+    devicePreferences: z.array(devicePreferenceSchema).max(10000).optional(),
     checksum: z.string(),
   })
   .strict();

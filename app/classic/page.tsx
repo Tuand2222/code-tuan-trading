@@ -44,6 +44,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { positionCycles } from "../../lib/position-cycles";
+import { fetchAllTrades } from "../../lib/read-trades";
+import { useSharedRisk, useSharedNotes } from "../../lib/shared-risk-client";
 import UnifiedRiskAnalyticsCockpit from "./components/UnifiedRiskAnalyticsCockpit";
 import {
   DEFAULT_RISK,
@@ -1361,6 +1363,23 @@ export default function Home() {
   const [calendarMonth, setCalendarMonth] = useState(new Date(2026, 7, 1));
 
   const syncAllLock = useRef(false);
+  useSharedNotes(
+    dataMode === "cloud" && persistenceOwner === accountId
+      ? accountId
+      : undefined,
+    notes,
+    setNotes,
+    setToast,
+    NOTE_TEMPLATES[0].content,
+  );
+  useSharedRisk(
+    dataMode === "cloud" && persistenceOwner === accountId
+      ? accountId
+      : undefined,
+    riskSettings,
+    setRiskSettings,
+    setToast,
+  );
   const syncAllConnectionsRef = useRef<
     (silent?: boolean, staleOnly?: boolean) => Promise<void>
   >(async () => undefined);
@@ -1520,6 +1539,52 @@ export default function Home() {
     return () => window.removeEventListener("paste", paste);
   }, [modalOpen]);
 
+  useEffect(() => {
+    if (dataMode !== "cloud" || persistenceOwner !== accountId || localFallback)
+      return;
+    let active = true;
+    const refresh = async () => {
+      if (document.visibilityState === "hidden" || modalOpen) return;
+      try {
+        if ((await listQueue(accountId)).length) return;
+        const response = await fetchAllTrades({ headers: { "X-Journal-Owner": accountId } });
+        if (!response.ok) return;
+        const payload = (await response.json()) as { trades?: Trade[] };
+        if (
+          active &&
+          Array.isArray(payload.trades) &&
+          (!trades.length || payload.trades.length) &&
+          !(await listQueue(accountId)).length
+        ) {
+          setTrades(payload.trades);
+          localStorage.setItem(
+            tradesStorageKey,
+            JSON.stringify(payload.trades),
+          );
+        }
+      } catch {
+        /* retain device copy */
+      }
+    };
+    window.addEventListener("focus", refresh);
+    window.addEventListener("storage", refresh);
+    const timer = setInterval(() => void refresh(), 30000);
+    return () => {
+      active = false;
+      clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, [
+    dataMode,
+    persistenceOwner,
+    accountId,
+    modalOpen,
+    tradesStorageKey,
+    trades,
+    localFallback,
+  ]);
+
   const draftImagePreviews = useMemo(
     () => draftImages.map((file) => ({ file, url: URL.createObjectURL(file) })),
     [draftImages],
@@ -1561,7 +1626,8 @@ export default function Home() {
       setNotes(storedNotes ?? NOTE_TEMPLATES[0].content);
       void (async () => {
         try {
-          const response = await fetch("/api/trades", {
+          const response = await fetchAllTrades({
+            headers: { "X-Journal-Owner": accountId },
             cache: "no-store",
             signal: controller.signal,
           });
@@ -2169,7 +2235,7 @@ export default function Home() {
       if (dataMode === "cloud" && selected.length) {
         const r = await fetch("/api/trades", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "X-Journal-Owner": accountId },
           body: JSON.stringify({ trades: selected, sourceType: "FILE" }),
         });
         const payload = (await r.json()) as {
@@ -2252,7 +2318,7 @@ export default function Home() {
       source: draft.source,
       fees: Number(draft.fees) || 0,
       feesKnown: draft.fees.trim() !== "",
-      riskKnown: true,
+      riskKnown: risk > 0,
       quantity: Number(draft.quantity) || 0,
       entryPrice: Number(draft.entryPrice) || 0,
       stopLoss: Number(draft.stopLoss) || 0,
@@ -2309,7 +2375,7 @@ export default function Home() {
           setToast("Đã lưu trên thiết bị; có mục chờ đồng bộ / đối soát.");
           return;
         }
-        const fresh = await fetch("/api/trades", { cache: "no-store" });
+        const fresh = await fetchAllTrades({ headers: { "X-Journal-Owner": accountId } });
         if (fresh.ok) {
           const data = (await fresh.json()) as { trades: Trade[] };
           setTrades(data.trades);
@@ -4718,7 +4784,7 @@ export default function Home() {
                   });
                   return;
                 }
-                const r = await fetch("/api/trades", { cache: "no-store" });
+                const r = await fetchAllTrades({ headers: { "X-Journal-Owner": accountId } });
                 if (r.ok) {
                   const p = (await r.json()) as { trades: Trade[] };
                   setTrades(p.trades);
@@ -4910,7 +4976,9 @@ export default function Home() {
           </div>
           <nav className="workspace-switch" aria-label="Chuyển giao diện">
             <span>Giao diện</span>
-            <a href="/classic#overview" aria-current="page">Classic</a>
+            <a href="/classic#overview" aria-current="page">
+              Classic
+            </a>
             <a href="/v6/#overview">v6</a>
           </nav>
         </header>

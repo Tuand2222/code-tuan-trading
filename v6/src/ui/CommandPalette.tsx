@@ -5,7 +5,8 @@ export function CommandPalette({ go }: { go: (page: string) => void }) {
   const [query, setQuery] = useState('');
   const commands = [
     ['Tổng quan', 'overview'],
-    ['Nhật ký', 'journal'],
+    ['Dữ liệu phân tích', 'evidence'],
+    ['Cloud và khôi phục', 'cloud'],
     ['Lịch', 'calendar'],
     ['Review', 'review'],
     ['Setup', 'playbook'],
@@ -48,7 +49,12 @@ export function CommandPalette({ go }: { go: (page: string) => void }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && filtered[0]) choose(filtered[0][1]);
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                const value = e.currentTarget.value.toLocaleLowerCase('vi');
+                const match = commands.find((c) => c[0].toLocaleLowerCase('vi').includes(value));
+                if (match) choose(match[1]);
+              }
             }}
           />
         </label>
