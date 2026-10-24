@@ -21,6 +21,12 @@ test('capital architecture uses actual history, preserves it during stress and a
     [],
   );
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('button', { name: 'Đổi giao diện sáng tối', exact: true }).click();
+  const darkAudit = await new AxeBuilder({ page }).analyze();
+  expect(
+    darkAudit.violations.filter((v) => ['critical', 'serious'].includes(v.impact ?? '')),
+  ).toEqual([]);
+  await page.getByRole('button', { name: 'Đổi giao diện sáng tối', exact: true }).click();
   await page.getByRole('button', { name: 'Mô phỏng & stress', exact: true }).click();
   await page.getByLabel('Số lệnh mỗi đường', { exact: true }).fill('20');
   await page.getByLabel('Số lệnh thua liên tiếp bơm vào', { exact: true }).fill('10');

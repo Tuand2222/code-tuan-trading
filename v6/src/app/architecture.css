@@ -31,6 +31,14 @@
 body {
   font-variant-numeric: tabular-nums;
 }
+section {
+  background: var(--surface);
+  border-color: var(--line);
+}
+p,
+thead th {
+  color: var(--muted);
+}
 .sidebar {
   background: var(--surface);
   width: 240px;
