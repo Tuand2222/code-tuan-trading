@@ -26,6 +26,7 @@ import { AutomaticBackup } from '../ui/DirectoryBackup';
 import { AppInstall } from '../ui/AppInstall';
 import { formatValue } from '../ui/format';
 const QuantOverview = lazy(() => import('./QuantOverview'));
+const CapitalPro = lazy(() => import('./CapitalPro'));
 const AdvancedWorkspace = lazy(() =>
   import('./AdvancedWorkspace').then((m) => ({ default: m.AdvancedWorkspace })),
 );
@@ -48,6 +49,13 @@ function Application() {
     [advancedFilters, setAdvancedFilters] = useState(false),
     [form, setForm] = useState<{ trade?: Trade; revision: number }>(),
     [detail, setDetail] = useState('');
+  const [theme, setTheme] = useState(() =>
+    localStorage.getItem('tuan-v6-theme') === 'dark' ? 'dark' : 'light',
+  );
+  useEffect(() => {
+    document.documentElement.dataset.v6Theme = theme;
+    localStorage.setItem('tuan-v6-theme', theme);
+  }, [theme]);
   const journal =
     data.journals.find((j) => j.id === route.filters.journal && !j.archivedAt) ??
     data.journals.find((j) => !j.archivedAt);
@@ -223,7 +231,12 @@ function Application() {
   ) : (
     <>
       {(route.page !== 'overview' || advancedFilters) && (
-        <FilterBar data={data} value={filters} onChange={update} />
+        <FilterBar
+          data={data}
+          value={filters}
+          onChange={update}
+          compact={['capital', 'risk-pro', 'cockpit'].includes(route.page)}
+        />
       )}
       {route.page === 'overview' ? (
         <QuantOverview
@@ -237,6 +250,8 @@ function Application() {
           onAdvancedFilters={() => setAdvancedFilters(!advancedFilters)}
           onOpen={setDetail}
         />
+      ) : ['capital', 'risk-pro', 'cockpit'].includes(route.page) ? (
+        <CapitalPro key={journal.id} journal={journal} filters={filters} onOpen={setDetail} />
       ) : ['advanced', 'discipline', 'simulation', 'analytics'].includes(route.page) ? (
         <AdvancedWorkspace
           key={journal.id + scope}
@@ -344,7 +359,13 @@ function Application() {
       </section>
     );
   return (
-    <div className={'app-shell' + (route.page === 'overview' ? ' v6-quant-mode' : '')}>
+    <div
+      className={
+        'app-shell' +
+        (route.page === 'overview' ? ' v6-quant-mode' : '') +
+        (['capital', 'risk-pro', 'cockpit'].includes(route.page) ? ' capital-mode' : '')
+      }
+    >
       <a
         className="skip"
         href="#main-content"
@@ -397,6 +418,13 @@ function Application() {
             ● Cloud & sao lưu
           </button>
           <button
+            className="theme-switch"
+            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+            aria-label="Đổi giao diện sáng tối"
+          >
+            {theme === 'light' ? '◐ Tối' : '◑ Sáng'}
+          </button>
+          <button
             className="primary"
             onClick={() => {
               location.href = '/classic#journal';
@@ -420,7 +448,17 @@ function Application() {
             <span className="eyebrow">
               {route.page === 'overview' ? 'V6 · PHÂN TÍCH ĐỊNH LƯỢNG' : vi.shell.stage}
             </span>
-            <h1>{route.page === 'overview' ? 'Lợi thế & chất lượng hệ thống' : title}</h1>
+            <h1>
+              {route.page === 'overview'
+                ? 'Lợi thế & chất lượng hệ thống'
+                : ['capital', 'risk-pro', 'cockpit'].includes(route.page)
+                  ? 'Quản trị vốn Pro'
+                  : route.page === 'cloud'
+                    ? 'Cloud & lịch sử phiên bản'
+                    : route.page === 'evidence'
+                      ? 'Dữ liệu phân tích'
+                      : title}
+            </h1>
             <p>
               {route.page === 'overview'
                 ? 'Kiểm chứng kết quả, hiệu suất thoát lệnh và rủi ro theo R.'

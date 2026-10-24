@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { capitalPolicySchema } from './capitalSettings';
 
 // Persist original facts only. Gross/Net/R, averages, open quantity and holding
 // duration belong to core/ in S1, never to these storage contracts.
@@ -75,6 +76,7 @@ export type FeeProfile = z.infer<typeof feeProfileSchema>;
 
 export const journalSettingsSchema = z
   .object({
+    capitalPolicy: capitalPolicySchema.optional(),
     minSample: z.number().int().min(1).default(20),
     holdingUnit: z.enum(['minutes', 'hours', 'days']).default('hours'),
     displayUnit: z.enum(['money', 'percent', 'R']).default('money'),

@@ -326,7 +326,7 @@ export function riskDesk(
   const observedTier =
     !dataComplete || ddPercent === null
       ? "unknown"
-      : ddPercent > settings.stopPercent ||
+      : ddPercent >= settings.stopPercent ||
           equity <= floor ||
           (usage ?? 0) >= 100
         ? "stop"

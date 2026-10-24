@@ -6,6 +6,7 @@ export function CommandPalette({ go }: { go: (page: string) => void }) {
   const [query, setQuery] = useState('');
   const commands = [
     ['Tổng quan', 'overview'],
+    ['Quản trị vốn Pro', 'capital'],
     ['Dữ liệu phân tích', 'evidence'],
     ['Cloud và khôi phục', 'cloud'],
     ['Lịch', 'calendar'],

@@ -9,10 +9,12 @@ export function FilterBar({
   value,
   onChange,
   data,
+  compact = false,
 }: {
   value: Filters;
   onChange: (f: Filters) => void;
   data: Snapshot;
+  compact?: boolean;
 }) {
   const [views, setViews] = useState<SavedView[]>([]),
     [name, setName] = useState(''),
@@ -104,7 +106,12 @@ export function FilterBar({
   ];
   return (
     <section className="panel filters">
-      <details open>
+      <details
+        open={
+          !compact ||
+          Object.entries(value).some(([k, v]) => !['journal', 'operator'].includes(k) && !!v)
+        }
+      >
         <summary>{vi.shell.filter}</summary>
         <div className="filter-grid">
           <label>

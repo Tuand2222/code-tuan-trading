@@ -72,7 +72,7 @@
   "shell": {
     "title": "Nhật ký giao dịch",
     "subtitle": "Đọc dữ liệu theo một mạch: kết quả → bằng chứng → nguyên nhân → hành động.",
-    "stage": "Nhật ký v6 · S5–S9",
+    "stage": "V6 · PHÂN TÍCH & QUẢN TRỊ VỐN",
     "local": "Trên thiết bị",
     "add": "＋ Thêm giao dịch",
     "addNotice": "Form thêm giao dịch v6 sẽ hoàn thiện ở S3. Nhật ký hiện tại vẫn hoạt động tại website v3.",
@@ -187,6 +187,7 @@
         "name": "PHÂN TÍCH V6",
         "links": [
           ["Tổng quan định lượng", "overview"],
+          ["Quản trị vốn Pro", "capital"],
           ["Phân tích nâng cao", "advanced"],
           ["Lợi thế thống kê", "edge"],
           ["Kỷ luật & Quản lý lệnh", "discipline"],

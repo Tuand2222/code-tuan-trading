@@ -47,6 +47,8 @@ export interface QuantObservation {
   exitDate?: string;
   quantity?: string;
   multiplier?: string;
+  plannedRR?: number;
+  side?: 'long' | 'short';
 }
 export function observeTrades(trades: Trade[]): QuantObservation[] {
   return trades
@@ -78,6 +80,7 @@ export function observeTrades(trades: Trade[]): QuantObservation[] {
         {
           id: t.id,
           symbol: t.symbol,
+          side: t.side,
           market: t.market,
           setup: t.setupId ?? '',
           openTime: f.openTime,
@@ -91,6 +94,20 @@ export function observeTrades(trades: Trade[]): QuantObservation[] {
             t.legs.filter((l) => l.kind === 'out').reduce((n, l) => n.plus(l.quantity), D('0')),
           ),
           multiplier: t.multiplier ?? '1',
+          plannedRR:
+            t.plannedSL &&
+            t.plannedTP &&
+            t.legs.filter((l) => l.kind === 'in').length === 1 &&
+            !t.legs.some((l) => l.synthetic) &&
+            (t.side === 'long'
+              ? D(t.plannedSL).lt(f.avgEntry) && D(t.plannedTP).gt(f.avgEntry)
+              : D(t.plannedSL).gt(f.avgEntry) && D(t.plannedTP).lt(f.avgEntry))
+              ? D(t.plannedTP)
+                  .minus(f.avgEntry)
+                  .abs()
+                  .div(D(t.plannedSL).minus(f.avgEntry).abs())
+                  .toNumber()
+              : undefined,
         },
       ];
     });

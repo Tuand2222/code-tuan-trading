@@ -154,6 +154,9 @@ export async function cloudDocuments(data: Snapshot): Promise<Doc[]> {
   for (const j of data.journals) {
     const raw = localStorage.getItem('tuan-v6-quant:' + j.id);
     if (raw) docs.push({ collection: 'preferences', id: 'quant:' + j.id, value: JSON.parse(raw) });
+    const capital = localStorage.getItem('tuan-v6-capital:' + j.id);
+    if (capital)
+      docs.push({ collection: 'preferences', id: 'capital:' + j.id, value: JSON.parse(capital) });
   }
   docs.push({
     collection: 'preferences',
@@ -247,7 +250,10 @@ export async function syncJournal(
     const local = new Map((await cloudDocuments(before.data)).map((d) => [key(d), d]));
     const managed = (collection: string, id: string) =>
       collection !== 'classic' &&
-      (collection !== 'preferences' || id === 'views' || id.startsWith('quant:'));
+      (collection !== 'preferences' ||
+        id === 'views' ||
+        id.startsWith('quant:') ||
+        id.startsWith('capital:'));
     const remote = new Map(
       manifest.records
         .filter((r) => managed(r.collection, r.record_id))
@@ -342,6 +348,8 @@ export async function syncJournal(
         if (d.collection === 'preferences') {
           if (d.id.startsWith('quant:'))
             localStorage.setItem('tuan-v6-quant:' + d.id.slice(6), JSON.stringify(d.value));
+          if (d.id.startsWith('capital:'))
+            localStorage.setItem('tuan-v6-capital:' + d.id.slice(8), JSON.stringify(d.value));
           if (d.id === 'views' && Array.isArray(d.value))
             await viewRepository.transaction('rw', viewRepository.views, async () => {
               await viewRepository.views.clear();
@@ -350,6 +358,8 @@ export async function syncJournal(
         }
     }
     for (const k of pulled) {
+      if (!next.has(k) && k.startsWith('preferences:capital:'))
+        localStorage.removeItem('tuan-v6-capital:' + k.slice('preferences:capital:'.length));
       if (!next.has(k) && k.startsWith('preferences:quant:'))
         localStorage.removeItem('tuan-v6-quant:' + k.slice('preferences:quant:'.length));
     }
@@ -469,6 +479,9 @@ export async function restoreCloudArchive(repo: JournalRepository, files: string
   for (const r of preview.records)
     if (!r.deleted && r.collection === 'preferences' && r.id.startsWith('quant:'))
       localStorage.setItem('tuan-v6-quant:' + r.id.slice(6), JSON.stringify(r.value));
+  for (const r of preview.records)
+    if (!r.deleted && r.collection === 'preferences' && r.id.startsWith('capital:'))
+      localStorage.setItem('tuan-v6-capital:' + r.id.slice(8), JSON.stringify(r.value));
   const views = preview.records.find(
     (r) => !r.deleted && r.collection === 'preferences' && r.id === 'views',
   );

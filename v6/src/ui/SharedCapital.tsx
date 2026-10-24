@@ -3,9 +3,11 @@ import { DEFAULT_RISK, type RiskSettings } from '../../../lib/risk-analytics';
 export function SharedCapital({
   onReference,
   currency,
+  onSaved,
 }: {
   onReference: (capital: number) => void;
   currency: string;
+  onSaved?: () => void;
 }) {
   const [settings, setSettings] = useState<RiskSettings>(DEFAULT_RISK),
     [owner, setOwner] = useState(''),
@@ -200,6 +202,7 @@ export function SharedCapital({
                     if (!r.ok) throw Error(b.error);
                     setVersion(b.revision);
                     setMessage('Đã lưu cấu hình vốn dùng chung.');
+                    onSaved?.();
                   })
                   .catch((e) => setMessage(String(e)))
                   .finally(() => setBusy(false));

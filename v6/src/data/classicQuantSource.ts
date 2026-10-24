@@ -27,6 +27,9 @@ export const receipt = z.object({
   version: z.number().int().optional(),
   note: z.string().optional(),
   side: z.string().optional(),
+  entryPrice: finite.optional(),
+  stopLoss: finite.optional(),
+  takeProfit: finite.optional(),
 });
 const markets: Record<string, string> = {
   'Chứng khoán': 'stocks',
@@ -66,6 +69,7 @@ export function classicObservations(input: unknown[]) {
       {
         id: t.id,
         symbol: t.symbol,
+        side: t.side === 'Buy' ? 'long' : t.side === 'Sell' ? 'short' : undefined,
         market: markets[t.market ?? ''] ?? 'unclassified',
         setup: t.setup ?? '',
         openTime: t.openedAt ?? closeTime,
@@ -80,6 +84,15 @@ export function classicObservations(input: unknown[]) {
         exitDate: t.date,
         quantity: t.quantity && t.quantity > 0 ? String(t.quantity) : undefined,
         multiplier: t.multiplier && t.multiplier > 0 ? String(t.multiplier) : undefined,
+        plannedRR:
+          t.entryPrice &&
+          t.stopLoss &&
+          t.takeProfit &&
+          (t.side === 'Buy'
+            ? t.stopLoss < t.entryPrice && t.takeProfit > t.entryPrice
+            : t.side === 'Sell' && t.stopLoss > t.entryPrice && t.takeProfit < t.entryPrice)
+            ? Math.abs((t.takeProfit - t.entryPrice) / (t.entryPrice - t.stopLoss))
+            : undefined,
       },
     ];
   });
@@ -108,6 +121,7 @@ export async function readClassicQuantSource() {
             ...classicObservations(payload.trades),
             receipts: payload.trades.map((r) => ({ ...(r as object), userId: user })),
             source: 'Classic · tài khoản đang đăng nhập',
+            owner: user,
             isDemo: false,
           };
       }
@@ -122,6 +136,7 @@ export async function readClassicQuantSource() {
       receipts: [] as unknown[],
       skipped: 0,
       source: 'Classic · trên thiết bị',
+      owner: user,
       isDemo: false,
     };
   const input: unknown = JSON.parse(raw);
@@ -130,6 +145,7 @@ export async function readClassicQuantSource() {
     ...classicObservations(input),
     receipts: input,
     source: 'Classic · bản lưu trên thiết bị',
+    owner: user,
     isDemo: localStorage.getItem('tuan-trader-demo-mode-v1' + (user ? ':' + user : '')) === 'true',
   };
 }

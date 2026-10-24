@@ -1,13 +1,23 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useLedger } from '../app/LedgerContext';
 import { plannedTradeSchema, altStrategySchema, type Journal } from '../data/schema';
 import { formatValue } from '../ui/format';
 import { TradeForm } from '../ui/TradeForm';
 import { tradeFacts } from '../core/trade';
 import { sum } from '../core/money';
+import { capitalProtection, accountObservations } from '../core/capitalPro';
+import { journalCapitalSettings } from '../data/capitalSettings';
 import { PlanImages } from '../ui/Chartbook';
 export function PlannedTrades({ journal }: { journal: Journal }) {
   const { data, mutate, busy, revision } = useLedger();
+  const gate = useMemo(
+    () =>
+      capitalProtection(
+        accountObservations(data.trades.filter((t) => t.journalId === journal.id)),
+        journalCapitalSettings(journal, data.cashFlows),
+      ),
+    [data.trades, data.cashFlows, journal],
+  );
   const [taking, setTaking] = useState<{ id: string; revision: number }>(),
     [individual, setIndividual] = useState<Record<string, string>>({});
   const [symbol, setSymbol] = useState(''),
@@ -27,6 +37,10 @@ export function PlannedTrades({ journal }: { journal: Journal }) {
         onSubmit={(e) => {
           e.preventDefault();
           try {
+            if (gate.tier === 'stop')
+              throw Error(
+                'Lớp bảo vệ vốn đang dừng kế hoạch mới; dữ liệu giao dịch đã xảy ra vẫn được ghi nhận.',
+              );
             const planned = plannedTradeSchema.parse({
               id: crypto.randomUUID(),
               journalId: journal.id,
@@ -75,7 +89,13 @@ export function PlannedTrades({ journal }: { journal: Journal }) {
             />
           </label>
         ))}
-        <button disabled={busy}>Lưu planned trade</button>
+        <button disabled={busy || gate.tier === 'stop'}>Lưu planned trade</button>
+        {gate.tier === 'stop' && (
+          <p role="alert">
+            Lớp 1 đang dừng kế hoạch mới. Mở Quản trị vốn Pro để đối chiếu; việc ghi nhận lệnh đã
+            xảy ra vẫn hoạt động.
+          </p>
+        )}
       </form>
       {data.plannedTrades
         .filter((p) => p.journalId === journal.id)

@@ -68,6 +68,7 @@ describe("PDF governance financial boundary", () => {
     const d = riskDesk([loss], settings, new Date("2026-10-24T00:00Z"));
     expect(d.tier).toBe("defensive");
     expect(d.riskBudget).toBe(225);
+    expect(riskDesk([trade({pnl:-7500, fees:0, swap:0})], settings).tier).toBe("stop");
     expect(positionSize(225, 100, 95, 1, 0, 1)?.quantity).toBe(45);
     expect(
       riskDesk([trade({ pnl: -8000, fees: 0, swap: 0 })], settings).riskBudget,

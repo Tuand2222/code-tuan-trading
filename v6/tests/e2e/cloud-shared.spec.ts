@@ -121,6 +121,9 @@ test('cloud roundtrip restores a new device, exports verifiable records and pres
   };
   await mock(page.context());
   await seed(page);
+  await page.goto('/#capital');
+  await page.getByRole('button', { name: 'Mô phỏng & stress', exact: true }).click();
+  await page.getByLabel('Seed tái lập', { exact: true }).fill('4321');
   await page.goto('/#cloud');
   await page.getByRole('button', { name: 'Bật lưu và đồng bộ nhật ký này', exact: true }).click();
   await expect(
@@ -139,6 +142,9 @@ test('cloud roundtrip restores a new device, exports verifiable records and pres
   await other.goto('/#cloud');
   await other.getByRole('button', { name: 'Bật lưu và đồng bộ nhật ký này', exact: true }).click();
   await expect(other.getByText('1 sổ · 30 giao dịch · 30 ghi chú', { exact: true })).toBeVisible();
+  await other.goto('/#capital');
+  await other.getByRole('button', { name: 'Mô phỏng & stress', exact: true }).click();
+  await expect(other.getByLabel('Seed tái lập', { exact: true })).toHaveValue('4321');
   await other.goto('/#overview');
   await expect(
     other.getByRole('article', { name: 'Kỳ vọng mỗi lệnh', exact: true }).locator('.quant-value'),

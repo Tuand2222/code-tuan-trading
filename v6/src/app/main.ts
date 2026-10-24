@@ -4,4 +4,5 @@ import Workspace from '../pages/Workspace';
 import './debug.css';
 import './workspace.css';
 import './journal.css';
+import './architecture.css';
 createRoot(document.getElementById('root')!).render(createElement(Workspace));
