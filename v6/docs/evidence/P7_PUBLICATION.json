@@ -1,0 +1,40 @@
+{
+  "package": {
+    "project_id": "appgprj_6ad3676fdf5c8191844fa8f0eb1c5242",
+    "checkout_path": "C:\\Users\\ADMIN\\Documents\\Codex\\2026-10-22\\x\\work\\site-main-update",
+    "commit_sha": "909035e4d091cf59869db814a8b0d3109e404b56",
+    "archive": "C:\\Users\\ADMIN\\Documents\\Codex\\2026-10-22\\x\\outputs\\hop-nhat-blueprint\\tuannhatky-unified-deploy.tar.gz"
+  },
+  "saved": {
+    "id": "appgprj_6ad3676fdf5c8191844fa8f0eb1c5242~appgver_5239f80cf4188191a4e72619e798ead2",
+    "project_id": "appgprj_6ad3676fdf5c8191844fa8f0eb1c5242",
+    "version_number": 17,
+    "source": {
+      "commit_sha": "909035e4d091cf59869db814a8b0d3109e404b56"
+    },
+    "archive_storage": {
+      "archive_format": "tar",
+      "sediment_file_id": "file_00000000d00081f8adcdd8bc702266f5",
+      "content_hash": "sha256:c7bf1b40c966aa1ed77b62007cfe98ae3c3edbf47dadcf6c80139ac5cdbac340",
+      "size_bytes": 21094400,
+      "file_count": 122
+    },
+    "screenshot_url": null,
+    "deployment_id": null
+  },
+  "deployment": {
+    "id": "appgdep_6adda1dfa3b881919f3f90715e3a0a16",
+    "project_id": "appgprj_6ad3676fdf5c8191844fa8f0eb1c5242",
+    "title": "Tuannhatky",
+    "version_id": "appgprj_6ad3676fdf5c8191844fa8f0eb1c5242~appgver_5239f80cf4188191a4e72619e798ead2",
+    "type": "publish",
+    "status": "succeeded",
+    "url": "https://tuannhatky.fabledcoot2.chatgpt.site",
+    "has_mcp": false,
+    "screenshot_asset_pointer": null,
+    "provider_deployment_id": "site---6ad3676fdf5c8191844fa8f0eb1c5242",
+    "failure_message": null,
+    "env_set_revision": 1,
+    "updated_at": "2026-10-25T06:30:18.072160+00:00"
+  }
+}

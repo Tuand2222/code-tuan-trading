@@ -1,0 +1,177 @@
+{
+  "phase": "P7",
+  "passed": 23,
+  "total": 23,
+  "cases": [
+    {
+      "name": "Sample A: equity, NAV, expectancy, SQN, Omega, weighted ES",
+      "pass": true,
+      "metrics": {
+        "sample": "A",
+        "count": 15,
+        "equity": 11850,
+        "dd": 0,
+        "maxdd": 0.01881467544684856,
+        "tier": 1,
+        "expectancy": 1.2333333333333334,
+        "sqn": 2.228984997397465,
+        "omega0": 4.083333333333333,
+        "es975": -1,
+        "rckRobust": 0.2312196072635187,
+        "fStar": 0,
+        "gate": false
+      }
+    },
+    {
+      "name": "Sample B: equity, NAV, expectancy, SQN, Omega, weighted ES",
+      "pass": true,
+      "metrics": {
+        "sample": "B",
+        "count": 15,
+        "equity": 23250,
+        "dd": 0,
+        "maxdd": 0.02409638554216864,
+        "tier": 1,
+        "expectancy": 0.8666666666666667,
+        "sqn": 2.115849992805015,
+        "omega0": 3.1666666666666665,
+        "es975": -1,
+        "rckRobust": 0.1887780599390037,
+        "fStar": 0,
+        "gate": false
+      }
+    },
+    {
+      "name": "B conversion: side, MAE, discipline, PnL per trade; input immutable",
+      "pass": true
+    },
+    {
+      "name": "Cashflow-neutral NAV after loss: deposit and withdrawal",
+      "pass": true,
+      "baseDD": 0.09999999999999998
+    },
+    {
+      "name": "Flow preceding PnL on same day; correct share issuance",
+      "pass": true,
+      "dd": 0.09999999999999998
+    },
+    {
+      "name": "Mixed timestamp offsets sort by actual instant, not lexical text",
+      "pass": true,
+      "dd": 0.09999999999999998
+    },
+    {
+      "name": "Tier thresholds, overrides, daily cap and three gates",
+      "pass": true
+    },
+    {
+      "name": "Invalid initialRisk / estimated risk excluded; gross missing fees excluded",
+      "pass": true
+    },
+    {
+      "name": "Fractional weighted ES vs floor/ceil; Omega(mu)=1",
+      "pass": true
+    },
+    {
+      "name": "Audited RCK and analytic RoR match actual source A",
+      "pass": true
+    },
+    {
+      "name": "Seeded Monte Carlo exactly matches A; permutation/revenge deterministic",
+      "pass": true,
+      "ddMedian": 0.039500049601000065,
+      "ddP95": 0.0821678461320885
+    },
+    {
+      "name": "Manual close has zero auto slip; explicit A price-unit override",
+      "pass": true
+    },
+    {
+      "name": "RiskStore cache computes once per commit and emits once",
+      "pass": true
+    },
+    {
+      "name": "Backup -> clear -> restore preserves every field",
+      "pass": true,
+      "fields": 16
+    },
+    {
+      "name": "Atomic failed commit/restore/quota does not change current state",
+      "pass": true
+    },
+    {
+      "name": "Migrate A+B: backup before write, priority, dedupe, extra/ext2, no removed keys",
+      "pass": true,
+      "trades": 17,
+      "flows": 3,
+      "duplicates": 1
+    },
+    {
+      "name": "B-only migration converts CF1 to initial capital once",
+      "pass": true
+    },
+    {
+      "name": "Malformed legacy / failed backup / quota: no unified write, no lost raw",
+      "pass": true
+    },
+    {
+      "name": "Empty existing ledger stays empty; fresh install samples only if no legacy",
+      "pass": true
+    },
+    {
+      "name": "Clear sample data preserves new user trades and edited sample records",
+      "pass": true
+    },
+    {
+      "name": "B manual Tier string migrates to canonical numeric override",
+      "pass": true
+    },
+    {
+      "name": "B sample floating position is separate from realized ledger; safe sample removal",
+      "pass": true
+    },
+    {
+      "name": "Generated Worker syntax + all four tasks equal main source functions",
+      "pass": true,
+      "tasks": [
+        "mc",
+        "ror",
+        "prop",
+        "analytics"
+      ]
+    }
+  ],
+  "samples": [
+    {
+      "sample": "A",
+      "count": 15,
+      "equity": 11850,
+      "dd": 0,
+      "maxdd": 0.01881467544684856,
+      "tier": 1,
+      "expectancy": 1.2333333333333334,
+      "sqn": 2.228984997397465,
+      "omega0": 4.083333333333333,
+      "es975": -1,
+      "rckRobust": 0.2312196072635187,
+      "fStar": 0,
+      "gate": false
+    },
+    {
+      "sample": "B",
+      "count": 15,
+      "equity": 23250,
+      "dd": 0,
+      "maxdd": 0.02409638554216864,
+      "tier": 1,
+      "expectancy": 0.8666666666666667,
+      "sqn": 2.115849992805015,
+      "omega0": 3.1666666666666665,
+      "es975": -1,
+      "rckRobust": 0.1887780599390037,
+      "fStar": 0,
+      "gate": false
+    }
+  ],
+  "timestamp": "2026-10-25T06:27:57.490Z"
+}

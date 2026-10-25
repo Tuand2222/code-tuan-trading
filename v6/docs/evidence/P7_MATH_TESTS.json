@@ -1,0 +1,138 @@
+{
+  "phase": "P7",
+  "passed": 12,
+  "total": 12,
+  "cases": [
+    {
+      "name": "Prop static: first-attempt probabilities exactly equal source A, independent of retry/funded RNG",
+      "pass": true,
+      "expected": {
+        "win": 623,
+        "fail": 377,
+        "timeout": 0
+      },
+      "actual": {
+        "pass": 0.623,
+        "fail": 0.377,
+        "timeout": 0
+      }
+    },
+    {
+      "name": "Prop trailing: first-attempt probabilities exactly equal source A, independent of retry/funded RNG",
+      "pass": true,
+      "expected": {
+        "win": 621,
+        "fail": 379,
+        "timeout": 0
+      },
+      "actual": {
+        "pass": 0.621,
+        "fail": 0.379,
+        "timeout": 0
+      }
+    },
+    {
+      "name": "Multi-stage unconditional success decreases at each stage; outcome probabilities and EV reconcile",
+      "pass": true,
+      "static": {
+        "pass": 0.926,
+        "fail": 0.073,
+        "to": 0.001,
+        "failPhase1": 0.024,
+        "toPhase1": 0,
+        "stPass": [
+          0.976,
+          0.948,
+          0.926
+        ],
+        "medT": 34,
+        "ev": 183.4,
+        "evPay": 20015.34171759109,
+        "campaignPay": 21684.54986203882,
+        "evUsd": 19845.89171759109,
+        "evPct": 11711.945540036053,
+        "roiMed": 119.59457025235382,
+        "expectedCostOneAttempt": 169.45,
+        "roiPdfFunded": 11711.945540036053,
+        "roiPdfCycle": 3647.249504700081,
+        "theoCycleProfit": 6857.142857142859,
+        "theoMonthlyProfit": 13714.285714285717,
+        "totalFeeIfPass": 175,
+        "cyc": 0.025398017539376865
+      },
+      "trailing": {
+        "pass": 0.887,
+        "fail": 0.113,
+        "to": 0,
+        "failPhase1": 0.029,
+        "toPhase1": 0,
+        "stPass": [
+          0.971,
+          0.922,
+          0.887
+        ],
+        "medT": 33,
+        "ev": 188.6,
+        "evPay": 18253.932508099602,
+        "campaignPay": 20678.11827587077,
+        "evUsd": 18087.4075080996,
+        "evPct": 10861.676930250473,
+        "roiMed": 109.62876772549758,
+        "expectedCostOneAttempt": 166.525,
+        "roiPdfFunded": 10861.676930250473,
+        "roiPdfCycle": 3552.476033199649,
+        "theoCycleProfit": 6857.142857142859,
+        "theoMonthlyProfit": 13714.285714285717,
+        "totalFeeIfPass": 175,
+        "cyc": 0.02736807533271691
+      }
+    },
+    {
+      "name": "Zero fees: ROI undefined, not 0%; positive payout retained",
+      "pass": true,
+      "payout": 25174.938524814814,
+      "roi": null
+    },
+    {
+      "name": "Only completed payout cycles paid; short horizon and unprofitable histories pay zero",
+      "pass": true
+    },
+    {
+      "name": "Sizer respects floor-to-step, Tier 2 reduction, budget, Tier 3 and missing conversion",
+      "pass": true,
+      "quantity": 3,
+      "actual": 300
+    },
+    {
+      "name": "Liquidity weights verified planned risk, excludes estimated/missing; extended symbols classify correctly",
+      "pass": true,
+      "effective": 47.5,
+      "missing": 2
+    },
+    {
+      "name": "What-if uses verified net R only; skip/cap/slip never modifies trade ledger",
+      "pass": true,
+      "base": 15,
+      "alternative": 9
+    },
+    {
+      "name": "Stress sliders degrade win rate/payoff and force an exact initial loss prefix",
+      "pass": true,
+      "expectancy": -0.08839999999999992,
+      "streakDD": 0.13994164535871156
+    },
+    {
+      "name": "Config restore rejects invalid simulation/stages/sizer atomically",
+      "pass": true
+    },
+    {
+      "name": "Generated Worker computes comparison and multi-stage Prop identically to main engine",
+      "pass": true
+    },
+    {
+      "name": "Pending data change rejects stale result; metadata-only change reuses deterministic cache safely",
+      "pass": true
+    }
+  ],
+  "timestamp": "2026-10-25T06:28:02.658Z"
+}

@@ -1,0 +1,88 @@
+{
+  "phase": "P7",
+  "passed": 12,
+  "total": 12,
+  "cases": [
+    {
+      "name": "MC auto-runs in real Worker; original A fan/summary and N<30 warning",
+      "pass": true,
+      "median": 2.361412663327201,
+      "p95DD": 0.0733249068422287,
+      "execution": "worker"
+    },
+    {
+      "name": "Seed/mode/what-if updates persist and never modify journal",
+      "pass": true,
+      "seed": 77,
+      "mode": "perm",
+      "reloadDeterministic": true
+    },
+    {
+      "name": "Stress locked for small sample and Tier 3; explicit assumption unlock is respected",
+      "pass": true
+    },
+    {
+      "name": "Stress sliders persist atomically, force loss prefix and share stressed ES with L2",
+      "pass": true,
+      "forcedStreak": 15,
+      "sharedES": 4.379409099867242,
+      "summary": "ES stressed (20 lệnh, trượt giá ×2, thanh khoản √(69.3/10)): 4.38R · 2,5% nhóm lệnh thua · 1/6 lệnh · ES 97,5% lệnh đơn -1.00R"
+    },
+    {
+      "name": "Sizer uses union product specs and A US30 step; USDJPY requires conversion; Tier3 gives zero",
+      "pass": true,
+      "symbols": 20,
+      "US30Step": 0.1
+    },
+    {
+      "name": "Liquidity group overrides and shared selector update one stressed ES",
+      "pass": true,
+      "effective": 98.66666666666667,
+      "override": 20
+    },
+    {
+      "name": "Prop multi-stage, activation, payout and compounding controls feed one seeded Worker result",
+      "pass": true,
+      "staticPass": 1,
+      "trailingPass": 1
+    },
+    {
+      "name": "Named Prop presets are source examples; zero fee ROI is dash; invalid stages do not overwrite state",
+      "pass": true,
+      "preset": "ftmo",
+      "zeroFeeRoi": null
+    },
+    {
+      "name": "Comparison table and Zones read exact cached MC/Prop/Equity/Edge; no duplicate charts",
+      "pass": true,
+      "sharedEquity": 11850,
+      "sharedDD": 0,
+      "sharedOmega": 4.083333333333333,
+      "summaryCanvases": 0
+    },
+    {
+      "name": "Verified recommendation survives UI-only save; MC feedback applies only to personal account",
+      "pass": true,
+      "recommendation": 0.009124087591240875,
+      "appliedTier2": 4.5,
+      "appliedTier3": 6.9,
+      "propProtected": true
+    },
+    {
+      "name": "Trade changes while Worker pending cannot show stale MC; metadata-only change recovers",
+      "pass": true,
+      "seed": 817,
+      "staleOverwrites": 0
+    },
+    {
+      "name": "P7 routes: unique runtime IDs, dark/mobile no horizontal overflow, Zones links route correctly",
+      "pass": true,
+      "routes": 5,
+      "runtimeDuplicateIds": 0,
+      "mobileOverflow": false
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "timestamp": "2026-10-25T06:22:10.683Z"
+}

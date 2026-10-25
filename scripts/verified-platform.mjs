@@ -10,7 +10,7 @@ function run(command, args, cwd = process.cwd()) {
 }
 const v6Root = path.resolve('v6');
 if (action === 'build') {
-  run(process.execPath, ['node_modules/vite/bin/vite.js', 'build'], v6Root);
+  run(process.execPath, ['scripts/build.mjs'], v6Root);
   const destination = path.resolve('public', 'v6');
   if (path.dirname(destination) !== path.resolve('public')) throw new Error('Invalid v6 asset destination');
   rmSync(destination, { recursive: true, force: true });

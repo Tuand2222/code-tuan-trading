@@ -1,0 +1,1641 @@
+{
+ "SRC_A_V3_Kiem_Toan.html": {
+  "bytes": 265621,
+  "lines": 2321,
+  "static_ids_by_section": {
+   "(header/global)": [
+    "btn-gross",
+    "btn-theme",
+    "sidebar",
+    "side-overview",
+    "side-workspace",
+    "side-edge",
+    "side-drilldown",
+    "side-discipline",
+    "side-pnlrisk",
+    "side-simulation",
+    "side-cockpit",
+    "side-mapping",
+    "side-dictionary",
+    "v3-safety",
+    "page-h1",
+    "alerts-bar",
+    "alert-disc",
+    "filter-bar",
+    "filter-summary",
+    "filter-chips",
+    "filter-clear"
+   ],
+   "tab-workspace": [
+    "tab-workspace",
+    "filter-date-range",
+    "filter-date-from",
+    "filter-date-to",
+    "filter-operator",
+    "filter-market",
+    "filter-setup",
+    "filter-side",
+    "filter-symbol",
+    "filter-discipline",
+    "filter-result",
+    "filter-review",
+    "filter-tag",
+    "custom-tags-container",
+    "saved-view-name",
+    "saved-views-dropdown",
+    "filtered-count",
+    "workspace-table-body"
+   ],
+   "tab-edge": [
+    "tab-edge",
+    "confidence-bar",
+    "kpi-expectancy",
+    "badge-expectancy",
+    "kpi-sqn",
+    "badge-sqn",
+    "kpi-pf",
+    "badge-pf",
+    "kpi-exit-eff",
+    "badge-exit-eff",
+    "kpi-dd",
+    "badge-dd",
+    "kpi-recovery",
+    "badge-recovery",
+    "chart-mfe",
+    "chart-mae",
+    "chart-rdist",
+    "chart-drawdown",
+    "heatmap-container",
+    "discipline-cost",
+    "breakdown-dim",
+    "breakdown-container",
+    "hold-wrap",
+    "chart-hold",
+    "hold-note"
+   ],
+   "tab-simulation": [
+    "tab-simulation",
+    "sim-horizon",
+    "sim-runs",
+    "sim-risk",
+    "sim-dd",
+    "sim-skip",
+    "sim-cap",
+    "sim-slip",
+    "chart-sim",
+    "sim-summary",
+    "sim-note"
+   ],
+   "tab-cockpit": [
+    "tab-cockpit",
+    "ck-day",
+    "ck-daily",
+    "ck-personal",
+    "ck-maxdd",
+    "ck-ddmode",
+    "ck-cards"
+   ],
+   "tab-pnlrisk": [
+    "tab-pnlrisk",
+    "risk-ratio-cards",
+    "chart-equity",
+    "risk-note"
+   ],
+   "tab-mapping": [
+    "tab-mapping",
+    "mapping-demo-body"
+   ],
+   "tab-dictionary": [
+    "tab-dictionary",
+    "dict-search",
+    "dict-cards-container"
+   ],
+   "tab-riskcapital": [
+    "tab-riskcapital",
+    "risk-gate-badge",
+    "risk-summary-cards",
+    "risk-quality",
+    "risk-tier-stats",
+    "risk-recovery-chart",
+    "risk-pct",
+    "risk-k",
+    "risk-dd-limit",
+    "risk-ror-horizon",
+    "risk-budget",
+    "risk-ror-result",
+    "risk-overlap",
+    "risk-detail-rows"
+   ],
+   "tab-riskedge": [
+    "tab-riskedge",
+    "risk-edge-quality",
+    "risk-omega-l",
+    "risk-omega-val",
+    "risk-omega-chart",
+    "risk-es-val",
+    "risk-tail-chart",
+    "risk-roll-window",
+    "risk-decay-stats",
+    "risk-drift-chart",
+    "risk-tp-r",
+    "risk-sl-r",
+    "risk-whatif"
+   ],
+   "tab-riskopt": [
+    "tab-riskopt",
+    "risk-alpha",
+    "risk-opt-dd",
+    "risk-opt-horizon",
+    "risk-opt-max",
+    "risk-opt-run",
+    "risk-opt-result",
+    "risk-opt-chart",
+    "risk-opt-fan-note",
+    "risk-serial",
+    "risk-prop-size",
+    "risk-prop-target",
+    "risk-prop-fee",
+    "risk-prop-split",
+    "risk-prop-out",
+    "risk-detail-modal",
+    "risk-detail-close",
+    "risk-detail-title",
+    "risk-edit-open",
+    "risk-edit-close",
+    "risk-edit-entry",
+    "risk-edit-sl",
+    "risk-edit-tp",
+    "risk-edit-exit",
+    "risk-edit-lots",
+    "adv-edit-mae",
+    "adv-edit-mfe",
+    "adv-edit-slip",
+    "adv-edit-tick",
+    "risk-edit-error",
+    "risk-detail-cancel",
+    "risk-detail-save"
+   ],
+   "tab-risktools": [
+    "tab-risktools",
+    "adv-quality",
+    "adv-symbol",
+    "adv-risk",
+    "adv-entry",
+    "adv-sl",
+    "adv-ptv",
+    "adv-step",
+    "adv-size-out",
+    "adv-price-quality",
+    "adv-duration",
+    "adv-hold-chart",
+    "adv-trades"
+   ],
+   "tab-riskstress": [
+    "tab-riskstress",
+    "adv-sw-label",
+    "adv-sw",
+    "adv-sp-label",
+    "adv-sp",
+    "adv-sf-label",
+    "adv-sf",
+    "adv-streak",
+    "adv-degrade",
+    "adv-tail",
+    "adv-stress-dd",
+    "adv-stress-reset",
+    "adv-stress-gates",
+    "adv-stress-out",
+    "adv-stress-chart"
+   ],
+   "tab-riskprop": [
+    "tab-riskprop",
+    "adv-preset",
+    "adv-p-size",
+    "adv-p-fee",
+    "adv-p-target",
+    "adv-p-maxloss",
+    "adv-p-daily",
+    "adv-p-risk",
+    "adv-p-split",
+    "adv-p-tpd",
+    "adv-p-horizon",
+    "adv-p-ddmode",
+    "adv-p-runs",
+    "adv-p-seed",
+    "adv-p-run",
+    "adv-p-summary",
+    "adv-p-chart",
+    "custom-option-modal",
+    "custom-modal-title",
+    "custom-option-input",
+    "custom-option-target-category",
+    "tooltip-modal",
+    "modal-title",
+    "modal-function",
+    "modal-formula",
+    "modal-scale",
+    "modal-action",
+    "add-trade-modal",
+    "new-trade-symbol",
+    "new-trade-pnl",
+    "new-trade-risk",
+    "new-trade-hold",
+    "settings-drawer",
+    "setting-initial-cap",
+    "setting-default-1r",
+    "label-friction-val",
+    "setting-friction",
+    "setting-sqn-cap"
+   ]
+  },
+  "ids_injected_by_js": [
+   "adv-correlated",
+   "adv-exit-bounds",
+   "adv-interlock",
+   "adv-mc-chart",
+   "adv-mc-h",
+   "adv-mc-mode",
+   "adv-mc-n",
+   "adv-mc-revenge",
+   "adv-mc-run",
+   "adv-mc-seed",
+   "adv-mc-summary",
+   "adv-rck",
+   "adv-rck-alpha",
+   "adv-rck-beta",
+   "adv-ror-analytics",
+   "adv-serial-complete",
+   "breakdown-mode",
+   "cal-g",
+   "cal-n",
+   "cal-p",
+   "cal-t",
+   "cb-f",
+   "cb-g",
+   "ck-a",
+   "ck-l",
+   "ck-n",
+   "ck-r",
+   "dep-list",
+   "dep-sum",
+   "dp-add",
+   "dp-t",
+   "gp-d",
+   "gp-list",
+   "gp-out",
+   "gp-save",
+   "im-g",
+   "im-o",
+   "im-p",
+   "im-t",
+   "kcfg",
+   "kcfg-l",
+   "rv-s",
+   "rv-w",
+   "side-riskcapital",
+   "side-riskedge",
+   "side-riskopt",
+   "side-riskprop",
+   "side-riskstress",
+   "side-risktools",
+   "sz-o",
+   "v6-ext",
+   "v6-ext2",
+   "v6-nav"
+  ],
+  "functions": [
+   {
+    "name": "weekdayOf",
+    "line": 1086
+   },
+   {
+    "name": "netR",
+    "line": 1087
+   },
+   {
+    "name": "fmtR",
+    "line": 1093
+   },
+   {
+    "name": "toast",
+    "line": 1094
+   },
+   {
+    "name": "snapshot",
+    "line": 1095
+   },
+   {
+    "name": "persist",
+    "line": 1096
+   },
+   {
+    "name": "applySaved",
+    "line": 1097
+   },
+   {
+    "name": "restore",
+    "line": 1103
+   },
+   {
+    "name": "exportBackup",
+    "line": 1104
+   },
+   {
+    "name": "importBackup",
+    "line": 1105
+   },
+   {
+    "name": "syncSettingsUI",
+    "line": 1110
+   },
+   {
+    "name": "rawTab",
+    "line": 1242
+   },
+   {
+    "name": "hashTab",
+    "line": 1243
+   },
+   {
+    "name": "switchSidebarTab",
+    "line": 1244
+   },
+   {
+    "name": "route",
+    "line": 1245
+   },
+   {
+    "name": "applyEdgeView",
+    "line": 1251
+   },
+   {
+    "name": "showTab",
+    "line": 1261
+   },
+   {
+    "name": "renderHoldChart",
+    "line": 1277
+   },
+   {
+    "name": "updateCockpitSettings",
+    "line": 1291
+   },
+   {
+    "name": "renderCockpit",
+    "line": 1296
+   },
+   {
+    "name": "cbSel",
+    "line": 1323
+   },
+   {
+    "name": "cbPool",
+    "line": 1324
+   },
+   {
+    "name": "cbSet",
+    "line": 1330
+   },
+   {
+    "name": "cbAdd",
+    "line": 1331
+   },
+   {
+    "name": "cbRender",
+    "line": 1338
+   },
+   {
+    "name": "cbInit",
+    "line": 1348
+   },
+   {
+    "name": "cbWriteUrl",
+    "line": 1370
+   },
+   {
+    "name": "cbBuildForm",
+    "line": 1379
+   },
+   {
+    "name": "showTip",
+    "line": 1389
+   },
+   {
+    "name": "hideTip",
+    "line": 1398
+   },
+   {
+    "name": "applyTheme",
+    "line": 1406
+   },
+   {
+    "name": "initTheme",
+    "line": 1407
+   },
+   {
+    "name": "toggleTheme",
+    "line": 1408
+   },
+   {
+    "name": "syncGrossBtn",
+    "line": 1409
+   },
+   {
+    "name": "toggleGross",
+    "line": 1410
+   },
+   {
+    "name": "renderRiskRatios",
+    "line": 1413
+   },
+   {
+    "name": "buildPool",
+    "line": 1430
+   },
+   {
+    "name": "simulate",
+    "line": 1434
+   },
+   {
+    "name": "runSimulation",
+    "line": 1442
+   },
+   {
+    "name": "promptAddCustomOption",
+    "line": 1461
+   },
+   {
+    "name": "closeCustomOptionModal",
+    "line": 1474
+   },
+   {
+    "name": "confirmAddCustomOption",
+    "line": 1478
+   },
+   {
+    "name": "renderCustomTagsPills",
+    "line": 1484
+   },
+   {
+    "name": "removeCustomOption",
+    "line": 1505
+   },
+   {
+    "name": "getActiveConditions",
+    "line": 1511
+   },
+   {
+    "name": "dateScope",
+    "line": 1520
+   },
+   {
+    "name": "renderFilterChips",
+    "line": 1530
+   },
+   {
+    "name": "updateFilters",
+    "line": 1536
+   },
+   {
+    "name": "resetFilters",
+    "line": 1550
+   },
+   {
+    "name": "rebuildSavedViews",
+    "line": 1565
+   },
+   {
+    "name": "saveCurrentView",
+    "line": 1570
+   },
+   {
+    "name": "loadSavedView",
+    "line": 1578
+   },
+   {
+    "name": "renderWorkspaceTable",
+    "line": 1591
+   },
+   {
+    "name": "recalculateAndRender",
+    "line": 1624
+   },
+   {
+    "name": "renderMfeChart",
+    "line": 1655
+   },
+   {
+    "name": "renderMaeChart",
+    "line": 1681
+   },
+   {
+    "name": "renderRDistChart",
+    "line": 1707
+   },
+   {
+    "name": "renderDrawdownChart",
+    "line": 1742
+   },
+   {
+    "name": "mulberry",
+    "line": 1779
+   },
+   {
+    "name": "bootstrapCI",
+    "line": 1780
+   },
+   {
+    "name": "sqnLabel",
+    "line": 1785
+   },
+   {
+    "name": "groupStats",
+    "line": 1786
+   },
+   {
+    "name": "renderConfidence",
+    "line": 1790
+   },
+   {
+    "name": "renderDisciplineCost",
+    "line": 1799
+   },
+   {
+    "name": "renderBreakdown",
+    "line": 1809
+   },
+   {
+    "name": "renderHeatmap",
+    "line": 1822
+   },
+   {
+    "name": "renderDictionaryCards",
+    "line": 1842
+   },
+   {
+    "name": "searchDictionary",
+    "line": 1865
+   },
+   {
+    "name": "openTooltipModal",
+    "line": 1873
+   },
+   {
+    "name": "closeTooltipModal",
+    "line": 1886
+   },
+   {
+    "name": "toggleSettingsDrawer",
+    "line": 1891
+   },
+   {
+    "name": "updateSettingsFromUI",
+    "line": 1895
+   },
+   {
+    "name": "openAddTradeModal",
+    "line": 1907
+   },
+   {
+    "name": "closeAddTradeModal",
+    "line": 1911
+   },
+   {
+    "name": "submitNewTrade",
+    "line": 1915
+   },
+   {
+    "name": "runMappingDemo",
+    "line": 1961
+   },
+   {
+    "name": "toggleMobileSidebar",
+    "line": 1988
+   },
+   {
+    "name": "go",
+    "line": 1996
+   },
+   {
+    "name": "window.renderRiskRatios",
+    "line": 2019
+   },
+   {
+    "name": "window.renderBreakdown",
+    "line": 2025
+   },
+   {
+    "name": "window.renderWorkspaceTable",
+    "line": 2029
+   },
+   {
+    "name": "addTab",
+    "line": 2038
+   },
+   {
+    "name": "parse",
+    "line": 2066
+   },
+   {
+    "name": "window.getActiveConditions",
+    "line": 2089
+   },
+   {
+    "name": "kApply",
+    "line": 2108
+   },
+   {
+    "name": "ed",
+    "line": 2119
+   },
+   {
+    "name": "createChart",
+    "line": 2149
+   },
+   {
+    "name": "getCashflow",
+    "line": 2150
+   },
+   {
+    "name": "nav",
+    "line": 2151
+   },
+   {
+    "name": "capitalNAV",
+    "line": 2155
+   },
+   {
+    "name": "tier",
+    "line": 2172
+   },
+   {
+    "name": "renderCapital",
+    "line": 2173
+   },
+   {
+    "name": "renderDetails",
+    "line": 2182
+   },
+   {
+    "name": "renderExposure",
+    "line": 2183
+   },
+   {
+    "name": "editorOpen",
+    "line": 2184
+   },
+   {
+    "name": "editorClose",
+    "line": 2185
+   },
+   {
+    "name": "editorSave",
+    "line": 2186
+   },
+   {
+    "name": "renderEdge",
+    "line": 2187
+   },
+   {
+    "name": "renderSerial",
+    "line": 2193
+   },
+   {
+    "name": "renderProp",
+    "line": 2194
+   },
+   {
+    "name": "optimizer",
+    "line": 2195
+   },
+   {
+    "name": "renderOpt",
+    "line": 2203
+   },
+   {
+    "name": "refresh",
+    "line": 2204
+   },
+   {
+    "name": "exportUnifiedBackup",
+    "line": 2205
+   },
+   {
+    "name": "importUnifiedBackup",
+    "line": 2206
+   },
+   {
+    "name": "attach",
+    "line": 2207
+   },
+   {
+    "name": "sampleRng",
+    "line": 2230
+   },
+   {
+    "name": "range",
+    "line": 2231
+   },
+   {
+    "name": "card",
+    "line": 2232
+   },
+   {
+    "name": "selectedNav",
+    "line": 2233
+   },
+   {
+    "name": "riskGate",
+    "line": 2234
+   },
+   {
+    "name": "rckBernoulli",
+    "line": 2236
+   },
+   {
+    "name": "rckEmpirical",
+    "line": 2239
+   },
+   {
+    "name": "analyticRoR",
+    "line": 2254
+   },
+   {
+    "name": "mount",
+    "line": 2255
+   },
+   {
+    "name": "syncSizerSymbol",
+    "line": 2282
+   },
+   {
+    "name": "calcSizer",
+    "line": 2283
+   },
+   {
+    "name": "timeMs",
+    "line": 2285
+   },
+   {
+    "name": "renderTools",
+    "line": 2286
+   },
+   {
+    "name": "interlocks",
+    "line": 2291
+   },
+   {
+    "name": "exitBounds",
+    "line": 2295
+   },
+   {
+    "name": "fullSerial",
+    "line": 2296
+   },
+   {
+    "name": "rckPanel",
+    "line": 2297
+   },
+   {
+    "name": "mcExtended",
+    "line": 2303
+   },
+   {
+    "name": "stress",
+    "line": 2306
+   },
+   {
+    "name": "propSimulation",
+    "line": 2310
+   },
+   {
+    "name": "renderExtended",
+    "line": 2314
+   },
+   {
+    "name": "render",
+    "line": 2315
+   }
+  ],
+  "functions_defined_more_than_once": {
+   "renderRiskRatios": [
+    1413,
+    2019
+   ],
+   "getActiveConditions": [
+    1511,
+    2089
+   ],
+   "renderWorkspaceTable": [
+    1591,
+    2029
+   ],
+   "renderBreakdown": [
+    1809,
+    2025
+   ]
+  },
+  "localStorage_keys": [
+   "tuannhatky-unified-trial-",
+   "tuannhatky-v6-backup-",
+   "tuannhatky_theme",
+   "tuannhatky_trial_v3_data",
+   "tuannhatky_trial_v3_ext2",
+   "tuannhatky_trial_v3_extra"
+  ]
+ },
+ "SRC_B_v9_Risk.html": {
+  "bytes": 275872,
+  "lines": 3983,
+  "static_ids_by_section": {
+   "(header/global)": [
+    "top-bar-equity",
+    "top-bar-cashflow",
+    "top-bar-dd",
+    "top-bar-status",
+    "nav-tabs",
+    "btn-tab-overview",
+    "btn-tab-layer1",
+    "btn-tab-layer2",
+    "btn-tab-layer3",
+    "btn-tab-cockpit"
+   ],
+   "tab-overview": [
+    "tab-overview",
+    "cashflow-table-body",
+    "trade-count-badge",
+    "trade-log-body"
+   ],
+   "tab-layer1": [
+    "tab-layer1",
+    "input-dd-pct",
+    "output-recovery-pct",
+    "chartAsymmetricRecovery",
+    "simultaneous-exposure-summary",
+    "chartSimultaneousExposure",
+    "ror-winrate",
+    "ror-payoff",
+    "ror-floor",
+    "chartRorCliff",
+    "bud-k",
+    "bud-f",
+    "daily-budget-max-risk",
+    "daily-budget-detail"
+   ],
+   "tab-layer2": [
+    "tab-layer2",
+    "whatif-scenario-select",
+    "whatif-orig-exp",
+    "whatif-orig-winrate",
+    "whatif-new-exp",
+    "whatif-new-winrate",
+    "whatif-stopped-early",
+    "whatif-pf-change",
+    "chartWhatIfCompare",
+    "sample-size-warning-tag",
+    "half-compare-text",
+    "chartRollingDrift",
+    "chartBaselTail",
+    "omega-target-select",
+    "chartOmegaCurve"
+   ],
+   "tab-layer3": [
+    "tab-layer3",
+    "rck-alpha",
+    "rck-beta",
+    "rck-winrate",
+    "rck-payoff",
+    "out-full-kelly",
+    "out-half-kelly",
+    "out-quarter-kelly",
+    "out-rck-optimal",
+    "out-final-rec",
+    "chk-mc-revenge-mode",
+    "chartMonteCarloFan",
+    "mc-p5-val",
+    "mc-p25-val",
+    "mc-p50-val",
+    "mc-p75-val",
+    "mc-p95-val"
+   ],
+   "tab-cockpit": [
+    "tab-cockpit",
+    "lbl-cockpit-winrate",
+    "rng-cockpit-winrate",
+    "lbl-cockpit-payoff",
+    "rng-cockpit-payoff",
+    "lbl-cockpit-risk",
+    "rng-cockpit-risk",
+    "chk-stress-streak",
+    "chk-stress-degrade",
+    "cockpit-status-badge",
+    "cockpit-exp-val",
+    "cockpit-ror-val",
+    "cockpit-rck-val",
+    "cockpit-es-val",
+    "chartCockpitSim",
+    "cockpit-warning-box",
+    "trade-modal",
+    "form-add-trade",
+    "modal-symbol",
+    "modal-side",
+    "modal-lots",
+    "modal-entry",
+    "modal-sl",
+    "modal-tp",
+    "modal-exit",
+    "modal-open-time",
+    "modal-close-time",
+    "modal-mae",
+    "modal-mfe",
+    "modal-setup",
+    "modal-exit-reason",
+    "modal-asset",
+    "modal-risk-usd",
+    "cashflow-modal",
+    "cf-type",
+    "cf-amount",
+    "cf-time",
+    "cf-note"
+   ]
+  },
+  "ids_injected_by_js": [
+   "a-setup-datalist",
+   "as-lock-stress",
+   "as-rec-rule",
+   "as-safe-tier",
+   "as-tail-mode",
+   "as-tier-cap",
+   "assumptions-verify-drawer",
+   "btn-ror-zoom",
+   "btn-toggle-4zone",
+   "chartRckFam",
+   "chartVarBreachTimeline",
+   "daily-loss-tracker-panel",
+   "db-schema-panel",
+   "db-schema-tables-view",
+   "dl-date-pick",
+   "dl-floating-input",
+   "dl-progress-bar",
+   "dl-progress-label",
+   "dl-realized-ovr",
+   "dl-remaining-r",
+   "dl-status-pill",
+   "dl-stop-alert",
+   "es-stats",
+   "fb-l1",
+   "gate-cockpit",
+   "gate-l3",
+   "gate-strip",
+   "interlock-banner",
+   "l2-planned-vs-actual-card",
+   "l2-tail-setup-alert",
+   "lbl-rr-drop",
+   "lbl-streak-len",
+   "lbl-wr-drop",
+   "lh-table",
+   "mc-info",
+   "mc-mdd",
+   "modal-setup-tier2-hint",
+   "modal-tier-note",
+   "om-l-slider",
+   "om-l-val",
+   "om-setup-1",
+   "om-setup-2",
+   "omega-controls-v9",
+   "omega-quantile-grid",
+   "omega-stats",
+   "perf-grid",
+   "pf-actfee",
+   "pf-comp",
+   "pf-out",
+   "pf-pdays",
+   "pf-stages",
+   "rck-extra",
+   "risk-compare",
+   "rng-stress-rr-drop",
+   "rng-stress-streak-len",
+   "rng-stress-wr-drop",
+   "ror-U",
+   "ror-bal",
+   "ror-emp",
+   "ror-heat",
+   "ror-kau",
+   "sel-mc-h",
+   "sel-mc-mode",
+   "sel-mc-n",
+   "sel-mc-seed",
+   "sz-out",
+   "tc-live",
+   "tc-sessout",
+   "tier-action-protocol-box",
+   "tier2-action-panel",
+   "tier3-action-panel",
+   "top-cockpit-gauges",
+   "top-dd-gauge-bar",
+   "top-dd-gauge-txt",
+   "top-dl-bar",
+   "top-dl-txt",
+   "unified-import-msg",
+   "unified-import-text",
+   "var-breach-badge",
+   "z4-heat",
+   "z4-mc",
+   "z4-prop",
+   "z4-stress",
+   "zone4-deck"
+  ],
+  "functions": [
+   {
+    "name": "switchTab",
+    "line": 1071
+   },
+   {
+    "name": "recalculateMasterCapital",
+    "line": 1082
+   },
+   {
+    "name": "calcTradeMetrics",
+    "line": 1121
+   },
+   {
+    "name": "renderTradeLogTable",
+    "line": 1169
+   },
+   {
+    "name": "renderCashflowTable",
+    "line": 1210
+   },
+   {
+    "name": "toggleCashflowModal",
+    "line": 1226
+   },
+   {
+    "name": "saveCashflow",
+    "line": 1230
+   },
+   {
+    "name": "openTradeModal",
+    "line": 1245
+   },
+   {
+    "name": "closeTradeModal",
+    "line": 1248
+   },
+   {
+    "name": "saveNewTrade",
+    "line": 1252
+   },
+   {
+    "name": "analyzeSimultaneousExposure",
+    "line": 1280
+   },
+   {
+    "name": "runWhatIfSimulation",
+    "line": 1325
+   },
+   {
+    "name": "calculateRollingDrift",
+    "line": 1394
+   },
+   {
+    "name": "analyzeSerialPsychology",
+    "line": 1437
+   },
+   {
+    "name": "initAsymmetricRecoveryChart",
+    "line": 1461
+   },
+   {
+    "name": "updateAsymmetricRecovery",
+    "line": 1491
+   },
+   {
+    "name": "initSimultaneousExposureChart",
+    "line": 1497
+   },
+   {
+    "name": "initRorCliffChart",
+    "line": 1521
+   },
+   {
+    "name": "updateRiskOfRuin",
+    "line": 1550
+   },
+   {
+    "name": "initWhatIfCompareChart",
+    "line": 1552
+   },
+   {
+    "name": "initRollingDriftChart",
+    "line": 1574
+   },
+   {
+    "name": "initBaselTailChart",
+    "line": 1596
+   },
+   {
+    "name": "initOmegaCurveChart",
+    "line": 1616
+   },
+   {
+    "name": "renderOmegaCurve",
+    "line": 1638
+   },
+   {
+    "name": "solveStanfordRCK",
+    "line": 1640
+   },
+   {
+    "name": "initMonteCarloFanChart",
+    "line": 1651
+   },
+   {
+    "name": "runMonteCarloSim",
+    "line": 1671
+   },
+   {
+    "name": "updateCockpitAll",
+    "line": 1701
+   },
+   {
+    "name": "generateCockpitSimPath",
+    "line": 1719
+   },
+   {
+    "name": "initCockpitSimChart",
+    "line": 1730
+   },
+   {
+    "name": "cum",
+    "line": 1767
+   },
+   {
+    "name": "boot",
+    "line": 1768
+   },
+   {
+    "name": "one",
+    "line": 1781
+   },
+   {
+    "name": "prop",
+    "line": 1783
+   },
+   {
+    "name": "mulberry",
+    "line": 1790
+   },
+   {
+    "name": "rorOnly",
+    "line": 1791
+   },
+   {
+    "name": "fRor",
+    "line": 1792
+   },
+   {
+    "name": "esW",
+    "line": 1800
+   },
+   {
+    "name": "varW",
+    "line": 1801
+   },
+   {
+    "name": "balsara",
+    "line": 1802
+   },
+   {
+    "name": "rck",
+    "line": 1803
+   },
+   {
+    "name": "window.recalculateMasterCapital",
+    "line": 1812
+   },
+   {
+    "name": "window.tierCfg",
+    "line": 1839
+   },
+   {
+    "name": "window.budCfg",
+    "line": 1842
+   },
+   {
+    "name": "window.renderSess",
+    "line": 1843
+   },
+   {
+    "name": "window.calcSizer",
+    "line": 1850
+   },
+   {
+    "name": "window.updateRiskOfRuin",
+    "line": 1857
+   },
+   {
+    "name": "window.fillFromLog",
+    "line": 1862
+   },
+   {
+    "name": "window.solveStanfordRCK",
+    "line": 1868
+   },
+   {
+    "name": "window.runMonteCarloSim",
+    "line": 1880
+   },
+   {
+    "name": "window.renderMetrics",
+    "line": 1889
+   },
+   {
+    "name": "window.updateES",
+    "line": 1895
+   },
+   {
+    "name": "window.renderOmegaCurve",
+    "line": 1902
+   },
+   {
+    "name": "window.propPreset",
+    "line": 1925
+   },
+   {
+    "name": "window.refreshAll",
+    "line": 1961
+   },
+   {
+    "name": "window.analyzeSerialPsychology",
+    "line": 1972
+   },
+   {
+    "name": "window.analyzeSimultaneousExposure",
+    "line": 1991
+   },
+   {
+    "name": "window.evalGates",
+    "line": 2021
+   },
+   {
+    "name": "window.runMonteCarloSim",
+    "line": 2038
+   },
+   {
+    "name": "renderRiskCompare",
+    "line": 2053
+   },
+   {
+    "name": "window.renderFeedback",
+    "line": 2064
+   },
+   {
+    "name": "window.applyFeedback",
+    "line": 2073
+   },
+   {
+    "name": "mulberry",
+    "line": 2083
+   },
+   {
+    "name": "mean",
+    "line": 2084
+   },
+   {
+    "name": "esW",
+    "line": 2085
+   },
+   {
+    "name": "varW",
+    "line": 2086
+   },
+   {
+    "name": "cum",
+    "line": 2087
+   },
+   {
+    "name": "tailMult",
+    "line": 2088
+   },
+   {
+    "name": "omegaCalc",
+    "line": 2092
+   },
+   {
+    "name": "esCalc",
+    "line": 2110
+   },
+   {
+    "name": "rckEmpCalc",
+    "line": 2130
+   },
+   {
+    "name": "propMulti",
+    "line": 2164
+   },
+   {
+    "name": "window.calcTradeMetrics",
+    "line": 2298
+   },
+   {
+    "name": "window.calcSizer",
+    "line": 2309
+   },
+   {
+    "name": "window.evaluatePlaybookSetups",
+    "line": 2340
+   },
+   {
+    "name": "window.localDateStr",
+    "line": 2402
+   },
+   {
+    "name": "window.updateDailyLossTracker",
+    "line": 2406
+   },
+   {
+    "name": "window.runTierProtocolActions",
+    "line": 2475
+   },
+   {
+    "name": "window.tradeLockReason",
+    "line": 2567
+   },
+   {
+    "name": "window.saveNewTrade",
+    "line": 2581
+   },
+   {
+    "name": "window.toggleRorZoom",
+    "line": 2605
+   },
+   {
+    "name": "window.renderRorHeatmap",
+    "line": 2612
+   },
+   {
+    "name": "window.updateRiskOfRuin",
+    "line": 2635
+   },
+   {
+    "name": "window.renderMetrics",
+    "line": 2687
+   },
+   {
+    "name": "populateOmegaSetupSelectors",
+    "line": 2799
+   },
+   {
+    "name": "getSetupRArray",
+    "line": 2810
+   },
+   {
+    "name": "window.renderOmegaCurve",
+    "line": 2821
+   },
+   {
+    "name": "ensureVarBreachChart",
+    "line": 2883
+   },
+   {
+    "name": "window.updateES",
+    "line": 2897
+   },
+   {
+    "name": "window.solveStanfordRCK",
+    "line": 2967
+   },
+   {
+    "name": "window.propPreset",
+    "line": 3052
+   },
+   {
+    "name": "window.runProp",
+    "line": 3067
+   },
+   {
+    "name": "window.assetClassOf",
+    "line": 3154
+   },
+   {
+    "name": "window.lhOfClass",
+    "line": 3164
+   },
+   {
+    "name": "window.effLH",
+    "line": 3169
+   },
+   {
+    "name": "window.lhVal",
+    "line": 3175
+   },
+   {
+    "name": "window.sessionTagOf",
+    "line": 3179
+   },
+   {
+    "name": "window.strategyIdOf",
+    "line": 3187
+   },
+   {
+    "name": "window.omegaRange",
+    "line": 3190
+   },
+   {
+    "name": "window.snapshotQuant",
+    "line": 3196
+   },
+   {
+    "name": "window.buildDatabaseTables",
+    "line": 3214
+   },
+   {
+    "name": "saveToIndexedDB",
+    "line": 3283
+   },
+   {
+    "name": "window.persistStateToStorage",
+    "line": 3305
+   },
+   {
+    "name": "window.loadStateFromStorage",
+    "line": 3338
+   },
+   {
+    "name": "window.resetDefaultStorage",
+    "line": 3361
+   },
+   {
+    "name": "window.exportDatabaseJson",
+    "line": 3366
+   },
+   {
+    "name": "window.renderSchemaExplorer",
+    "line": 3411
+   },
+   {
+    "name": "window.applyLayoutMode",
+    "line": 3599
+   },
+   {
+    "name": "window.toggleFourZoneLayout",
+    "line": 3616
+   },
+   {
+    "name": "window.switchTab",
+    "line": 3622
+   },
+   {
+    "name": "window.evalGates",
+    "line": 3635
+   },
+   {
+    "name": "window.updateCockpitAll",
+    "line": 3686
+   },
+   {
+    "name": "runCockpitStressLabV9",
+    "line": 3695
+   },
+   {
+    "name": "window.refreshAll",
+    "line": 3747
+   },
+   {
+    "name": "window.adaptUnifiedTrades",
+    "line": 3777
+   },
+   {
+    "name": "window.importUnifiedTrades",
+    "line": 3815
+   },
+   {
+    "name": "window.runUnifiedImport",
+    "line": 3834
+   },
+   {
+    "name": "window.exportSupabaseSql",
+    "line": 3846
+   },
+   {
+    "name": "window.renderLhTable",
+    "line": 3910
+   },
+   {
+    "name": "window.refreshAll",
+    "line": 3926
+   },
+   {
+    "name": "window.applyLayoutMode",
+    "line": 3960
+   },
+   {
+    "name": "window.evalGates",
+    "line": 3962
+   }
+  ],
+  "functions_defined_more_than_once": {
+   "switchTab": [
+    1071,
+    3622
+   ],
+   "recalculateMasterCapital": [
+    1082,
+    1812
+   ],
+   "calcTradeMetrics": [
+    1121,
+    2298
+   ],
+   "saveNewTrade": [
+    1252,
+    2581
+   ],
+   "analyzeSimultaneousExposure": [
+    1280,
+    1991
+   ],
+   "analyzeSerialPsychology": [
+    1437,
+    1972
+   ],
+   "updateRiskOfRuin": [
+    1550,
+    1857,
+    2635
+   ],
+   "renderOmegaCurve": [
+    1638,
+    1902,
+    2821
+   ],
+   "solveStanfordRCK": [
+    1640,
+    1868,
+    2967
+   ],
+   "runMonteCarloSim": [
+    1671,
+    1880,
+    2038
+   ],
+   "updateCockpitAll": [
+    1701,
+    3686
+   ],
+   "cum": [
+    1767,
+    2087
+   ],
+   "mulberry": [
+    1790,
+    2083
+   ],
+   "esW": [
+    1800,
+    2085
+   ],
+   "varW": [
+    1801,
+    2086
+   ],
+   "calcSizer": [
+    1850,
+    2309
+   ],
+   "renderMetrics": [
+    1889,
+    2687
+   ],
+   "updateES": [
+    1895,
+    2897
+   ],
+   "propPreset": [
+    1925,
+    3052
+   ],
+   "refreshAll": [
+    1961,
+    3747,
+    3926
+   ],
+   "evalGates": [
+    2021,
+    3635,
+    3962
+   ],
+   "applyLayoutMode": [
+    3599,
+    3960
+   ]
+  },
+  "localStorage_keys": [
+   "tuannhatky_risk_schema_dump.json",
+   "tuannhatky_risk_supabase.sql",
+   "tuannhatky_v10_db_state"
+  ]
+ },
+ "_README": "Kiểm kê tự động (regex) từ 2 file nguồn. static_ids_by_section = id có sẵn trong HTML tĩnh theo từng <section>; ids_injected_by_js = id được chèn bằng JS; functions_defined_more_than_once = hàm bị định nghĩa/ghi đè nhiều lần (dấu hiệu code trùng/patch chồng patch). Dùng làm checklist: mọi chức năng 'GIỮ' phải còn id/hàm tương ứng sau khi hợp nhất, mọi mục 'BỎ' phải không còn xuất hiện."
+}

@@ -1,18 +1,15 @@
-name: Verify v6 foundation
+name: Verify unified journal
 on:
-  push:
-    branches: [main, 'sprint/**']
-    paths: ['v6/**', 'tests/trading/v6-baseline.test.ts', 'tsconfig.json', '.github/workflows/v6-s0.yml']
   pull_request:
-    paths: ['v6/**', 'tests/trading/v6-baseline.test.ts', 'tsconfig.json', '.github/workflows/v6-s0.yml']
+    paths: ['v6/**', 'worker/**', 'scripts/**', '.github/workflows/v6-s0.yml']
+  push:
+    branches: [main, 'fix/**']
+    paths: ['v6/**', 'worker/**', 'scripts/**', '.github/workflows/v6-s0.yml']
   workflow_dispatch:
 permissions:
   contents: read
-concurrency:
-  group: v6-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 jobs:
-  foundation:
+  unified:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -26,28 +23,11 @@ jobs:
           cache: npm
           cache-dependency-path: v6/package-lock.json
       - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm test
+      - run: npm run verify
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run e2e
       - uses: actions/upload-artifact@v4
         with:
-          name: v6-s3-journal-build
+          name: unified-html
           path: v6/dist/
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: v6-responsive-evidence
-          path: v6/test-results/
-  v3-reference:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24.19.0
-      - run: npm run install:ci
-      - run: npm test

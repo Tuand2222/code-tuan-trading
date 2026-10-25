@@ -1,0 +1,61 @@
+{
+  "pass": true,
+  "url": "https://tuannhatky.fabledcoot2.chatgpt.site/v6/",
+  "status": 200,
+  "responseSha256": "96a983599b6cbd22a1ad15da37c8640810b8aaebc6377a894041bedc63dd4d29",
+  "sourceSha256": "d5f4ed1058cc1c000d8abd948fbfbd8e357cc9a3fd86d8504e1ca64dd81a79e4",
+  "htmlIdentical": false,
+  "identicalAfterRemovingCloudflareScript": true,
+  "cloudflareScripts": 1,
+  "initial": {
+    "title": "Giao dịch và bộ lọc – Tuan Trader V6",
+    "trades": 15,
+    "routes": [
+      "gameplan",
+      "cockpit",
+      "workspace",
+      "calendar",
+      "review",
+      "chartbook",
+      "overview",
+      "edge",
+      "drilldown",
+      "discipline",
+      "pnlrisk",
+      "riskcapital",
+      "riskedge",
+      "riskopt",
+      "simulation",
+      "riskprop",
+      "zones",
+      "risktools",
+      "import",
+      "mapping",
+      "dictionary"
+    ],
+    "header": "$11,850.00",
+    "classicHref": "/classic",
+    "workerAvailable": true,
+    "ready": "true"
+  },
+  "worker": {
+    "execution": "worker",
+    "result": "0.00%"
+  },
+  "legacy": [
+    {
+      "path": "/classic",
+      "status": 200,
+      "bytes": 48876
+    },
+    {
+      "path": "/legacy",
+      "status": 200,
+      "bytes": 31623
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+  "timestamp": "2026-10-25T06:32:09.918Z"
+}

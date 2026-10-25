@@ -1,0 +1,35 @@
+{
+  "phase": "P7",
+  "duplicateStaticIds": {},
+  "duplicateLiteralHtmlIdsAcrossStaticAndScripts": {},
+  "duplicateNamedFunctions": {},
+  "nodeCheck": [
+    {
+      "script": 2,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "script": 3,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "script": 4,
+      "exitCode": 0,
+      "stderr": ""
+    }
+  ],
+  "forbiddenStrings": {
+    "recalculateMasterCapital": 0,
+    "zone4-deck": 0,
+    "z4-": 0,
+    "fourZoneActive": 0,
+    "WK4_SRC": 0,
+    "nav-tabs": 0
+  },
+  "legacyKeyOccurrences": 1,
+  "legacyKeyOutsideMigration": 0,
+  "bytes": 403677,
+  "lines": 2781
+}
