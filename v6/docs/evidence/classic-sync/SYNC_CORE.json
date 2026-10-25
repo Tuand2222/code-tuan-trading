@@ -1,0 +1,31 @@
+{
+  "passed": 4,
+  "total": 4,
+  "cases": [
+    {
+      "name": "Classic mapping preserves net, fees/swap, risk flags and annotations",
+      "pass": true,
+      "net": 970,
+      "missingRiskExcluded": true
+    },
+    {
+      "name": "Owner-bound outbox coalesces edits and additions and retains versioned deletion",
+      "pass": true,
+      "foreignOwnerQueued": false,
+      "coalesced": true
+    },
+    {
+      "name": "Indexed expanding VaR equals sorted-prefix formula for ties and quantile boundaries",
+      "pass": true,
+      "prefixes": 1195,
+      "quantilesChecked": 2390
+    },
+    {
+      "name": "Large bootstrap uses identical seeded engine in generated Worker",
+      "pass": true,
+      "records": 2001,
+      "iterations": 2000,
+      "exact": true
+    }
+  ]
+}

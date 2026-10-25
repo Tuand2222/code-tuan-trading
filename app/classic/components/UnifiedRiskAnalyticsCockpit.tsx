@@ -664,9 +664,7 @@ export default function UnifiedRiskAnalyticsCockpit({
                       if (e.key === "Enter") onDay(p.date);
                     }}
                   >
-                    <title>
-                      {p.date}: {f(p.balance, 0)} ₫
-                    </title>
+                    <title>{`${p.date}: ${f(p.balance, 0)} ₫`}</title>
                   </circle>
                 ))}
                 <text x="40" y="195">

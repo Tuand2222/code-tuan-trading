@@ -22,12 +22,28 @@ class ClassicStore extends Dexie {
   }
 }
 let store: ClassicStore | undefined;
+export const classicSender='classic-'+crypto.randomUUID();
 const db = () => (store ??= new ClassicStore());
 export async function saveLocal(key: string, value: unknown) {
   await db().values.put({ key, value, updatedAt: new Date().toISOString() });
 }
 export async function readLocal<T>(key: string) {
   return (await db().values.get(key))?.value as T | undefined;
+}
+export async function persistClassicLedger(key:string,rows:unknown[]){
+  // IndexedDB is authoritative for large ledgers; localStorage is only a small mirror.
+  await saveLocal('ledger-cache:'+key,rows);
+  try{const raw=JSON.stringify(rows);localStorage.setItem(key,raw.length<1000000?raw:JSON.stringify({storage:'indexeddb',count:rows.length}));}
+  catch{/* the complete IndexedDB copy has already committed */}
+  window.dispatchEvent(new CustomEvent('classic-ledger-updated'));
+  try{const ch=new BroadcastChannel('tuan-classic-journal');ch.postMessage({sender:classicSender});ch.close();}catch{}
+}
+export async function readClassicLedger(key:string){
+  const cached=await readLocal<unknown[]>('ledger-cache:'+key);
+  if(Array.isArray(cached))return cached;
+  const stored=localStorage.getItem(key);
+  if(stored){try{const value=JSON.parse(stored);if(Array.isArray(value))return value;}catch{}}
+  return [];
 }
 export async function removeLocal(key: string) {
   await db().values.delete(key);

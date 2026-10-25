@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-26",
+  "inlineScriptsChecked": 3,
+  "duplicateIds": 0,
+  "duplicateNamedFunctions": 0,
+  "unifiedCore": {
+    "passed": 66,
+    "total": 66
+  },
+  "unifiedBrowser": {
+    "passed": 76,
+    "total": 76
+  },
+  "tradingAndD1": {
+    "passed": 122,
+    "total": 122
+  },
+  "backendNode": {
+    "passed": 22,
+    "total": 22
+  },
+  "syncSafetyCases": [
+    {
+      "sharedCapitalCannotDivergeLocally": true
+    },
+    {
+      "earlyEditQueued": true,
+      "indexedDbFailureDoesNotClaimDurability": true
+    },
+    {
+      "conflictPreserved": true,
+      "archivedBeforeUseClassic": true
+    },
+    {
+      "foreignOwnerOutboxNotSent": true
+    },
+    {
+      "deviceLedgerReadAndWrite": true,
+      "netAfterCosts": 333
+    }
+  ],
+  "sourceSha256": "257467ce77222f166f476c17b98273aacfdbb609bfbc5748d50ccd1162c98945",
+  "browserEvidenceDirectory": "unified-1792956181379",
+  "browserErrors": []
+}

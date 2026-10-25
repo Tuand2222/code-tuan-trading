@@ -109,37 +109,38 @@ export async function identifyTrade<T extends IngestionTrade>(
   };
 }
 export type Resolution = "skip" | "enrich" | "keep";
+export async function identifyTrades<T extends IngestionTrade>(rows:T[],user='device'){
+  const result:Array<T & {dedupHash:string;semanticHash:string}>=[];
+  for(let i=0;i<rows.length;i+=250)result.push(...await Promise.all(rows.slice(i,i+250).map(t=>identifyTrade(t,user))));
+  return result;
+}
 export async function planIngestion<T extends IngestionTrade>(
   existing: T[],
   incoming: T[],
   user = "device",
 ) {
-  const known = (await Promise.all(
-    existing.map((t) => identifyTrade(t, user)),
-  )) as Array<T & { dedupHash: string; semanticHash: string }>;
+  const known = await identifyTrades(existing,user);
   const exact = new Map(known.map((t) => [t.dedupHash, t]));
+  const semantic=new Map<string,{row:typeof known[number];index:number}>(),buckets=new Map<string,Array<{row:typeof known[number];index:number}>>();
+  const group=(t:T)=>[t.accountId||'unassigned',normalizeSymbol(t.symbol),t.side].join('|');
+  known.forEach((row,index)=>{if(!semantic.has(row.semanticHash))semantic.set(row.semanticHash,{row,index});const time=Date.parse(row.openedAt||'');if(Number.isFinite(time)){const key=group(row)+'|'+Math.floor(time/300000);const bucket=buckets.get(key)||[];bucket.push({row,index});buckets.set(key,bucket);}});
   const seen = new Map(exact);
   const additions: typeof known = [];
   const duplicates: Array<{ incoming: T; existing: T; hash: string }> = [];
   const candidates: Array<{ incoming: T; existing: T; reason: string }> = [];
-  for (const input of incoming) {
-    const t = await identifyTrade(input, user);
+  for (const t of await identifyTrades(incoming,user)) {
     const old = seen.get(t.dedupHash);
     if (old) {
       duplicates.push({ incoming: t, existing: old, hash: t.dedupHash });
       continue;
     }
     // Never collapse real fills which happen to share price/time/quantity.
-    const candidate = known.find(
-      (o) =>
-        o.semanticHash === t.semanticHash ||
-        ((o.accountId || "unassigned") === (t.accountId || "unassigned") &&
-          normalizeSymbol(o.symbol) === normalizeSymbol(t.symbol) &&
-          o.side === t.side &&
-          o.openedAt &&
-          t.openedAt &&
-          Math.abs(Date.parse(o.openedAt) - Date.parse(t.openedAt)) <= 300000),
-    );
+    const match=semantic.get(t.semanticHash);let candidate=match?.row;
+    const time=Date.parse(t.openedAt||'');
+    if(Number.isFinite(time)){
+      let first=match?.index??Infinity;
+      for(const bin of [-1,0,1])for(const entry of buckets.get(group(t)+'|'+(Math.floor(time/300000)+bin))||[]){if(entry.index<first&&Math.abs(Date.parse(entry.row.openedAt!)-time)<=300000){candidate=entry.row;first=entry.index;}if(first===0)break;}
+    }
     if (candidate)
       candidates.push({
         incoming: t,

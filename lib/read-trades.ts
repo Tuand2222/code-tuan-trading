@@ -1,5 +1,5 @@
 export async function fetchAllTrades(options: RequestInit = {}) {
-  let url = "/api/trades";
+  let url = "/api/trades?limit=1000";
   const headers = new Headers(options.headers);
   let owner = headers.get("X-Journal-Owner");
   const rows = new Map<string, unknown>();
@@ -21,8 +21,22 @@ export async function fetchAllTrades(options: RequestInit = {}) {
     }
     for (const t of page.trades) rows.set(t.id, t);
     url = page.next
-      ? "/api/trades?cursor=" + encodeURIComponent(page.next)
+      ? "/api/trades?limit=1000&cursor=" + encodeURIComponent(page.next)
       : "";
   } while (url);
-  return Response.json({ trades: [...rows.values()] });
+  return Response.json({ owner, trades: [...rows.values()] });
+}
+
+/** A file is resumable, not one unbounded transaction. Each receipt is durable. */
+export async function saveTradeBatches<T extends {id: string}>(rows:T[],owner:string,onReceipt:(rows:T[],done:number)=>Promise<void>){
+  let imported=0,duplicates=0,updated=0;
+  for(let offset=0;offset<rows.length;offset+=250){
+    const batch=rows.slice(offset,offset+250);
+    const response=await fetch('/api/trades',{method:'POST',headers:{'Content-Type':'application/json','X-Journal-Owner':owner},body:JSON.stringify({trades:batch,sourceType:'FILE'})});
+    const result=await response.json() as {error?:string;imported?:number;duplicates?:number;updated?:number;trades?:T[]};
+    if(!response.ok)throw Error(`Đã lưu ${offset}/${rows.length} dòng; có thể nhập lại cùng file để tiếp tục mà không nhân đôi. ${result.error||'Không thể lưu lô tiếp theo'}`);
+    imported+=result.imported||0;duplicates+=result.duplicates||0;updated+=result.updated||0;
+    await onReceipt(result.trades||[],offset+batch.length);
+  }
+  return {imported,duplicates,updated,scanned:rows.length};
 }

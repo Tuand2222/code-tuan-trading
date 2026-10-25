@@ -111,6 +111,10 @@ export async function GET(request: Request) {
     const accountUser = await requireUser(request);
     checkOwner(request, accountUser.id);
     const params = new URL(request.url).searchParams;
+    if(params.get('summary')==='1'){
+      const [summary]=await getDb().select({count:sql<number>`COUNT(*)`,revision:sql<number>`COALESCE(SUM(${trades.version}),0)`,deleted:sql<number>`COALESCE(SUM(CASE WHEN ${trades.deletedAt} IS NOT NULL THEN 1 ELSE 0 END),0)`}).from(trades).where(eq(trades.userId,accountUser.id));
+      return Response.json({owner:accountUser.id,...summary},{headers:{'Cache-Control':'no-store'}});
+    }
     const limit = Math.min(
       1000,
       Math.max(1, Number(params.get("limit")) || 500),
@@ -153,7 +157,7 @@ export async function GET(request: Request) {
       last = page.at(-1);
     return Response.json({
       owner: accountUser.id,
-      trades: page,
+      trades: params.get('projection')==='analysis'?page.map(row=>{let raw:Record<string,unknown>={};try{raw=JSON.parse(row.rawPayloadJson||'{}');}catch{}return {...row,rawPayloadJson:JSON.stringify({unifiedV6:raw.unifiedV6||{}})};}):page,
       next:
         rows.length > limit && last
           ? btoa(
@@ -221,6 +225,10 @@ export async function PATCH(request: Request) {
         { status: 409 },
       );
     const value = cleanTrade({ ...current, ...body.trade }, accountUser);
+    // Retain the original receipt once; repeated edits must not recursively quote the old payload.
+    let original:Record<string,unknown>={};try{original=JSON.parse(current.rawPayloadJson||'{}');}catch{}
+    const metadata=(body.trade as Record<string,unknown>).unifiedV6??original.unifiedV6;
+    value.rawPayloadJson=JSON.stringify({receiptEnvelope:1,sourceReceipt:original.receiptEnvelope===1?original.sourceReceipt:original,...(metadata?{unifiedV6:metadata}:{})});
     const {
       id: _,
       userId: __,
@@ -233,6 +241,7 @@ export async function PATCH(request: Request) {
         .update(trades)
         .set({
           ...editable,
+          rawPayloadJson:value.rawPayloadJson,
           deletedAt: restore ? null : current.deletedAt,
           version: sql`${trades.version}+1`,
         })
@@ -279,21 +288,24 @@ export async function DELETE(request: Request) {
     const id = searchParams.get("id");
     if (!id && searchParams.get("all") !== "1")
       throw Error("Trade id is required");
+    const version=searchParams.get('version');
+    if(version!==null&&(!Number.isInteger(Number(version))||Number(version)<1))throw Error('Invalid version');
     const condition = id
       ? and(
           eq(trades.userId, accountUser.id),
           eq(trades.id, id),
           isNull(trades.deletedAt),
+          version===null?undefined:eq(trades.version,Number(version)),
         )
       : and(eq(trades.userId, accountUser.id), isNull(trades.deletedAt));
-    await getDb().batch([
+    const result=await getDb().batch([
       getDb()
         .update(trades)
         .set({
           deletedAt: new Date().toISOString(),
           version: sql`${trades.version}+1`,
         })
-        .where(condition),
+        .where(condition).returning({id:trades.id}),
       getDb()
         .insert(tradeAudit)
         .values({
@@ -305,6 +317,7 @@ export async function DELETE(request: Request) {
           detailsJson: JSON.stringify({ id, all: !id }),
         }),
     ]);
+    if(version!==null&&!result[0].length)return Response.json({error:'Version conflict; reload before deleting.'},{status:409});
     return Response.json({ deleted: true, recoverableDays: 30 });
   } catch (error) {
     return routeError(error);

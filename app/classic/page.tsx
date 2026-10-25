@@ -44,7 +44,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { positionCycles } from "../../lib/position-cycles";
-import { fetchAllTrades } from "../../lib/read-trades";
+import { fetchAllTrades, saveTradeBatches } from "../../lib/read-trades";
 import { useSharedRisk, useSharedNotes } from "../../lib/shared-risk-client";
 import UnifiedRiskAnalyticsCockpit from "./components/UnifiedRiskAnalyticsCockpit";
 import {
@@ -55,6 +55,7 @@ import {
 } from "../../lib/risk-analytics";
 import {
   planIngestion,
+  identifyTrades,
   identifyTrade,
   sha256,
   type Resolution,
@@ -62,6 +63,9 @@ import {
 import {
   saveLocal,
   readLocal,
+  persistClassicLedger,
+  readClassicLedger,
+  classicSender,
   listLocal,
   removeLocal,
   queueMutation,
@@ -1316,6 +1320,7 @@ export default function Home() {
   const [draftImages, setDraftImages] = useState<File[]>([]);
   const [tradeImages, setTradeImages] = useState<TradeImage[]>([]);
   const [imageTradeId, setImageTradeId] = useState("");
+  const [imageTradeQuery,setImageTradeQuery]=useState("");
   const [imageUploading, setImageUploading] = useState(false);
   const [activeImage, setActiveImage] = useState<TradeImage | null>(null);
   const [connectProvider, setConnectProvider] = useState<Provider | null>(null);
@@ -1557,10 +1562,7 @@ export default function Home() {
           !(await listQueue(accountId)).length
         ) {
           setTrades(payload.trades);
-          localStorage.setItem(
-            tradesStorageKey,
-            JSON.stringify(payload.trades),
-          );
+          void persistClassicLedger(tradesStorageKey, payload.trades).catch(()=>setToast("Chưa lưu được nhật ký trên thiết bị; bản cloud được giữ."));
         }
       } catch {
         /* retain device copy */
@@ -1585,6 +1587,7 @@ export default function Home() {
     localFallback,
   ]);
 
+  useEffect(()=>{const channel=new BroadcastChannel('tuan-classic-journal');channel.onmessage=async event=>{if(event.data?.sender===classicSender)return;if(dataMode==='cloud'){window.dispatchEvent(new Event('focus'));return;}const rows=await readClassicLedger(tradesStorageKey) as Trade[];if(accountId==='device'){setTrades(rows);setIsDemo(false);}};return ()=>channel.close();},[accountId,dataMode,tradesStorageKey]);
   const draftImagePreviews = useMemo(
     () => draftImages.map((file) => ({ file, url: URL.createObjectURL(file) })),
     [draftImages],
@@ -1599,10 +1602,12 @@ export default function Home() {
     if (accountSessionPending || siteUser === undefined) return;
     const controller = new AbortController();
     let active = true;
-    const stored = window.localStorage.getItem(tradesStorageKey);
+    let stored = window.localStorage.getItem(tradesStorageKey);
     const storedNotes = window.localStorage.getItem(notesStorageKey);
     const storedDemoMode = window.localStorage.getItem(demoStorageKey);
     const storageTimer = window.setTimeout(() => {
+      void (async()=>{
+      const cached=await readClassicLedger(tradesStorageKey);if(!active)return;if(cached.length)stored=JSON.stringify(cached);
       setTrades(SAMPLE_TRADES);
       setIsDemo(true);
       setDataMode("device");
@@ -1664,24 +1669,11 @@ export default function Home() {
             setToast("Cloud đang trống; đã giữ nguyên nhật ký trên thiết bị.");
             return;
           }
-          if (stored && stored !== JSON.stringify(cloudTrades)) {
-            window.localStorage.setItem(
-              `tuan-trader-recovery:${tradesStorageKey}:${Date.now()}`,
-              JSON.stringify({
-                at: new Date().toISOString(),
-                trades: stored,
-                notes: storedNotes,
-                demo: storedDemoMode,
-              }),
-            );
-          }
+          if (stored && stored !== JSON.stringify(cloudTrades))await saveLocal(`recovery:${tradesStorageKey}:${Date.now()}`,{trades:stored,notes:storedNotes,demo:storedDemoMode});
           setLocalFallback(false);
           setTrades(cloudTrades);
           setIsDemo(false);
-          window.localStorage.setItem(
-            tradesStorageKey,
-            JSON.stringify(cloudTrades),
-          );
+          void persistClassicLedger(tradesStorageKey, cloudTrades).catch(()=>setToast("Chưa lưu được nhật ký trên thiết bị; bản cloud được giữ."));
           window.localStorage.setItem(demoStorageKey, "false");
         } catch {
           /* preview and offline mode keep device data */
@@ -1689,6 +1681,7 @@ export default function Home() {
       })();
       void loadConnections(controller.signal);
       void loadTradeImages(controller.signal);
+      })().catch(()=>setToast("Chưa đọc được nhật ký trên thiết bị."));
     }, 0);
     return () => {
       active = false;
@@ -1825,6 +1818,9 @@ export default function Home() {
     [filteredByRange, query, symbolFilter, resultFilter, journalMarket],
   );
 
+  const [journalPage,setJournalPage]=useState(0);
+  useEffect(()=>setJournalPage(0),[query,symbolFilter,resultFilter,journalMarket,range]);
+  const visibleJournalTrades=journalTrades.slice(journalPage*200,(journalPage+1)*200);
   const tradesById = useMemo(
     () => new Map(trades.map((trade) => [trade.id, trade])),
     [trades],
@@ -2080,23 +2076,9 @@ export default function Home() {
           result.errors[0] ?? "Không tìm thấy giao dịch trong file.",
         );
       const fileHash = await sha256(new Uint8Array(await file.arrayBuffer()));
-      const identified = await Promise.all(
-        result.trades.map((t, i) =>
-          identifyTrade(
-            {
-              ...t,
-              id:
-                t.externalId && !t.externalId.startsWith("import-")
-                  ? t.id
-                  : `file:${fileHash}:${i}`,
-              rawPayloadJson: JSON.stringify(t),
-            },
-            accountId,
-          ),
-        ),
-      );
+      const identified = await identifyTrades(result.trades.map((t,i)=>({...t,id:t.externalId&&!t.externalId.startsWith('import-')?t.id:`file:${fileHash}:${i}`,rawPayloadJson:JSON.stringify(t)})),accountId);
       importRaw.current = identified;
-      setImportCurrency(isPdf ? "USDT" : "VND");
+      setImportCurrency(isPdf || /binance/i.test(file.name) || result.trades.some(t=>/binance/i.test(t.source||"")) ? "USDT" : "VND");
       setImportFx("");
       setImportAccount("");
       setImportBroker("");
@@ -2214,10 +2196,6 @@ export default function Home() {
           quantity: d.incoming.quantity,
           exitPrice: d.incoming.exitPrice,
         });
-      if (selected.length > 500)
-        throw Error(
-          "Một lần nhập tối đa 500 dòng để lưu nguyên tử; chia file trước khi nhập. Chưa có dòng nào được lưu.",
-        );
       let accepted: Trade[] = selected;
       let receipt: import("../../lib/governance-report").AuditReceipt = {
         source: tradeImportPreview.fileName,
@@ -2232,31 +2210,16 @@ export default function Home() {
           resolution: resolutions[c.incoming.id],
         })),
       };
+      const progressRows=new Map((isDemo?[]:trades).map(t=>[t.id,t]));
       if (dataMode === "cloud" && selected.length) {
-        const r = await fetch("/api/trades", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-Journal-Owner": accountId },
-          body: JSON.stringify({ trades: selected, sourceType: "FILE" }),
-        });
-        const payload = (await r.json()) as {
-          trades?: Trade[];
-          error?: string;
-          imported?: number;
-          duplicates?: number;
-        };
-        if (!r.ok) throw Error(payload.error ?? "Không thể lưu lô");
-        accepted = payload.trades ?? [];
-        receipt = {
-          ...receipt,
-          ...payload,
-          trades: undefined,
-        } as typeof receipt;
+        const summary=await saveTradeBatches(selected,accountId,async(rows,done)=>{for(const t of rows)progressRows.set(t.id,t);await saveLocal('import-progress:'+accountId,{file:tradeImportPreview.fileName,done,total:selected.length,receipt:rows});if(done%5000===0||done===selected.length){await persistClassicLedger(tradesStorageKey,[...progressRows.values()]);setTrades([...progressRows.values()]);setIsDemo(false);}if(done%5000===0||done===selected.length)setToast(`Đã lưu ${done}/${selected.length} dòng; các lô đã hoàn tất được giữ nếu gián đoạn.`);});
+        accepted=[...progressRows.values()];receipt={...receipt,...summary};
       }
       const base = isDemo ? [] : trades;
       const merged = new Map(base.map((t) => [t.id, t]));
       for (const t of accepted) merged.set(t.id, t);
       const next = [...merged.values()];
-      window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
+      await persistClassicLedger(tradesStorageKey,next);
       await saveLocal("ledger:" + accountId, next);
       setTrades(next);
       setIsDemo(false);
@@ -2265,9 +2228,9 @@ export default function Home() {
       setTradeImportPreview(null);
       setIngestionPlan(null);
       setToast(
-        `Đã lưu lô nguyên tử · ${receipt.imported ?? 0} mới · ${receipt.duplicates ?? 0} trùng ID.`,
+        `Đã lưu nhật ký · ${receipt.imported ?? 0} mới · ${receipt.duplicates ?? 0} trùng ID. Các lô có thể nhập lại an toàn.`,
       );
-      await exportGovernance("xlsx", receipt, next);
+      if(next.length<=5000)await exportGovernance("xlsx", receipt, next);
     } catch (e) {
       setToast(e instanceof Error ? e.message : "Không thể lưu lô nhập.");
     } finally {
@@ -2352,7 +2315,7 @@ export default function Home() {
         : [...trades, trade];
     setTrades(next);
     setIsDemo(false);
-    window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
+    void persistClassicLedger(tradesStorageKey, next).catch(()=>setToast("Chưa lưu được nhật ký trên thiết bị; bản cloud được giữ."));
     window.localStorage.setItem(demoStorageKey, "false");
     setModalOpen(false);
     setEditingTradeId(null);
@@ -2379,10 +2342,7 @@ export default function Home() {
         if (fresh.ok) {
           const data = (await fresh.json()) as { trades: Trade[] };
           setTrades(data.trades);
-          window.localStorage.setItem(
-            tradesStorageKey,
-            JSON.stringify(data.trades),
-          );
+          void persistClassicLedger(tradesStorageKey, data.trades).catch(()=>setToast("Chưa lưu được nhật ký trên thiết bị; bản cloud được giữ."));
         }
         const imageCount = imagesToUpload.length
           ? await uploadTradeImages(trade.id, imagesToUpload)
@@ -2427,7 +2387,7 @@ export default function Home() {
     setTradeImages((current) =>
       current.filter((image) => image.tradeId !== id),
     );
-    window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
+    void persistClassicLedger(tradesStorageKey, next).catch(()=>setToast("Chưa lưu được nhật ký trên thiết bị; bản cloud được giữ."));
     setToast("Đã xóa giao dịch.");
     if (dataMode === "cloud") {
       await queueMutation({
@@ -2442,10 +2402,7 @@ export default function Home() {
   const restoreDemo = async () => {
     setTrades(SAMPLE_TRADES);
     setIsDemo(true);
-    window.localStorage.setItem(
-      tradesStorageKey,
-      JSON.stringify(SAMPLE_TRADES),
-    );
+    void persistClassicLedger(tradesStorageKey, SAMPLE_TRADES).catch(()=>setToast("Chưa lưu được nhật ký trên thiết bị; bản cloud được giữ."));
     window.localStorage.setItem(demoStorageKey, "true");
     setToast(
       "Đang hiển thị dữ liệu minh họa; dữ liệu cloud không bị thay đổi.",
@@ -2456,7 +2413,7 @@ export default function Home() {
     setTrades([]);
     setTradeImages([]);
     setIsDemo(false);
-    window.localStorage.setItem(tradesStorageKey, "[]");
+    void persistClassicLedger(tradesStorageKey,[]).catch(()=>setToast("Chưa lưu được thay đổi trên thiết bị."));
     window.localStorage.setItem(demoStorageKey, "false");
     setToast("Đã chuyển sang nhật ký của bạn. Hãy thêm giao dịch đầu tiên.");
     navigate("journal");
@@ -2481,7 +2438,7 @@ export default function Home() {
     setTrades([]);
     setTradeImages([]);
     setIsDemo(false);
-    window.localStorage.setItem(tradesStorageKey, "[]");
+    void persistClassicLedger(tradesStorageKey,[]).catch(()=>setToast("Chưa lưu được thay đổi trên thiết bị."));
     window.localStorage.setItem(demoStorageKey, "false");
     setToast(
       "Đã chuyển dữ liệu khỏi nhật ký; có bản trước thao tác trên thiết bị.",
@@ -2876,7 +2833,7 @@ export default function Home() {
         merged.set(key, trade);
       }
       const next = [...merged.values()];
-      window.localStorage.setItem(tradesStorageKey, JSON.stringify(next));
+      void persistClassicLedger(tradesStorageKey, next).catch(()=>setToast("Chưa lưu được nhật ký trên thiết bị; bản cloud được giữ."));
       return next;
     });
     setIsDemo(false);
@@ -3127,7 +3084,7 @@ export default function Home() {
           </div>
           <div className="journal-media-actions">
             <label>
-              <span>Gắn vào lệnh</span>
+              <span>Gắn vào lệnh</span><input aria-label="Tìm lệnh để gắn ảnh" placeholder="Lọc theo ngày, mã hoặc ID" value={imageTradeQuery} onChange={e=>setImageTradeQuery(e.target.value)}/>
               <select
                 value={effectiveImageTradeId}
                 onChange={(event) => setImageTradeId(event.target.value)}
@@ -3135,8 +3092,8 @@ export default function Home() {
                 aria-label="Chọn giao dịch để gắn ảnh"
               >
                 <option value="">Chọn giao dịch</option>
-                {[...trades]
-                  .sort((a, b) => b.date.localeCompare(a.date))
+                {[...trades].filter(t=>t.id===effectiveImageTradeId||(t.date+' '+t.symbol+' '+t.id).toLowerCase().includes(imageTradeQuery.toLowerCase()))
+                  .sort((a,b)=>a.id===effectiveImageTradeId?-1:b.id===effectiveImageTradeId?1:b.date.localeCompare(a.date)).slice(0,200)
                   .map((trade) => (
                     <option value={trade.id} key={trade.id}>
                       {trade.date} · {trade.symbol} · {trade.side}
@@ -3370,7 +3327,8 @@ export default function Home() {
                 {ingestionPlan.candidates.length} cặp cần đối soát. Dấu vân tay
                 làm tròn chỉ gợi ý, không tự xóa lệnh.
               </p>
-              {ingestionPlan.candidates.map((c) => (
+              <div><button type="button" onClick={()=>setResolutions(Object.fromEntries(ingestionPlan.candidates.map(c=>[c.incoming.id,'skip' as Resolution])))}>Bỏ qua tất cả dòng nghi trùng</button><button type="button" onClick={()=>setResolutions(Object.fromEntries(ingestionPlan.candidates.map(c=>[c.incoming.id,'keep' as Resolution])))}>Giữ tất cả thành lệnh riêng</button><span> Xem tối đa 100 cặp đầu; quyết định hàng loạt áp dụng toàn bộ cặp đang đối soát.</span></div>
+              {ingestionPlan.candidates.slice(0,100).map((c) => (
                 <article key={c.incoming.id}>
                   <strong>
                     {c.reason} · {c.incoming.symbol}
@@ -3514,6 +3472,7 @@ export default function Home() {
         </button>
       </section>
       <section className="table-panel journal-results" aria-live="polite">
+        <div className="filter-strip" aria-label="Phân trang nhật ký"><button onClick={()=>setJournalPage(Math.max(0,journalPage-1))} disabled={journalPage===0}>Trang trước</button><span>{journalTrades.length.toLocaleString('vi-VN')} lệnh · Trang {journalPage+1}/{Math.max(1,Math.ceil(journalTrades.length/200))}</span><button onClick={()=>setJournalPage(journalPage+1)} disabled={(journalPage+1)*200>=journalTrades.length}>Trang sau</button></div>
         {journalTrades.length ? (
           <>
             <div className="journal-table-desktop">
@@ -3543,7 +3502,7 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {journalTrades.map((trade) => {
+                    {visibleJournalTrades.map((trade) => {
                       const images = imagesByTrade.get(trade.id) ?? [];
                       return (
                         <tr key={trade.id}>
@@ -3659,7 +3618,7 @@ export default function Home() {
               </p>
             </div>
             <div className="journal-mobile-list">
-              {journalTrades.map((trade) => {
+              {visibleJournalTrades.map((trade) => {
                 const images = imagesByTrade.get(trade.id) ?? [];
                 return (
                   <article className="journal-trade-card" key={trade.id}>
@@ -4776,10 +4735,7 @@ export default function Home() {
                     const map = new Map(current.map((t) => [t.id, t]));
                     map.set(restored.id, restored as Trade);
                     const next = [...map.values()];
-                    window.localStorage.setItem(
-                      tradesStorageKey,
-                      JSON.stringify(next),
-                    );
+                    void persistClassicLedger(tradesStorageKey, next).catch(()=>setToast("Chưa lưu được nhật ký trên thiết bị; bản cloud được giữ."));
                     return next;
                   });
                   return;
@@ -4788,10 +4744,7 @@ export default function Home() {
                 if (r.ok) {
                   const p = (await r.json()) as { trades: Trade[] };
                   setTrades(p.trades);
-                  window.localStorage.setItem(
-                    tradesStorageKey,
-                    JSON.stringify(p.trades),
-                  );
+                  void persistClassicLedger(tradesStorageKey, p.trades).catch(()=>setToast("Chưa lưu được nhật ký trên thiết bị; bản cloud được giữ."));
                 }
               }}
             />

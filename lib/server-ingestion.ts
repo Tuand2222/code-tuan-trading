@@ -1,4 +1,5 @@
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull, sql, getTableColumns } from "drizzle-orm";
+import { env } from "cloudflare:workers";
 import { getDb } from "../db";
 import { trades, tradeAudit, brokerConnections } from "../db/schema";
 import { identifyTrade, redactSecrets } from "./unified-ingestion";
@@ -62,27 +63,7 @@ export async function ingestTrades(
       )
       .returning(),
   );
-  const statements = prepared.map((row) =>
-    db
-      .insert(trades)
-      .values(row)
-      .onConflictDoUpdate({
-        target: [trades.userId, trades.dedupHash],
-        // Repeated receipts may add broker facts; private annotations and images are untouched.
-        set: {
-          pnl: sql`CASE WHEN excluded.pnl_known = 1 THEN excluded.pnl ELSE ${trades.pnl} END`,
-          fees: sql`CASE WHEN excluded.fees_known = 1 THEN excluded.fees ELSE ${trades.fees} END`,
-          pnlKnown: sql`MAX(${trades.pnlKnown},excluded.pnl_known)`,
-          feesKnown: sql`MAX(${trades.feesKnown},excluded.fees_known)`,
-          quantity: sql`excluded.quantity`,
-          exitPrice: sql`excluded.exit_price`,
-          rawPayloadJson: sql`excluded.raw_payload_json`,
-          version: sql`${trades.version}+1`,
-        },
-        setWhere: sql`${trades.deletedAt} IS NULL AND (${trades.pnl} != excluded.pnl OR ${trades.fees} != excluded.fees OR ${trades.quantity} != excluded.quantity OR ${trades.exitPrice} != excluded.exit_price OR ${trades.feesKnown} != excluded.fees_known OR ${trades.pnlKnown} != excluded.pnl_known)`,
-      })
-      .returning(),
-  );
+  const statements: Array<{toSQL():{sql:string;params:unknown[]}}> = [];
   if (owner)
     statements.push(
       db
@@ -122,7 +103,7 @@ export async function ingestTrades(
         )
         .returning() as never,
     );
-  if (!statements.length)
+  if (!prepared.length)
     return {
       trades: [],
       imported: 0,
@@ -131,12 +112,17 @@ export async function ingestTrades(
       scanned: 0,
       batchId,
     };
-  // D1 batch is one transaction; cursor/audit roll back with all records on any error.
-  const all = [...backfill, ...statements];
-  const results = await db.batch([all[0], ...all.slice(1)]);
-  const changed = results
-    .slice(backfill.length, backfill.length + prepared.length)
-    .flat() as (typeof trades.$inferSelect)[];
+  // One JSON-bound bulk INSERT avoids hundreds of SQL compilations and stays below
+  // D1's parameter limit. Audit/cursor/legacy hashes remain in the same transaction.
+  const columns=Object.entries(getTableColumns(trades)).filter(([key])=>key!=='createdAt');
+  const defaults=Object.fromEntries(columns.filter(([,column])=>['string','number','boolean'].includes(typeof column.default)).map(([key,column])=>[key,column.default]));
+  const quote=(value:string)=>'"'+value.replaceAll('"','""')+'"';
+  const bulk=env.DB.prepare(`INSERT INTO trades (${columns.map(([,c])=>quote(c.name)).join(',')}) SELECT ${columns.map(([key])=>`json_extract(value,'$.${key}')`).join(',')} FROM json_each(?) WHERE 1 ON CONFLICT(user_id,dedup_hash) DO UPDATE SET pnl=CASE WHEN excluded.pnl_known=1 THEN excluded.pnl ELSE trades.pnl END,fees=CASE WHEN excluded.fees_known=1 THEN excluded.fees ELSE trades.fees END,pnl_known=MAX(trades.pnl_known,excluded.pnl_known),fees_known=MAX(trades.fees_known,excluded.fees_known),quantity=excluded.quantity,exit_price=excluded.exit_price,raw_payload_json=json_set(excluded.raw_payload_json,'$.unifiedV6',COALESCE(CASE WHEN json_valid(trades.raw_payload_json) THEN json_extract(trades.raw_payload_json,'$.unifiedV6') END,json_extract(excluded.raw_payload_json,'$.unifiedV6'),json('{}'))),version=trades.version+1 WHERE trades.deleted_at IS NULL AND (trades.pnl!=excluded.pnl OR trades.fees!=excluded.fees OR trades.quantity!=excluded.quantity OR trades.exit_price!=excluded.exit_price OR trades.fees_known!=excluded.fees_known OR trades.pnl_known!=excluded.pnl_known) RETURNING *`).bind(JSON.stringify(prepared.map(row=>({...defaults,...row}))));
+  const native=(query:{toSQL():{sql:string;params:unknown[]}})=>{const q=query.toSQL();return env.DB.prepare(q.sql).bind(...q.params);};
+  const trailing=statements;
+  const results=await env.DB.batch([...backfill.map(native),bulk,...trailing.map(q=>native(q as never))]);
+  const allColumns=Object.entries(getTableColumns(trades));
+  const changed=results[backfill.length].results.map(value=>{const row=value as Record<string,unknown>;return Object.fromEntries(allColumns.map(([key,col])=>[key,col.dataType==='boolean'?Boolean(row[col.name]):row[col.name]]));}) as (typeof trades.$inferSelect)[];
   return {
     trades: changed,
     imported: changed.filter((t) => t.version === 1).length,

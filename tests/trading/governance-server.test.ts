@@ -133,6 +133,15 @@ describe("D1 atomic ingestion, conflict control and recovery", () => {
       await db.prepare("SELECT id FROM trades WHERE id='limit-0'").first(),
     ).toBeNull();
   });
+  it("retains V6 private annotations when a repeated broker receipt enriches money fields", async () => {
+    await ingestTrades([row('annotation-receipt')], 'FILE');
+    const edit=await PATCH(new Request('https://test/api/trades',{method:'PATCH',body:JSON.stringify({trade:{id:'annotation-receipt',version:1,unifiedV6:{review:'DONE',tag:'Giữ nguyên'}}})}));
+    expect(edit.status).toBe(200);
+    await ingestTrades([row('annotation-receipt',{pnl:200})], 'FILE');
+    const stored=await db.prepare("SELECT pnl,raw_payload_json FROM trades WHERE id='annotation-receipt'").first<{pnl:number;raw_payload_json:string}>();
+    expect(stored?.pnl).toBe(200);
+    expect(JSON.parse(stored!.raw_payload_json).unifiedV6).toEqual({review:'DONE',tag:'Giữ nguyên'});
+  });
   it("rejects a stale edit and keeps soft-deleted data recoverable", async () => {
     await ingestTrades([row("editable")], "MANUAL");
     const patch = (version: number, note: string) =>

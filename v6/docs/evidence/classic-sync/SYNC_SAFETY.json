@@ -1,0 +1,24 @@
+{
+  "pass": true,
+  "cases": [
+    {
+      "sharedCapitalCannotDivergeLocally": true
+    },
+    {
+      "earlyEditQueued": true,
+      "indexedDbFailureDoesNotClaimDurability": true
+    },
+    {
+      "conflictPreserved": true,
+      "archivedBeforeUseClassic": true
+    },
+    {
+      "foreignOwnerOutboxNotSent": true
+    },
+    {
+      "deviceLedgerReadAndWrite": true,
+      "netAfterCosts": 333
+    }
+  ],
+  "pageErrors": []
+}
