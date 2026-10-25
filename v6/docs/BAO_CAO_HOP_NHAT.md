@@ -1,49 +1,74 @@
-# BÁO CÁO HỢP NHẤT — bản cuối P0–P7
+# BÁO CÁO ĐỐI CHIẾU VÀ SỬA S1–S10
 
-Ngày: 2026-10-25. Sản phẩm: `Tuannhatky_Pro_HopNhat.html` / mã GitHub `v6/index.html`. SHA-256: `d5f4ed1058cc1c000d8abd948fbfbd8e357cc9a3fd86d8504e1ca64dd81a79e4`. File 403,677 byte, 2781 dòng. A gốc 265.621 byte/2.321 dòng; B gốc 275.872 byte/3.983 dòng.
+Ngày 25/10/2026. Baseline GitHub: `35614a6d8910bbdcab8c59387e1be4d26d0682a2` (web phiên bản 17). Bản sửa: `v6/index.html`, tải riêng dưới tên `index.html`. SHA-256 file tải: `413c79e0b6c6b6637770c07dea8b920298c266e0bc364d1a5c81f86c5d36f071`; 410,380 byte, 2804 dòng (baseline 403.677 byte, 2.781 dòng).
 
-Đã thực hiện tuần tự P0–P7. 121/121 kiểm tra chức năng/giao diện bản hợp nhất đạt; 118/118 kiểm tra Classic và 22/22 kiểm tra backend đạt. Bản HTML đơn dùng Tailwind CDN, Chart.js CDN, Inter và JetBrains Mono, không thêm thư viện ứng dụng. Thư viện trong devDependencies chỉ phục vụ kiểm thử.
+## Tài liệu và thứ tự đối chiếu
 
-## Phạm vi và giới hạn thực tế
+Đã đọc tệp 01 bên ngoài ZIP, toàn bộ blueprint/file 04/inventory và mã A/B trong ZIP; đọc 30 trang đặc tả định lượng và 3 trang PDF quyền truy cập. Có render kiểm tra trực quan trang 6, 7, 8, 22, 23 của đặc tả. A/B và inventory giống byte bản trước; blueprint cập nhật nhận định vốn/DD và bổ sung file 04. Tệp 01 ngoài ZIP mới hơn và có S1–S10; tệp 01 trong ZIP là phiên bản ngắn trước đó. Dùng yêu cầu của người dùng để triển khai; tài liệu không tự cấp quyền, không tự ghi đè chính sách kho hay kết quả kiểm thử.
 
-- Giữ phần A theo DOM/class/nhãn gốc trong phạm vi giữ; gộp các điều khiển Risk trùng và B độc nhất đúng blueprint. Giữ thiết kế sáng; sửa override dark để đọc được, bổ sung nhãn truy cập, focus, menu và layout ở 768px. Có liên kết thật tới `/classic`.
-- Classic, `/legacy`, API, D1/R2 và backend hiện có được giữ. 209 tệp V6 cũ được bỏ khỏi nhánh nguồn/build; lịch sử vẫn truy xuất trong Git. Thư mục build được làm sạch để không đóng gói asset React cũ. Hai fixture golden của Classic vẫn giữ để chạy đối chiếu độc lập.
-- Một `state.trades`, một `state.cashflows`, một RiskMath, Worker sinh từ các phương thức đó, một RiskStore tính số liệu chung. Mọi trang đọc snapshot chung. Mã wrapper patch và mã chết/gán cứng D23 không được mang sang.
-- **Không có SRC_C.** Không đoán key hay schema production cũ. Migrate hỗ trợ key/file A/B đã biết và không xóa các key cũ. Không tuyên bố dữ liệu production V6 cũ đã được tự chuyển. Mẫu mặc định là A theo §11.
-- **IndexedDB chưa phải cloud.** Đây là bản phản chiếu cùng origin/thiết bị, có thể mất cùng localStorage khi xóa dữ liệu trang. Có sao lưu JSON, archive trước khôi phục và file SQL ba bảng; SQL CHƯA chạy trên PostgreSQL/Supabase, chưa nối cloud cho kho hợp nhất và không cam kết lưu vĩnh viễn. Backend cloud Classic vẫn giữ nguyên.
-- Giữ `pnlrisk` Classic vs V6 và mapping simulator A; mapping là minh họa, không phải đồng bộ hai chiều với dữ liệu Classic thật.
+Không xây lại P0–P7 từ đầu: kiểm tra lại 701 quyết định và giữ kiến trúc bản đã xuất bản, sửa phần thiếu theo tài liệu mới. Không có SRC_C trong ZIP. Key hợp nhất v17 vẫn giữ nguyên; không xóa/migrate đoán các key production không biết. Classic/Legacy/backend/D1/R2 giữ nguyên.
 
-## Quyết định công thức và dữ liệu
+## Kết quả S1–S10
 
-Vốn/NAV/DD theo A: chạy theo thời gian, phát hành/thu hồi đơn vị khi nạp/rút, nên cashflow không tự thay DD. Tier/override và trần ngày cùng Risk Profile; ngân sách min(Equity × fTier × hệ số Tier, hạn mức/ngưỡng k). Lỗ floating được cộng riêng, không để lãi vị thế khác che lỗ. Dừng tạo lệnh mới không cản sửa/nhập lịch sử.
+| Mục | Trước sửa | Sau sửa / giới hạn |
+|---|---|---|
+| S1 | Thiếu current_equity | Đã thêm current_equity từ snapshot RiskStore vào risk_profiles, JSON/SQL/IndexedDB. |
+| S2 | open_time / planned_rr | Xuất entry_time / planned_rr_ratio; nhập vẫn hiểu open_time cũ và entry_time mới, payload gốc khôi phục từng trường. |
+| S3 | Tên cột lệch, MC chưa chạy vẫn chụp ra null | Snapshot đợi MC thật, đủ 12 cột PDF. Không lưu nếu payoff/đầu vào không xác định; không lấp số giả. MDD và f* lưu theo tỷ lệ 0..1, UI đổi sang %. |
+| S4 | Cache chỉ ở RAM, tải lại mất | SHA-256 khóa theo phiên bản tính toán, lệnh, dòng tiền, vốn, Risk Profile, giả định, lựa chọn và payload; kiểm checksum kết quả. Cache tối đa 8 trong extra.mcCache của cùng sổ, được IndexedDB phản chiếu. Snapshot có input_hash/cache_entry và cũng được dùng lại. Đổi dữ liệu/cấu hình làm cache hết hiệu lực. |
+| S5 | Chưa giải thích xác suất chuỗi 3 lệnh | Dòng Tier 1 lấy (1−WR)^3 từ RiskStore; WR 50% cho 12,5%. Không đủ mẫu thì báo thiếu. |
+| S6 | Chưa hiển thị số lệnh đệm | RiskStore tính khoảng vốn đến Tier 3 và rủi ro thực từ dailyBudget trước/sau Tier 2. Ví dụ 5→10; nếu trần ngày đã giới hạn thì không bịa số gấp đôi. Đây là xấp xỉ giữ vốn cố định. |
+| S7 | Cứng 20 ngày/tháng | Tham số 1..31 ngày/tháng, mặc định 21; chu kỳ payout mặc định vẫn 10. Thay ngày tháng không đổi payout mỗi chu kỳ. |
+| S8 | Xuất personal / prop | Đủ PERSONAL, FTMO, THE5ERS_HYPER, THE5ERS_HIGH_STAKES, THE5ERS_BOOTCAMP, TOPSTEP_TRAILING. Topstep có key nguồn top. Preset ngoài enum (Apex/MyFundedFX/FundedNext/quỹ tùy chỉnh cũ) giữ dữ liệu gốc và báo chưa xếp loại, account_type=null đến khi chọn đúng loại; tuyệt đối không đổi tên thành FTMO. SQL có CHECK sáu giá trị, giữ NULL cho trường chưa phân loại. |
+| S9 | Nhãn Kaufman dùng drift/std; chưa có thẻ xấp xỉ riêng | Kaufman theo Edge=W−L đúng bộ số mới; Balsara giữ bộ giải gốc; thêm xấp xỉ từ Edge theo payoff và giữ thực nghiệm Worker. Ghi chú khác biệt giả định, chân trời và định cỡ; b không nguyên vẫn là mở rộng liên tục của phương trình. |
+| S10 | Có ô tùy chỉnh, nhưng chuyển từ quỹ về cá nhân giữ 2/3,5 | Đổi loại tài khoản đặt lại 3/5 cá nhân, 2/3,5 quỹ; sửa thủ công được lưu. Không tự đoán ngưỡng Mở rộng. TODO: đối chiếu PDF trang 6 theo yêu cầu; bảng thực nằm trang 7–8 và số vẫn thiếu ngay trong bản render. |
 
-R chỉ đủ chuẩn khi initialRisk > 0, không estimated và hữu hạn; thiếu phí không bịa Gross R. BUY/SELL→Long/Short, MAE âm, discipline chuẩn hóa. P&L suy ra từ Actual R × initialRisk khi bật tính từ giá/nhập R; P&L thủ công A được giữ. `realizedR` khi sửa tại dòng không làm tròn trước khi lưu. Trượt giá MANUAL tự động = 0; SL/TP tính theo độ lệch giá và nhập tay A vẫn ghi đè.
+## Lỗi RCK phát hiện thêm khi đối chiếu
 
-ES/VaR dùng trọng số phân đoạn B, giữ dấu lợi suất và cảnh báo N<40. ES lệnh đơn khác ES gộp/stressed; cả hai đều có đơn vị/chân trời rõ ràng. LH có trọng số 1R xác minh, không gán $250 giả. RCK dùng solver A, haircut B trong cùng solver; mặc định f* = min các trần sau kiểm chứng MC/RoR, cổng Safety∧Edge∧N≥30. UI giả lập không tự mở đề xuất thực tế. MAE/MFE không biết thứ tự chạm TP/SL: What-if hiển thị cận, không bịa WR/PF/trailing chính xác.
+Các trường nội bộ kế thừa rckAlpha/rckBeta và hai ID adv-rck-alpha/adv-rck-beta lần lượt đang lưu xác suất và sàn vốn. Bản trước truyền chúng thẳng theo thứ tự α/β vào solver nên λ bị đảo. Bản này giữ nguyên ý nghĩa dữ liệu người dùng đã lưu, truyền sàn vốn làm α và xác suất làm β. Nhãn Hy Lạp trên hai ô, đường β tham chiếu trên biểu đồ và rck_alpha/rck_beta khi xuất SQL đã đổi đúng nghĩa PDF. Không đổi key/giá trị cấu hình ngầm. Ví dụ xác suất 10%, sàn vốn 70% cho λ = 6,4556962358. Bộ giải vẫn là một RiskMath dùng chung Worker, không thêm bản sao công thức.
 
-MC có một lõi seeded bootstrap/hoán vị; revenge theo A mở rộng (sau lỗ, xác suất 25% lệnh sau nhận thêm −0,5R). Stress có một trang/phân đoạn với chuỗi 10–15, WR giảm 5–10 điểm %, payoff giảm 20–30%, tail25Mode và khóa cổng. Sizer một bản, hợp 20 sản phẩm, A thắng xung đột (US30 step 0,1), floor theo bước lượng và ngân sách; USDJPY cần point value chuyển đổi thật.
+Các kỳ vọng cũ kiểm thử RiskStore λ theo thứ tự sai được thay bằng công thức đối chứng PDF; thêm test độc lập kiểm λ, ràng buộc và UI. Test bất đồng bộ trước đây giả định Worker khởi động ngay được sửa để chờ bước băm đầu vào, vẫn kiểm kết quả stale, không nới điều kiện an toàn.
 
-Prop dùng sàn trailing và daily floor A: max(1−ml,peak−ml), dayStart×(1−dl), chạm ngưỡng là vi phạm. Tính lượt đầu độc lập RNG funded/retry: bộ oracle 1.000 lượt cho 623/377 Static, 621/379 Trailing, khớp A. Giữ 1–3 giai đoạn, phí kích hoạt, chu kỳ payout, tuyến tính/lãi kép của B. EV một lượt dùng cùng population (phí thi + P(pass) × phí kích hoạt); chi phí/ROI chiến dịch retry tối đa 10 lượt tách riêng. Chỉ trả ở chu kỳ hoàn tất, mang lỗ qua chu kỳ, chỉ trả phần vượt vốn gốc theo split; rút tiền điều chỉnh đỉnh/ngày theo tỷ lệ để không tạo DD giả. Funded mặc định 60 lệnh; lợi nhuận tháng lý thuyết giả định 20 ngày. Phí 0 ⇒ ROI chưa xác định, không hiển thị 0% giả. Preset quỹ là tham số nguồn minh họa, chưa xác minh điều khoản hiện hành.
+## Lưu trữ và tương thích
 
-Migrate/restore không phá hủy: preview kiểm tra trước khi ghi; dedupe date|symbol|side|netPnl, ID va chạm khác giao dịch được đổi hậu tố, không ghi đè lệnh cũ. Không dựng giá từ 1% entry và không tự gán rủi ro mặc định. Thiếu dữ liệu tiền có thể suy ra thì báo từng dòng. Khôi phục UI tạo JSON bản trước và IndexedDB archive trước khi thay. JSON Schema có metadata/payload gốc để roundtrip mọi trường, kể cả notes, cashflows và snapshot cũ trùng ID. SQL có schema riêng, khóa ghép user/profile, RLS và yêu cầu UUID chủ sở hữu; không tự xóa hàng cloud khác.
+Một state.trades, một state.cashflows và một key tuannhatky_pro_unified_v1. Cache chỉ chứa kết quả dẫn xuất, không chứa sổ lệnh thứ hai. Kết quả 10.000 đường được dùng lại qua runtime/trình duyệt mới và qua snapshot lưu; sửa Risk Profile/lệnh làm khóa khác. Kết quả cache bị sửa checksum bị bỏ, chạy thật lại. Không lưu được vì quota không ghi đè mất sổ. WebCrypto không có thì bỏ cache, vẫn tính được. JSON/raw payload giữ roundtrip; snapshot v17 thiếu trường được giữ nguyên trong payload, chỉ đổi đơn vị/cột có thể chứng minh khi chiếu ra DB, không tự chế giá trị thiếu.
 
-Worker cache theo payload, coalesce và loại kết quả stale; fingerprint kiểm chứng chỉ phụ thuộc dữ liệu/tham số liên quan. Feedback Tier chỉ lấy MC đúng mức khuyên dùng đã kiểm chứng; phải bấm áp dụng, tài khoản Prop khóa nút. Boot chờ dữ liệu/default UI sẵn sàng, có thử IndexedDB chậm. Worker/cache V6 cũ được retire riêng; không xóa localStorage, IndexedDB hay cache Classic.
+SQL thêm cột bằng ADD COLUMN IF NOT EXISTS để tương thích bảng đã xuất trước. CHECK enum là NOT VALID để không phá bản ghi legacy chưa phân loại; các dòng mới phải đúng enum hoặc NULL khi chưa phân loại. SQL chưa chạy trên PostgreSQL/Supabase. IndexedDB là bản sao trên cùng thiết bị, không phải cloud; G7/G8 ngoài phạm vi theo yêu cầu mới (không thêm backend PostgreSQL/API, TypeScript hay WebAssembly).
 
-## Kiểm tra đã chạy và chưa chạy
+## Kiểm thử thực tế
 
-Đã chạy Node cho từng script, Acorn, quét ID trong DOM và chuỗi HTML, regex tên hàm, kiểm tra các chuỗi cấm; khóa B chỉ xuất hiện một lần trong migrateLegacy. Đã chạy Chromium thật với CSP giống Worker production: 21 routes, dữ liệu A/B, modal thêm/sửa, cashflows, Net/Gross, R/$/%/Pips, các bộ lọc, Review, Chartbook, import/dedupe, preset, Worker, MC/Prop/stress/sizer, cache-stale, khôi phục file thật và IndexedDB rollback. Cùng dữ liệu: Equity/DD/Tier/Expectancy/SQN/Ω/ES/f* dùng chung và đối chiếu các trang. Có thử nâng từ service worker cũ và giữ marker dữ liệu/cache Classic.
+Tổng **138/138**: 62 kiểm tra lõi và 76 kiểm tra Chromium, gồm 121 kiểm tra trước được chạy lại và 17 kiểm tra mới. Toàn bộ 3 script qua node --check; ID trùng=0, hàm có tên trùng=0; không thiếu ID GIỮ; 6 chuỗi cấm đều=0. Những số lượng/timestamp đầy đủ nằm trong output JSON phía dưới.
 
-Đã chạy axe tự động các rule WCAG 2 A trên 21 routes: 0 vi phạm; thử bàn phím Tab/Escape/return-focus và viewport 360/768/1280, không tràn trang. Heading dark có tỷ lệ tương phản ~13,40. Đây không phải chứng nhận WCAG AA toàn diện; chưa kiểm thử trình đọc màn hình thủ công, Safari/Firefox, điều khoản quỹ hiện hành, SQL trên server thật hay độ bền lưu trữ qua 30 năm. Không kiểm thử bằng cách xóa kho production thật.
+Đã dùng Chart.js thật (không stub): fan chart Monte Carlo, RCK, Omega/đuôi, Prop, các trang phân tích được tải trong trình duyệt; xác nhận Chart.version/instances và có ảnh kết quả. Có test số Stressed ES/VaR với oracle nguồn, Ω tại mục tiêu Prop 0,25R, daily/trailing vi phạm giữa đường dù đường không giới hạn có thể phục hồi, và ROI/EV/chu kỳ Prop. Các preset quỹ vẫn là ví dụ nguồn, không xác minh điều khoản hiện hành.
 
-Root typecheck đạt. Test Classic lúc đầu có một timeout Miniflare 5 giây khi máy chạy nhiều việc; chạy lại toàn bộ 1 worker/timeout 15 giây đạt 118/118. Không đổi công thức hay test kỳ vọng để vượt lỗi. Backend Node 22/22 đạt. Bundle backend có cảnh báo kích thước chunk hiện có, build thành công.
+Đã kiểm WCAG 2 A tự động trên 21 trang (0 vi phạm), focus/Tab/Escape, dark, viewport 360/768/1280 không tràn trang, Worker thật, sao lưu/xóa/khôi phục từng trường và chuyển SW V6 cũ giữ dữ liệu. Chưa kiểm màn hình đọc thủ công, Safari/Firefox, mọi tổ hợp thị trường/dữ liệu, hiệu năng trên thiết bị người dùng hay độ bền 30 năm. Không xóa dữ liệu production để thử.
 
-## Mặc định §11
+## Đối chiếu PDF quyền truy cập và việc cần làm tay
 
-Giữ pnlrisk/mapping; mẫu A (B nạp được trong Cài đặt); safeTierMax=1; key `tuannhatky_pro_unified_v1`; không yêu cầu offline, giữ CDN. Không hỏi lại các mục này. Các giả định payout/retry/LH/thiếu giá bổ sung được ghi ở trên.
+Đã kiểm thật GitHub: repo public, phiên đăng nhập có quyền push/admin, main trả "Branch not protected", GitHub Pages trả 404 (chưa thấy cấu hình). Không thay quyền repo, cài App, tạo token, cấp Admin cho agent khác hay bật Pages chỉ vì tài liệu hướng dẫn. PDF nói "Codex không tự deploy" là mô tả workflow GitHub/host trong tài liệu; phiên này có công cụ Sites và người dùng đã yêu cầu deploy, nên xuất bản bằng Sites. Chưa có workflow GitHub→Sites tự deploy khi merge. Root không đổi thành site tĩnh vì Classic/API đang cần backend; bản tải index.html dùng riêng cho host tĩnh được.
 
-## Inventory đầy đủ — 701 mục
+Việc người dùng tự quyết/thực hiện:
 
-Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộng tại P0 được chỉnh thành GỘP theo các quyết định D cụ thể; không dựng ID/hàm rỗng. Tên hàm chuyển vào namespace RiskMath/Core hoặc renderer chung được ghi đúng đích dưới đây.
+1. Review PR và merge main sau ít nhất một approval theo CONTRIBUTING.md; không coi push lên nhánh là merge.
+2. Bật branch protection nếu muốn GitHub cưỡng chế PR/review/cấm force-push. Hiện quy tắc có trong CONTRIBUTING nhưng chưa bật trên server.
+3. Nếu cấp agent khác: chọn đúng repo và quyền tối thiểu trong tài khoản/App của bạn; không gửi mật khẩu/token vào chat. Quyền sửa PR của connector và Git đang dùng có thể khác nhau.
+4. Chỉ cấu hình auto-deploy từ main nếu muốn workflow đó; phiên này deploy qua Sites. Không tự đổi host.
+5. Đối chiếu số ngưỡng Mở rộng ở PDF trang 6 theo yêu cầu (bảng tại trang 7–8 bị thiếu số); chỉnh hai ô Tier trong Risk Profile nếu có bản PDF rõ hơn.
+6. Chọn loại quỹ chuẩn cho preset legacy ngoài enum trước khi dùng dữ liệu xuất làm cấu hình thật. Sao lưu JSON định kỳ. Chỉ chạy SQL sau khi thay UUID chủ sở hữu và kiểm tra schema/RLS trên môi trường thử.
+
+Đã thêm AGENTS.md ngắn ở gốc, giới hạn thay đổi trong V6/giữ Classic, một lõi toán, kiểm tra trước PR và không commit secrets/nhật ký thật. Không thêm thư viện ứng dụng.
+
+## Mặc định và bố cục
+
+Giữ mặc định §11: mẫu A, B chọn được, safeTierMax=1, key cũ hợp nhất, CDN, giữ pnlrisk/mapping. Giữ Zones là thẻ tóm tắt từ RiskStore theo D15; biểu đồ lớn nằm ở trang tương ứng, không nhân bản/dời DOM. Đây là cách giải mâu thuẫn giữa mô tả 4 vùng file 04 và quyết định chống trùng cụ thể D15.
+
+## ID thêm/đổi tên
+
+Không đổi/xóa thêm ID giữ lại. Thêm ror-approx cho chỉ số mới và pf-month-days cho tham số 21 ngày. Hai ID RCK cũ giữ nguyên để tương thích; chỉ sửa nhãn α/β và ánh xạ công thức. Những ID đã gộp/đổi trong P0–P7 vẫn được ghi bên dưới.
+
+## Inventory đầy đủ
+
+406 GIỮ / 256 GỘP / 39 BỎ, tổng 701.
 
 | Nguồn | Loại | ID/hàm | Quyết định | Đích | Lý do |
 |---|---|---|---|---|---|
@@ -749,7 +774,7 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
 | SRC_B_v9_Risk.html | function | window.applyLayoutMode | BỎ | — | Mã cũ, stub/gán cứng, đọc chéo storage hoặc thủ thuật dời DOM bị cấm. |
 | SRC_B_v9_Risk.html | function | window.evalGates | GỘP | RiskStore.read().gates | Gộp vào một module/renderer gốc; không giữ wrapper patch hoặc tạo hàm rỗng. Theo D1–D22 và kiến trúc §7. |
 
-## ID đổi tên/hợp nhất và lý do
+## ID đã hợp nhất/đổi tên và lý do
 
 | Nguồn | ID cũ | Đích | Lý do |
 |---|---|---|---|
@@ -854,14 +879,19 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
 | SRC_B_v9_Risk.html | sel-mc-n | sim-runs | Gộp vào điều khiển/kết quả duy nhất theo blueprint. |
 | SRC_B_v9_Risk.html | sz-out | adv-size-out | Gộp vào điều khiển/kết quả duy nhất theo blueprint. |
 
-## Output kiểm tra thực tế
+## Output thực tế
 
-### Static
+### S1_S10_STATIC_TESTS.json
 ```json
 {
-  "phase": "P7",
-  "duplicateStaticIds": {},
-  "duplicateLiteralHtmlIdsAcrossStaticAndScripts": {},
+  "inventoryRows": 701,
+  "inventoryCounts": {
+    "GIỮ": 406,
+    "GỘP": 256,
+    "BỎ": 39
+  },
+  "missingRetainedIds": [],
+  "duplicateIds": {},
   "duplicateNamedFunctions": {},
   "nodeCheck": [
     {
@@ -888,41 +918,34 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
     "WK4_SRC": 0,
     "nav-tabs": 0
   },
-  "legacyKeyOccurrences": 1,
-  "legacyKeyOutsideMigration": 0,
-  "bytes": 403677,
-  "lines": 2781
+  "bytes": 410380,
+  "lines": 2804
 }
 ```
 
-### Đối chiếu
+### S1_S10_GITHUB_CONFIG_AUDIT.json
 ```json
 {
-  "inventoryRows": 701,
-  "inventoryCounts": {
-    "GIỮ": 406,
-    "GỘP": 256,
-    "BỎ": 39
+  "repository": {
+    "status": 200,
+    "visibility": "public",
+    "defaultBranch": "main",
+    "permissions": {
+      "admin": true,
+      "maintain": true,
+      "push": true,
+      "triage": true,
+      "pull": true
+    }
   },
-  "missingRetainedIds": [],
-  "unresolvedRetainedFunctions": []
-}
-```
-
-### Classic/backend
-```json
-{
-  "typecheckExitCode": 0,
-  "classicUnitTests": {
-    "passed": 118,
-    "total": 118
+  "mainProtection": {
+    "status": 404,
+    "message": "Branch not protected"
   },
-  "backendNodeTests": {
-    "passed": 22,
-    "total": 22,
-    "exitCode": 0
-  },
-  "note": "Lần đầu một test Miniflare quá timeout 5 giây khi chạy đồng thời; chạy lại toàn bộ với maxWorkers=1, timeout 15 giây: 118/118 đạt."
+  "pages": {
+    "status": 404,
+    "message": "Not Found"
+  }
 }
 ```
 
@@ -947,7 +970,7 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
         "sqn": 2.228984997397465,
         "omega0": 4.083333333333333,
         "es975": -1,
-        "rckRobust": 0.2312196072635187,
+        "rckRobust": 0.15794469902910171,
         "fStar": 0,
         "gate": false
       }
@@ -966,7 +989,7 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
         "sqn": 2.115849992805015,
         "omega0": 3.1666666666666665,
         "es975": -1,
-        "rckRobust": 0.1887780599390037,
+        "rckRobust": 0.13059399929648358,
         "fStar": 0,
         "gate": false
       }
@@ -1083,7 +1106,7 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
       "sqn": 2.228984997397465,
       "omega0": 4.083333333333333,
       "es975": -1,
-      "rckRobust": 0.2312196072635187,
+      "rckRobust": 0.15794469902910171,
       "fStar": 0,
       "gate": false
     },
@@ -1098,12 +1121,12 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
       "sqn": 2.115849992805015,
       "omega0": 3.1666666666666665,
       "es975": -1,
-      "rckRobust": 0.1887780599390037,
+      "rckRobust": 0.13059399929648358,
       "fStar": 0,
       "gate": false
     }
   ],
-  "timestamp": "2026-10-25T06:27:57.490Z"
+  "timestamp": "2026-10-25T07:07:00.498Z"
 }
 ```
 
@@ -1185,7 +1208,7 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
       ]
     }
   ],
-  "timestamp": "2026-10-25T06:27:59.203Z"
+  "timestamp": "2026-10-25T07:07:02.420Z"
 }
 ```
 
@@ -1249,7 +1272,7 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
         "roiPdfFunded": 11711.945540036053,
         "roiPdfCycle": 3647.249504700081,
         "theoCycleProfit": 6857.142857142859,
-        "theoMonthlyProfit": 13714.285714285717,
+        "theoMonthlyProfit": 14400,
         "totalFeeIfPass": 175,
         "cyc": 0.025398017539376865
       },
@@ -1275,7 +1298,7 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
         "roiPdfFunded": 10861.676930250473,
         "roiPdfCycle": 3552.476033199649,
         "theoCycleProfit": 6857.142857142859,
-        "theoMonthlyProfit": 13714.285714285717,
+        "theoMonthlyProfit": 14400,
         "totalFeeIfPass": 175,
         "cyc": 0.02736807533271691
       }
@@ -1327,7 +1350,7 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
       "pass": true
     }
   ],
-  "timestamp": "2026-10-25T06:28:02.658Z"
+  "timestamp": "2026-10-25T07:07:05.825Z"
 }
 ```
 
@@ -1367,7 +1390,7 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
       "pass": true,
       "tables": 3,
       "policies": 3,
-      "bytes": 34405,
+      "bytes": 42275,
       "databaseExecution": "NOT RUN"
     },
     {
@@ -1375,7 +1398,1145 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
       "pass": true
     }
   ],
-  "timestamp": "2026-10-25T06:28:03.566Z"
+  "timestamp": "2026-10-25T07:07:06.708Z"
+}
+```
+
+### S1_S10_CORE_TESTS.json
+```json
+{
+  "suite": "S1-S10 core",
+  "passed": 10,
+  "total": 10,
+  "cases": [
+    {
+      "name": "PDF RCK lambda and exact weighted 97.5% tail oracle",
+      "pass": true,
+      "lambda": 6.455696235812881,
+      "es": -13.599999999999996,
+      "var975": -11
+    },
+    {
+      "name": "Kaufman Edge .10 oracle and Balsara distinct from expected-edge approximation",
+      "pass": true,
+      "kaufmanPercent": [
+        1.8071595021380356,
+        66.94214876033057,
+        81.81818181818181
+      ],
+      "balsaraPercent": 19.21101466862746,
+      "approxPercent": 8.101311022241207
+    },
+    {
+      "name": "Cash withdrawal preserves drawdown after $250 loss; Tier defaults and negative-edge gate",
+      "pass": true,
+      "dd": 0.025000000000000022,
+      "withdrawalDD": 0.025000000000000022,
+      "negativeEdgeRecommendation": 0
+    },
+    {
+      "name": "S5/S6 real Tier probability and budget buffer; capped budgets are not assumed to double",
+      "pass": true,
+      "loss3": 0.125,
+      "before": 5,
+      "after": 10,
+      "capped": {
+        "before": 25,
+        "after": 25
+      }
+    },
+    {
+      "name": "S1/S2/S8 canonical export names and all six account enum values; SQL upgrades prior schema",
+      "pass": true,
+      "currentEquity": 11850,
+      "accountTypes": [
+        "PERSONAL",
+        "FTMO",
+        "THE5ERS_HYPER",
+        "THE5ERS_HIGH_STAKES",
+        "THE5ERS_BOOTCAMP",
+        "TOPSTEP_TRAILING"
+      ]
+    },
+    {
+      "name": "S3 snapshot requires completed MC, contains all 12 finite fields and preserves ratio units",
+      "pass": true,
+      "requiredColumns": 12,
+      "nullColumns": 0,
+      "snapshot": {
+        "snapshot_schema": 2,
+        "input_hash": "f7c084a2f2abb10cd750a19625ee09666d43fe5bd27a315367ac18f30f2738ec",
+        "cache_entry": {
+          "version": "pdf-s1-s10-v2",
+          "input_hash": "f7c084a2f2abb10cd750a19625ee09666d43fe5bd27a315367ac18f30f2738ec",
+          "result_hash": "95d327181fd95359b569fc09f8014d9ec90110cf40528d7ea51e4d7db42cac70",
+          "result_json": "{\"bands\":[[0,-1.0000000000000009,-1.9900000000000029,-2.970100000000009,-1.5146515000000194,-2.019206979999999,-0.8434374637599995,-0.0961177828803117,0.4251198634699138,1.1811164409643027,2.29371894903303,2.5798159881436966,3.782075426803333,4.052856685668527,5.335992405583845,5.832880928802231,6.371275778714169,7.645644940322005,8.970217890228206,9.893435303961917,11.189341396891162,11.40277261761591,12.098988519358866,13.27377431972685,14.047455631649264,14.681215746047439,16.50942406520923,16.95752063584932,18.560036030557782,19.65013365690784,21.867901208661177,21.727081164637774,23.156433768466723,24.56578429184941,25.20923536122044,26.195643362362155,27.674880094381994,27.92853364434762,29.44720477253846,31.648402666021536,32.646525623146516,34.23828393062427,35.48997770124074,36.400325863721214,36.806184897281405,37.35048828817138,39.94071384769835,40.787928908716786,41.908994024163746,42.38022538059476,43.728909756294996,45.23006816450115,45.93696791741115,47.80354497237611,49.38410152876609,50.84135412044948,54.032430078643536,55.12687815887549,55.76046851887042,56.79794582206716,58.96566070321627,60.45565886650659,62.374882204236215,64.19927164696695,66.29186567613101,66.73296902458017,69.10863965183836,71.09301763438252,73.61908865194515,74.29921496713476,76.24048354154698,77.89978708583301,80.6455944220901,81.17033027251934,84.24571830106532,84.9205163947406,87.1395625914775,89.93148147592169,92.66599421143277,92.63800675844752,94.91563403997203,97.996519476906,99.095206159236,101.41814543224616,104.3241554571944,105.7824818653229,108.50841906956394,112.09858242086099,113.84578136901288,116.32194616534663,118.53379368632986,118.73438788204385,121.35920053662836,121.94077509331555,125.63282179350335,128.92485352191693,129.63103539568425,132.28761397560643,136.05848395285375,137.59888658458812,141.68666176875416],[0,-1.0000000000000009,0.4849999999999799,0.7542799999999961,1.9633313600000202,2.9171891824999685,3.8669411308760226,4.846653001474999,5.865701457448269,7.028806619311556,8.392206245334988,9.104482582063556,10.704050892397078,11.548063106489725,12.549598316920685,13.833615026898304,14.783723690808358,16.05050322301984,17.80088604755243,19.24469510368072,20.2823939201592,21.428312189612562,22.815780928709707,24.164692780542897,26.060426916092716,27.427892470856996,28.60978019182394,30.10182750339423,31.554847318580048,33.30470057721051,34.89717375761208,35.570311273903556,37.118055245009444,38.7706484480975,40.63072813404547,41.88293151166207,43.35776819259814,44.872595311585805,46.73393141430247,48.48443132326072,50.6572767377355,52.00710537478535,52.912280361608374,54.93532806304764,56.71724102574984,58.72552560747244,60.419938721505375,61.81769227714567,62.618200108914436,64.74433088363935,66.28589427599114,67.66622221225431,69.73025598501992,72.35516228704515,74.5777426103742,76.09867032089555,78.18648461351916,80.50781055896292,82.79363148041483,84.96393665027311,87.03115591940728,88.79439259870409,91.04762953237324,94.0241599361241,94.92364507854757,97.89226586285302,100.27978948696865,102.21114371218198,104.12180358233184,106.3592248146763,108.91407388427132,110.54198333575668,112.47825709326729,114.94125363958845,117.7321650171034,120.10504032756049,122.38462019830143,124.72394048851285,126.58039828846492,129.26098300336656,131.88927777333163,135.04497899318972,138.19996864819348,140.17046574930237,144.30827086450026,146.30464005418418,148.81145302245793,153.24903711482239,153.92879459528027,157.1326931941668,160.916452860447,163.4168600486065,165.69771886590212,169.38742805414452,172.54189390527657,174.68171201687568,179.41730497619136,182.4659755379556,187.59770486642248,190.51328862664,194.04714021783676],[0,1.4999999999999902,2.464999999999984,3.6038959999999953,4.853189672000013,6.436625372000027,7.548462695712477,8.951072430240647,10.09007295017248,11.633299489374815,13.103887912123756,14.354070136792574,16.128783491405983,17.325097727534676,18.786227351091654,20.3893343505851,21.767855624052366,23.396121280226257,24.806656240789504,26.010137370282038,27.647974772707705,28.659395678805822,30.45805409257416,32.14333524208055,33.990613707421936,35.487910744232586,37.09878044240376,38.61050783194149,40.45685953448355,42.46721662667958,44.16213063173791,46.391624444600076,48.09988277047941,49.57741323088782,51.71295401452307,53.398058387697866,55.48158872574833,57.51208153389757,59.616943570852165,61.51410442991296,63.480594766030094,65.54897348552578,68.30858989352168,69.93840631305281,71.87086373827927,73.91257600975389,76.85650481450999,79.0661608506501,80.49762441151704,81.85413320217954,83.7992521047461,85.92139269715835,87.69227689948877,90.37560122717963,91.85459868630306,93.9282720333506,96.4851659470262,98.90492181311996,102.37019195788947,104.74841510398107,107.31109973600113,109.27022309151843,112.04228721378149,114.72832043964804,116.9228319017991,119.01366047667166,122.17752644805655,125.36058378533087,127.39146483826902,130.61357982208207,134.2616538686981,135.67908290106575,139.3146366952398,141.93871156756163,145.02186404838605,148.2562123830143,150.67604773730517,154.56783898175587,158.25141456570552,160.50800827739326,163.439821892827,167.04273411588812,169.0560219193742,173.095835355328,177.8227450271064,181.21584997237997,183.5594575544048,187.46262951151004,190.7902539868581,194.91055768636704,196.66333245536936,201.86862657591055,205.47691790315895,209.1114808268895,212.95371819474093,217.06153489369916,220.36392838381653,222.759667528304,227.6010625412285,230.13240181036818,236.14126633272008],[0,2.8000000000000025,4.342000000000001,6.120799999999993,7.651368439999984,9.440642326399985,11.215156955348583,12.616601932661764,13.999516173615657,16.13900123482177,17.79228007671181,19.6902666301455,21.582726590664446,23.383205758241466,24.93318107011615,26.487064528097214,28.171149444385545,29.899610287399536,31.570924507407373,33.1178930987813,34.90889361301881,36.92151301398607,38.83512801406741,40.5796177122103,42.60045417604586,44.39407339797119,46.52333388317431,47.95771237417086,51.03935408212617,52.76210364103924,54.641700518049774,57.19991204043442,59.557910721040926,61.78864609186405,63.730109844966435,66.31536868994823,68.17590053813348,70.25808790243273,73.15008915605601,74.58155530737844,77.43365791676275,80.17007977679695,82.70832510887007,85.58137143247164,88.26022473532664,90.11898423426878,92.11870113071157,94.5972388042519,97.36414848528285,99.89209442998377,102.84417347768256,105.63010282272245,106.6911547877981,110.37987737349324,113.3881079434381,116.72132737239585,118.80018578553178,121.87390281544177,124.08320231345891,126.30113668583304,129.58527239791323,133.14223868413504,135.18594918089605,139.10910587099195,141.3531347608754,145.3299415270189,148.31032589947628,151.3837072582039,154.64385116531494,156.39925671275802,159.09425657672904,162.95197143989733,166.20375935540957,170.32972392920703,172.68865691819144,176.92525008511626,180.8623661205997,185.59043977883275,188.0676835811757,192.03414303568604,196.1107336785753,199.328024413539,203.88844568264832,206.961499572372,212.2269811116916,215.83345129139957,219.65563024244653,224.22786889694478,228.15660695218085,231.27583468368078,236.67771286128638,238.35802508663767,242.97570045666052,247.126880038965,251.89122473457917,258.34053024116565,262.18489467186106,266.1036838756411,273.0258255080034,278.793844751339,282.13981108426475],[0,5.000000000000004,7.425999999999999,9.882920000000016,11.765580696,13.92664268149999,16.198887094135994,17.940449886875022,20.724615648589673,23.043809101781033,24.58185671555324,27.2181945157389,29.510308960482433,31.182347358934305,34.20148000356953,36.453743300613375,38.33698741968243,40.63013689987998,43.13455718359638,45.6306601352787,47.90011530761971,50.46370967647924,52.521649703728215,55.84939026117781,58.26596397374255,60.18059139996532,64.36227190401583,65.7029151602954,68.39591559644333,71.32054500145495,73.89035317647676,75.50495333576998,78.75500015705083,79.24280617838086,83.0148850376932,86.21666128147932,88.59260808023781,92.20407990874423,96.0718398444,97.48318380188117,100.23296659987095,103.63856150417945,105.09484977277714,108.08248013737156,111.34344381786931,115.8558084663075,117.11845494579211,119.62722388559554,125.94911876932761,128.1357243490655,132.7661030886286,135.43265161173403,139.08105456321266,145.1324801726671,147.22035247079322,151.37836189289337,153.2091713948852,157.58847076375636,160.9373339631961,165.54164534659205,168.760332247318,171.37817762169973,174.75218274272217,178.66649759715872,182.66969412148123,188.30971678762282,193.49929168980003,199.3807519692039,203.95117124708517,207.83230795018096,209.83241410230718,214.47990031384174,217.25130033512764,223.5963263418302,226.30883267300365,232.18279406105128,237.35603884822024,242.9414542003588,245.23317360573085,247.4753705895114,253.51192368605388,257.7831271317448,260.129621772816,264.3181925014187,268.13533509483716,275.4931966844632,280.5191301692202,285.6618182529522,292.13916733634545,298.83568405725833,305.9816799433184,310.2676843935426,314.77235586245075,317.55821892906306,323.17838547490163,330.88956829621213,340.08702478353274,344.75114467217816,350.93516994444684,362.08550176307205,369.01663811269464]],\"med\":2.361412663327201,\"p5\":1.4168666176875417,\"p95\":3.6901663811269465,\"win\":1,\"ddMed\":0.04439764835798499,\"ddP95\":0.0733249068422287,\"ddProb\":0,\"seed\":2026}"
+        },
+        "account_id": "RP_MAIN_01",
+        "sample_size_n": 15,
+        "rck_optimal_fraction": 0,
+        "snapshot_id": "ba93289b-c640-43d5-9437-dd1c3ee67a38",
+        "created_at": "2026-10-25T13:49:34.409Z",
+        "trades_count": 15,
+        "expectancy_r": 1.2333333333333334,
+        "win_rate_w": 0.6,
+        "payoff_ratio_b": 2.7222222222222223,
+        "es_975_r": -1,
+        "var_975_r": -1,
+        "var_990_r": -1,
+        "rck_optimal_pct": 0,
+        "tier_state": 1,
+        "mc_p95_mdd": 0.0733249068422287,
+        "mc_ror_prob": 0,
+        "mc_p50_equity": 39832.74006042733,
+        "omega_curve_json": [
+          {
+            "x": -1,
+            "y": 20
+          },
+          {
+            "x": -0.9545454545454546,
+            "y": 20
+          },
+          {
+            "x": -0.9090909090909091,
+            "y": 20
+          },
+          {
+            "x": -0.8636363636363636,
+            "y": 20
+          },
+          {
+            "x": -0.8181818181818181,
+            "y": 20
+          },
+          {
+            "x": -0.7727272727272727,
+            "y": 20
+          },
+          {
+            "x": -0.7272727272727273,
+            "y": 18.97222222222222
+          },
+          {
+            "x": -0.6818181818181819,
+            "y": 16.047619047619047
+          },
+          {
+            "x": -0.6363636363636364,
+            "y": 13.854166666666664
+          },
+          {
+            "x": -0.5909090909090908,
+            "y": 12.148148148148142
+          },
+          {
+            "x": -0.5454545454545454,
+            "y": 10.783333333333333
+          },
+          {
+            "x": -0.5,
+            "y": 9.666666666666666
+          },
+          {
+            "x": -0.4545454545454546,
+            "y": 8.736111111111112
+          },
+          {
+            "x": -0.40909090909090906,
+            "y": 7.948717948717949
+          },
+          {
+            "x": -0.36363636363636365,
+            "y": 7.273809523809524
+          },
+          {
+            "x": -0.31818181818181823,
+            "y": 6.68888888888889
+          },
+          {
+            "x": -0.2727272727272727,
+            "y": 6.177083333333333
+          },
+          {
+            "x": -0.2272727272727273,
+            "y": 5.725490196078431
+          },
+          {
+            "x": -0.18181818181818177,
+            "y": 5.3240740740740735
+          },
+          {
+            "x": -0.13636363636363635,
+            "y": 4.964912280701754
+          },
+          {
+            "x": -0.09090909090909094,
+            "y": 4.641666666666667
+          },
+          {
+            "x": -0.045454545454545414,
+            "y": 4.349206349206348
+          },
+          {
+            "x": 0,
+            "y": 4.083333333333333
+          },
+          {
+            "x": 0.045454545454545414,
+            "y": 3.8405797101449286
+          },
+          {
+            "x": 0.09090909090909083,
+            "y": 3.6180555555555567
+          },
+          {
+            "x": 0.13636363636363646,
+            "y": 3.413333333333332
+          },
+          {
+            "x": 0.18181818181818188,
+            "y": 3.224358974358975
+          },
+          {
+            "x": 0.2272727272727273,
+            "y": 3.049382716049383
+          },
+          {
+            "x": 0.2727272727272727,
+            "y": 2.886904761904762
+          },
+          {
+            "x": 0.3181818181818181,
+            "y": 2.7356321839080455
+          },
+          {
+            "x": 0.36363636363636354,
+            "y": 2.594444444444445
+          },
+          {
+            "x": 0.40909090909090917,
+            "y": 2.462365591397849
+          },
+          {
+            "x": 0.4545454545454546,
+            "y": 2.338541666666666
+          },
+          {
+            "x": 0.5,
+            "y": 2.2222222222222223
+          },
+          {
+            "x": 0.5454545454545454,
+            "y": 2.112745098039216
+          },
+          {
+            "x": 0.5909090909090908,
+            "y": 2.00952380952381
+          },
+          {
+            "x": 0.6363636363636365,
+            "y": 1.912037037037037
+          },
+          {
+            "x": 0.6818181818181819,
+            "y": 1.8198198198198197
+          },
+          {
+            "x": 0.7272727272727273,
+            "y": 1.7324561403508774
+          },
+          {
+            "x": 0.7727272727272727,
+            "y": 1.6495726495726497
+          },
+          {
+            "x": 0.8181818181818181,
+            "y": 1.570833333333333
+          },
+          {
+            "x": 0.8636363636363635,
+            "y": 1.4959349593495934
+          },
+          {
+            "x": 0.9090909090909092,
+            "y": 1.4246031746031742
+          },
+          {
+            "x": 0.9545454545454546,
+            "y": 1.3565891472868215
+          },
+          {
+            "x": 1,
+            "y": 1.2916666666666667
+          },
+          {
+            "x": 1.0454545454545454,
+            "y": 1.2296296296296299
+          },
+          {
+            "x": 1.0909090909090908,
+            "y": 1.170289855072464
+          },
+          {
+            "x": 1.1363636363636362,
+            "y": 1.1134751773049645
+          },
+          {
+            "x": 1.1818181818181817,
+            "y": 1.059027777777778
+          },
+          {
+            "x": 1.227272727272727,
+            "y": 1.006788866259335
+          },
+          {
+            "x": 1.272727272727273,
+            "y": 0.9568965517241376
+          },
+          {
+            "x": 1.3181818181818183,
+            "y": 0.9092676604018144
+          },
+          {
+            "x": 1.3636363636363638,
+            "y": 0.8637515842839036
+          },
+          {
+            "x": 1.4090909090909092,
+            "y": 0.8202107873527588
+          },
+          {
+            "x": 1.4545454545454546,
+            "y": 0.7785194174757281
+          },
+          {
+            "x": 1.5,
+            "y": 0.738562091503268
+          },
+          {
+            "x": 1.5454545454545454,
+            "y": 0.7011027278003483
+          },
+          {
+            "x": 1.5909090909090908,
+            "y": 0.6653431650595577
+          },
+          {
+            "x": 1.6363636363636362,
+            "y": 0.6311702717692734
+          },
+          {
+            "x": 1.6818181818181817,
+            "y": 0.5984807379272925
+          },
+          {
+            "x": 1.727272727272727,
+            "y": 0.5671800318640469
+          },
+          {
+            "x": 1.772727272727273,
+            "y": 0.5371814872594902
+          },
+          {
+            "x": 1.8181818181818183,
+            "y": 0.5089058524173027
+          },
+          {
+            "x": 1.8636363636363638,
+            "y": 0.4825870646766169
+          },
+          {
+            "x": 1.9090909090909092,
+            "y": 0.4574209245742092
+          },
+          {
+            "x": 1.9545454545454546,
+            "y": 0.4333333333333333
+          },
+          {
+            "x": 2,
+            "y": 0.41025641025641024
+          },
+          {
+            "x": 2.0454545454545454,
+            "y": 0.38952164009111623
+          },
+          {
+            "x": 2.090909090909091,
+            "y": 0.3697104677060135
+          },
+          {
+            "x": 2.1363636363636362,
+            "y": 0.35076252723311546
+          },
+          {
+            "x": 2.1818181818181817,
+            "y": 0.3326226012793178
+          },
+          {
+            "x": 2.227272727272727,
+            "y": 0.31609674728940795
+          },
+          {
+            "x": 2.272727272727273,
+            "y": 0.30085609457806756
+          },
+          {
+            "x": 2.3181818181818183,
+            "y": 0.2862838915470494
+          },
+          {
+            "x": 2.3636363636363638,
+            "y": 0.2723371049551307
+          },
+          {
+            "x": 2.409090909090909,
+            "y": 0.25897631779984714
+          },
+          {
+            "x": 2.4545454545454546,
+            "y": 0.2461653572764684
+          },
+          {
+            "x": 2.5,
+            "y": 0.23387096774193547
+          },
+          {
+            "x": 2.5454545454545454,
+            "y": 0.2220625224577794
+          },
+          {
+            "x": 2.590909090909091,
+            "y": 0.2107117688513038
+          },
+          {
+            "x": 2.6363636363636362,
+            "y": 0.1997926028344279
+          },
+          {
+            "x": 2.6818181818181817,
+            "y": 0.18928086838534605
+          },
+          {
+            "x": 2.727272727272727,
+            "y": 0.1791541791541792
+          },
+          {
+            "x": 2.772727272727273,
+            "y": 0.1693917593198168
+          },
+          {
+            "x": 2.8181818181818183,
+            "y": 0.16051364365971102
+          },
+          {
+            "x": 2.8636363636363638,
+            "y": 0.152755905511811
+          },
+          {
+            "x": 2.909090909090909,
+            "y": 0.1452859350850077
+          },
+          {
+            "x": 2.9545454545454546,
+            "y": 0.1380880121396055
+          },
+          {
+            "x": 3,
+            "y": 0.13114754098360656
+          },
+          {
+            "x": 3.045454545454546,
+            "y": 0.1244509516837481
+          },
+          {
+            "x": 3.090909090909091,
+            "y": 0.11798561151079139
+          },
+          {
+            "x": 3.1363636363636367,
+            "y": 0.1117397454031117
+          },
+          {
+            "x": 3.1818181818181817,
+            "y": 0.10570236439499307
+          },
+          {
+            "x": 3.2272727272727275,
+            "y": 0.0998632010943912
+          },
+          {
+            "x": 3.2727272727272725,
+            "y": 0.0942126514131898
+          },
+          {
+            "x": 3.3181818181818183,
+            "y": 0.0887417218543046
+          },
+          {
+            "x": 3.3636363636363633,
+            "y": 0.08344198174706653
+          },
+          {
+            "x": 3.409090909090909,
+            "y": 0.07830551989730422
+          },
+          {
+            "x": 3.454545454545454,
+            "y": 0.0733249051833123
+          },
+          {
+            "x": 3.5,
+            "y": 0.0684931506849315
+          }
+        ],
+        "parameters": {
+          "sim": {
+            "horizon": 100,
+            "runs": 1000,
+            "risk": 1,
+            "dd": 25,
+            "skip": false,
+            "cap": null,
+            "slip": 0,
+            "mode": "boot",
+            "seed": 2026,
+            "revenge": false,
+            "tailSlip": 1,
+            "tailWindow": 25,
+            "liquidity": "auto"
+          },
+          "stress": {
+            "winrate": 53,
+            "payoff": 1.6,
+            "risk": 1,
+            "dd": 20,
+            "streak": false,
+            "degrade": false,
+            "tail": false,
+            "streakLength": 12,
+            "wrDrop": 7,
+            "rrDrop": 25
+          },
+          "prop": {
+            "preset": "custom",
+            "size": 100000,
+            "fee": 500,
+            "stages": [
+              8
+            ],
+            "ml": 10,
+            "dl": 5,
+            "risk": 0.5,
+            "split": 80,
+            "tpd": 2,
+            "horizon": 120,
+            "ddMode": "static",
+            "runs": 1000,
+            "seed": 42,
+            "actFee": 0,
+            "comp": true,
+            "payoutDays": 10,
+            "fundedH": 60,
+            "tradingDays": 21
+          },
+          "profile": {
+            "rckAlpha": 0.05,
+            "rckBeta": 0.2,
+            "acct": "personal",
+            "propKey": "custom",
+            "t2": 3,
+            "t3": 5,
+            "tierOverride": "auto",
+            "k": 4,
+            "fTier": 1,
+            "dailyLossLimit": 1000,
+            "personalDailyLimit": 500,
+            "maxDrawdown": 2000,
+            "ddMode": "static",
+            "assumptions": {
+              "tierCapMode": "ftier_mult",
+              "tail25Mode": "losing_only",
+              "safeTierMax": 1,
+              "recRule": "min3",
+              "lockStressLab": true,
+              "rckMode": "empirical",
+              "rorZoom": false
+            }
+          },
+          "selectedIds": null
+        },
+        "results": {
+          "mc": {
+            "bands": [
+              [
+                0,
+                -1.0000000000000009,
+                -1.9900000000000029,
+                -2.970100000000009,
+                -1.5146515000000194,
+                -2.019206979999999,
+                -0.8434374637599995,
+                -0.0961177828803117,
+                0.4251198634699138,
+                1.1811164409643027,
+                2.29371894903303,
+                2.5798159881436966,
+                3.782075426803333,
+                4.052856685668527,
+                5.335992405583845,
+                5.832880928802231,
+                6.371275778714169,
+                7.645644940322005,
+                8.970217890228206,
+                9.893435303961917,
+                11.189341396891162,
+                11.40277261761591,
+                12.098988519358866,
+                13.27377431972685,
+                14.047455631649264,
+                14.681215746047439,
+                16.50942406520923,
+                16.95752063584932,
+                18.560036030557782,
+                19.65013365690784,
+                21.867901208661177,
+                21.727081164637774,
+                23.156433768466723,
+                24.56578429184941,
+                25.20923536122044,
+                26.195643362362155,
+                27.674880094381994,
+                27.92853364434762,
+                29.44720477253846,
+                31.648402666021536,
+                32.646525623146516,
+                34.23828393062427,
+                35.48997770124074,
+                36.400325863721214,
+                36.806184897281405,
+                37.35048828817138,
+                39.94071384769835,
+                40.787928908716786,
+                41.908994024163746,
+                42.38022538059476,
+                43.728909756294996,
+                45.23006816450115,
+                45.93696791741115,
+                47.80354497237611,
+                49.38410152876609,
+                50.84135412044948,
+                54.032430078643536,
+                55.12687815887549,
+                55.76046851887042,
+                56.79794582206716,
+                58.96566070321627,
+                60.45565886650659,
+                62.374882204236215,
+                64.19927164696695,
+                66.29186567613101,
+                66.73296902458017,
+                69.10863965183836,
+                71.09301763438252,
+                73.61908865194515,
+                74.29921496713476,
+                76.24048354154698,
+                77.89978708583301,
+                80.6455944220901,
+                81.17033027251934,
+                84.24571830106532,
+                84.9205163947406,
+                87.1395625914775,
+                89.93148147592169,
+                92.66599421143277,
+                92.63800675844752,
+                94.91563403997203,
+                97.996519476906,
+                99.095206159236,
+                101.41814543224616,
+                104.3241554571944,
+                105.7824818653229,
+                108.50841906956394,
+                112.09858242086099,
+                113.84578136901288,
+                116.32194616534663,
+                118.53379368632986,
+                118.73438788204385,
+                121.35920053662836,
+                121.94077509331555,
+                125.63282179350335,
+                128.92485352191693,
+                129.63103539568425,
+                132.28761397560643,
+                136.05848395285375,
+                137.59888658458812,
+                141.68666176875416
+              ],
+              [
+                0,
+                -1.0000000000000009,
+                0.4849999999999799,
+                0.7542799999999961,
+                1.9633313600000202,
+                2.9171891824999685,
+                3.8669411308760226,
+                4.846653001474999,
+                5.865701457448269,
+                7.028806619311556,
+                8.392206245334988,
+                9.104482582063556,
+                10.704050892397078,
+                11.548063106489725,
+                12.549598316920685,
+                13.833615026898304,
+                14.783723690808358,
+                16.05050322301984,
+                17.80088604755243,
+                19.24469510368072,
+                20.2823939201592,
+                21.428312189612562,
+                22.815780928709707,
+                24.164692780542897,
+                26.060426916092716,
+                27.427892470856996,
+                28.60978019182394,
+                30.10182750339423,
+                31.554847318580048,
+                33.30470057721051,
+                34.89717375761208,
+                35.570311273903556,
+                37.118055245009444,
+                38.7706484480975,
+                40.63072813404547,
+                41.88293151166207,
+                43.35776819259814,
+                44.872595311585805,
+                46.73393141430247,
+                48.48443132326072,
+                50.6572767377355,
+                52.00710537478535,
+                52.912280361608374,
+                54.93532806304764,
+                56.71724102574984,
+                58.72552560747244,
+                60.419938721505375,
+                61.81769227714567,
+                62.618200108914436,
+                64.74433088363935,
+                66.28589427599114,
+                67.66622221225431,
+                69.73025598501992,
+                72.35516228704515,
+                74.5777426103742,
+                76.09867032089555,
+                78.18648461351916,
+                80.50781055896292,
+                82.79363148041483,
+                84.96393665027311,
+                87.03115591940728,
+                88.79439259870409,
+                91.04762953237324,
+                94.0241599361241,
+                94.92364507854757,
+                97.89226586285302,
+                100.27978948696865,
+                102.21114371218198,
+                104.12180358233184,
+                106.3592248146763,
+                108.91407388427132,
+                110.54198333575668,
+                112.47825709326729,
+                114.94125363958845,
+                117.7321650171034,
+                120.10504032756049,
+                122.38462019830143,
+                124.72394048851285,
+                126.58039828846492,
+                129.26098300336656,
+                131.88927777333163,
+                135.04497899318972,
+                138.19996864819348,
+                140.17046574930237,
+                144.30827086450026,
+                146.30464005418418,
+                148.81145302245793,
+                153.24903711482239,
+                153.92879459528027,
+                157.1326931941668,
+                160.916452860447,
+                163.4168600486065,
+                165.69771886590212,
+                169.38742805414452,
+                172.54189390527657,
+                174.68171201687568,
+                179.41730497619136,
+                182.4659755379556,
+                187.59770486642248,
+                190.51328862664,
+                194.04714021783676
+              ],
+              [
+                0,
+                1.4999999999999902,
+                2.464999999999984,
+                3.6038959999999953,
+                4.853189672000013,
+                6.436625372000027,
+                7.548462695712477,
+                8.951072430240647,
+                10.09007295017248,
+                11.633299489374815,
+                13.103887912123756,
+                14.354070136792574,
+                16.128783491405983,
+                17.325097727534676,
+                18.786227351091654,
+                20.3893343505851,
+                21.767855624052366,
+                23.396121280226257,
+                24.806656240789504,
+                26.010137370282038,
+                27.647974772707705,
+                28.659395678805822,
+                30.45805409257416,
+                32.14333524208055,
+                33.990613707421936,
+                35.487910744232586,
+                37.09878044240376,
+                38.61050783194149,
+                40.45685953448355,
+                42.46721662667958,
+                44.16213063173791,
+                46.391624444600076,
+                48.09988277047941,
+                49.57741323088782,
+                51.71295401452307,
+                53.398058387697866,
+                55.48158872574833,
+                57.51208153389757,
+                59.616943570852165,
+                61.51410442991296,
+                63.480594766030094,
+                65.54897348552578,
+                68.30858989352168,
+                69.93840631305281,
+                71.87086373827927,
+                73.91257600975389,
+                76.85650481450999,
+                79.0661608506501,
+                80.49762441151704,
+                81.85413320217954,
+                83.7992521047461,
+                85.92139269715835,
+                87.69227689948877,
+                90.37560122717963,
+                91.85459868630306,
+                93.9282720333506,
+                96.4851659470262,
+                98.90492181311996,
+                102.37019195788947,
+                104.74841510398107,
+                107.31109973600113,
+                109.27022309151843,
+                112.04228721378149,
+                114.72832043964804,
+                116.9228319017991,
+                119.01366047667166,
+                122.17752644805655,
+                125.36058378533087,
+                127.39146483826902,
+                130.61357982208207,
+                134.2616538686981,
+                135.67908290106575,
+                139.3146366952398,
+                141.93871156756163,
+                145.02186404838605,
+                148.2562123830143,
+                150.67604773730517,
+                154.56783898175587,
+                158.25141456570552,
+                160.50800827739326,
+                163.439821892827,
+                167.04273411588812,
+                169.0560219193742,
+                173.095835355328,
+                177.8227450271064,
+                181.21584997237997,
+                183.5594575544048,
+                187.46262951151004,
+                190.7902539868581,
+                194.91055768636704,
+                196.66333245536936,
+                201.86862657591055,
+                205.47691790315895,
+                209.1114808268895,
+                212.95371819474093,
+                217.06153489369916,
+                220.36392838381653,
+                222.759667528304,
+                227.6010625412285,
+                230.13240181036818,
+                236.14126633272008
+              ],
+              [
+                0,
+                2.8000000000000025,
+                4.342000000000001,
+                6.120799999999993,
+                7.651368439999984,
+                9.440642326399985,
+                11.215156955348583,
+                12.616601932661764,
+                13.999516173615657,
+                16.13900123482177,
+                17.79228007671181,
+                19.6902666301455,
+                21.582726590664446,
+                23.383205758241466,
+                24.93318107011615,
+                26.487064528097214,
+                28.171149444385545,
+                29.899610287399536,
+                31.570924507407373,
+                33.1178930987813,
+                34.90889361301881,
+                36.92151301398607,
+                38.83512801406741,
+                40.5796177122103,
+                42.60045417604586,
+                44.39407339797119,
+                46.52333388317431,
+                47.95771237417086,
+                51.03935408212617,
+                52.76210364103924,
+                54.641700518049774,
+                57.19991204043442,
+                59.557910721040926,
+                61.78864609186405,
+                63.730109844966435,
+                66.31536868994823,
+                68.17590053813348,
+                70.25808790243273,
+                73.15008915605601,
+                74.58155530737844,
+                77.43365791676275,
+                80.17007977679695,
+                82.70832510887007,
+                85.58137143247164,
+                88.26022473532664,
+                90.11898423426878,
+                92.11870113071157,
+                94.5972388042519,
+                97.36414848528285,
+                99.89209442998377,
+                102.84417347768256,
+                105.63010282272245,
+                106.6911547877981,
+                110.37987737349324,
+                113.3881079434381,
+                116.72132737239585,
+                118.80018578553178,
+                121.87390281544177,
+                124.08320231345891,
+                126.30113668583304,
+                129.58527239791323,
+                133.14223868413504,
+                135.18594918089605,
+                139.10910587099195,
+                141.3531347608754,
+                145.3299415270189,
+                148.31032589947628,
+                151.3837072582039,
+                154.64385116531494,
+                156.39925671275802,
+                159.09425657672904,
+                162.95197143989733,
+                166.20375935540957,
+                170.32972392920703,
+                172.68865691819144,
+                176.92525008511626,
+                180.8623661205997,
+                185.59043977883275,
+                188.0676835811757,
+                192.03414303568604,
+                196.1107336785753,
+                199.328024413539,
+                203.88844568264832,
+                206.961499572372,
+                212.2269811116916,
+                215.83345129139957,
+                219.65563024244653,
+                224.22786889694478,
+                228.15660695218085,
+                231.27583468368078,
+                236.67771286128638,
+                238.35802508663767,
+                242.97570045666052,
+                247.126880038965,
+                251.89122473457917,
+                258.34053024116565,
+                262.18489467186106,
+                266.1036838756411,
+                273.0258255080034,
+                278.793844751339,
+                282.13981108426475
+              ],
+              [
+                0,
+                5.000000000000004,
+                7.425999999999999,
+                9.882920000000016,
+                11.765580696,
+                13.92664268149999,
+                16.198887094135994,
+                17.940449886875022,
+                20.724615648589673,
+                23.043809101781033,
+                24.58185671555324,
+                27.2181945157389,
+                29.510308960482433,
+                31.182347358934305,
+                34.20148000356953,
+                36.453743300613375,
+                38.33698741968243,
+                40.63013689987998,
+                43.13455718359638,
+                45.6306601352787,
+                47.90011530761971,
+                50.46370967647924,
+                52.521649703728215,
+                55.84939026117781,
+                58.26596397374255,
+                60.18059139996532,
+                64.36227190401583,
+                65.7029151602954,
+                68.39591559644333,
+                71.32054500145495,
+                73.89035317647676,
+                75.50495333576998,
+                78.75500015705083,
+                79.24280617838086,
+                83.0148850376932,
+                86.21666128147932,
+                88.59260808023781,
+                92.20407990874423,
+                96.0718398444,
+                97.48318380188117,
+                100.23296659987095,
+                103.63856150417945,
+                105.09484977277714,
+                108.08248013737156,
+                111.34344381786931,
+                115.8558084663075,
+                117.11845494579211,
+                119.62722388559554,
+                125.94911876932761,
+                128.1357243490655,
+                132.7661030886286,
+                135.43265161173403,
+                139.08105456321266,
+                145.1324801726671,
+                147.22035247079322,
+                151.37836189289337,
+                153.2091713948852,
+                157.58847076375636,
+                160.9373339631961,
+                165.54164534659205,
+                168.760332247318,
+                171.37817762169973,
+                174.75218274272217,
+                178.66649759715872,
+                182.66969412148123,
+                188.30971678762282,
+                193.49929168980003,
+                199.3807519692039,
+                203.95117124708517,
+                207.83230795018096,
+                209.83241410230718,
+                214.47990031384174,
+                217.25130033512764,
+                223.5963263418302,
+                226.30883267300365,
+                232.18279406105128,
+                237.35603884822024,
+                242.9414542003588,
+                245.23317360573085,
+                247.4753705895114,
+                253.51192368605388,
+                257.7831271317448,
+                260.129621772816,
+                264.3181925014187,
+                268.13533509483716,
+                275.4931966844632,
+                280.5191301692202,
+                285.6618182529522,
+                292.13916733634545,
+                298.83568405725833,
+                305.9816799433184,
+                310.2676843935426,
+                314.77235586245075,
+                317.55821892906306,
+                323.17838547490163,
+                330.88956829621213,
+                340.08702478353274,
+                344.75114467217816,
+                350.93516994444684,
+                362.08550176307205,
+                369.01663811269464
+              ]
+            ],
+            "med": 2.361412663327201,
+            "p5": 1.4168666176875417,
+            "p95": 3.6901663811269465,
+            "win": 1,
+            "ddMed": 0.04439764835798499,
+            "ddP95": 0.0733249068422287,
+            "ddProb": 0,
+            "seed": 2026
+          },
+          "stress": null,
+          "prop": null
+        }
+      }
+    },
+    {
+      "name": "S4 10,000-run result reused across fresh runtime; trade/profile changes invalidate SHA-256 cache",
+      "pass": true,
+      "runs": 10000,
+      "firstComputations": 1,
+      "freshRuntimeComputations": 0,
+      "cacheHit": true,
+      "profileRerun": 1,
+      "inputHash": "d02e94e0336fa8276f6ed9167ae328385081de3ca7be33529bffe34131202dbc"
+    },
+    {
+      "name": "S4 corrupted cache falls back to real computation; cache write quota failure preserves journal",
+      "pass": true,
+      "corruptResultUsed": false,
+      "quotaFailurePreservedLedger": true
+    },
+    {
+      "name": "PDF target Omega and mid-path Daily/Trailing violations beat later recovery",
+      "pass": true,
+      "omegaTarget": 0.25,
+      "omega": 1.4,
+      "dailySeed": 8,
+      "dailyStopFail": 1,
+      "ignoringDailyPass": 1,
+      "trailingSeed": 1,
+      "staticPass": 1,
+      "trailingStopFail": 1
+    },
+    {
+      "name": "S7 21-day default and configurable monthly profit; payout interval stays 10 days",
+      "pass": true,
+      "monthly21": 20720.000000000004,
+      "monthly20": 19733.33333333334,
+      "payoutDays": 10
+    }
+  ],
+  "timestamp": "2026-10-25T13:49:46.937Z"
 }
 ```
 
@@ -1557,7 +2718,7 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
   ],
   "pageErrors": [],
   "consoleErrors": [],
-  "timestamp": "2026-10-25T06:23:52.916Z"
+  "timestamp": "2026-10-25T07:07:59.499Z"
 }
 ```
 
@@ -1663,7 +2824,7 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
     }
   ],
   "pageErrors": [],
-  "timestamp": "2026-10-25T06:21:47.449Z"
+  "timestamp": "2026-10-25T07:08:29.547Z"
 }
 ```
 
@@ -1755,7 +2916,7 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
   ],
   "pageErrors": [],
   "consoleErrors": [],
-  "timestamp": "2026-10-25T06:22:10.683Z"
+  "timestamp": "2026-10-25T07:08:55.561Z"
 }
 ```
 
@@ -1783,14 +2944,14 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
     {
       "name": "Snapshot stores available shared Worker results and original parameters; no synthetic Monte Carlo",
       "pass": true,
-      "snapshotId": "386ca112-b739-4afd-997f-cc7e4e7d81ff",
+      "snapshotId": "0fcedadc-e5e6-4aad-a6ff-b693a8394dd7",
       "verifiedR": 16
     },
     {
       "name": "JSON schema and SQL download contain full state; SQL escaped and ownership explicitly required",
       "pass": true,
       "jsonTrades": 17,
-      "sqlBytes": 59630,
+      "sqlBytes": 87359,
       "databaseExecution": "NOT RUN"
     },
     {
@@ -1839,7 +3000,7 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
   ],
   "pageErrors": [],
   "consoleErrors": [],
-  "timestamp": "2026-10-25T06:22:21.015Z"
+  "timestamp": "2026-10-25T07:09:06.321Z"
 }
 ```
 
@@ -2090,7 +3251,7 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
     }
   ],
   "pageErrors": [],
-  "timestamp": "2026-10-25T06:22:25.973Z"
+  "timestamp": "2026-10-25T07:09:11.065Z"
 }
 ```
 
@@ -2274,80 +3435,118 @@ Trạng thái cuối: 406 GIỮ, 256 GỘP, 39 BỎ. Một số GIỮ quá rộn
     }
   ],
   "pageErrors": [],
-  "timestamp": "2026-10-25T06:23:26.209Z"
+  "timestamp": "2026-10-25T07:10:16.876Z"
 }
 ```
 
-## Xuất bản P7 — phiên bản 17
-
-- Web: https://tuannhatky.fabledcoot2.chatgpt.site/v6/
-- Native source commit: `909035e4d091cf59869db814a8b0d3109e404b56`.
-- Deployment `appgdep_6adda1dfa3b881919f3f90715e3a0a16`: `succeeded`, phiên bản 17, 2026-10-25T06:30:18Z.
-- Kiểm tra trực tiếp web: HTTP 200; nhận diện 21 route, boot sẵn sàng, 15 lệnh mẫu A; RoR chạy trong Worker thật; /classic và /legacy HTTP 200; pageErrors=0, consoleErrors=0.
-- Cloudflare chèn thêm một script challenge vào HTML công khai. Sau khi bỏ đúng script này để đối chiếu, SHA-256 khớp file nguồn `d5f4ed1058cc1c000d8abd948fbfbd8e357cc9a3fd86d8504e1ca64dd81a79e4`. Không coi khác biệt do hạ tầng là thay đổi mã ứng dụng.
-- GitHub dùng nhánh `fix/audit-missing-net`, PR https://github.com/Tuand2222/code-tuan-trading/pull/9. Không merge `main`: CONTRIBUTING.md §Code Review & Merge yêu cầu “Đợi ít nhất 1 approval” và cấm commit trực tiếp main. Bản web đã xuất bản qua kho nguồn Sites riêng.
-
-Output nghiệm thu production thực tế:
+### S1_S10_BROWSER_TESTS.json
 ```json
 {
-  "pass": true,
-  "url": "https://tuannhatky.fabledcoot2.chatgpt.site/v6/",
-  "status": 200,
-  "responseSha256": "96a983599b6cbd22a1ad15da37c8640810b8aaebc6377a894041bedc63dd4d29",
-  "sourceSha256": "d5f4ed1058cc1c000d8abd948fbfbd8e357cc9a3fd86d8504e1ca64dd81a79e4",
-  "htmlIdentical": false,
-  "identicalAfterRemovingCloudflareScript": true,
-  "cloudflareScripts": 1,
-  "initial": {
-    "title": "Giao dịch và bộ lọc – Tuan Trader V6",
-    "trades": 15,
-    "routes": [
-      "gameplan",
-      "cockpit",
-      "workspace",
-      "calendar",
-      "review",
-      "chartbook",
-      "overview",
-      "edge",
-      "drilldown",
-      "discipline",
-      "pnlrisk",
-      "riskcapital",
-      "riskedge",
-      "riskopt",
-      "simulation",
-      "riskprop",
-      "zones",
-      "risktools",
-      "import",
-      "mapping",
-      "dictionary"
-    ],
-    "header": "$11,850.00",
-    "classicHref": "/classic",
-    "workerAvailable": true,
-    "ready": "true"
-  },
-  "worker": {
-    "execution": "worker",
-    "result": "0.00%"
-  },
-  "legacy": [
+  "suite": "S1-S10 browser",
+  "passed": 7,
+  "total": 7,
+  "cases": [
     {
-      "path": "/classic",
-      "status": 200,
-      "bytes": 48876
+      "name": "Tier probability and real buffer; account changes reset defaults and custom thresholds survive reload",
+      "pass": true,
+      "bufferBefore": 5,
+      "bufferAfter": 10,
+      "prop": [
+        2,
+        3.5
+      ],
+      "personal": [
+        3,
+        5
+      ],
+      "customAfterReload": [
+        4,
+        6
+      ]
     },
     {
-      "path": "/legacy",
-      "status": 200,
-      "bytes": 31623
+      "name": "All six account enum options export; unsupported legacy preset is flagged, not relabeled FTMO",
+      "pass": true,
+      "accountTypes": [
+        "PERSONAL",
+        "FTMO",
+        "THE5ERS_HYPER",
+        "THE5ERS_HIGH_STAKES",
+        "THE5ERS_BOOTCAMP",
+        "TOPSTEP_TRAILING"
+      ],
+      "legacyUnsupportedNotGuessed": true
+    },
+    {
+      "name": "Snapshot button completes real MC first; all 12 canonical fields populated, backup roundtrip exact",
+      "pass": true,
+      "fields": 12,
+      "missing": [],
+      "worker": "worker",
+      "currentEquity": 11850,
+      "columns": [
+        "trade_id",
+        "profile_id",
+        "seq_no",
+        "symbol",
+        "side",
+        "lots",
+        "entry_time",
+        "close_time",
+        "entry_price",
+        "sl_price",
+        "tp_price",
+        "exit_price",
+        "planned_rr_ratio",
+        "realized_r_multiple",
+        "mae_r",
+        "mfe_r",
+        "slippage_r",
+        "asset_class",
+        "liquidity_horizon_days",
+        "holding_hours",
+        "strategy_id",
+        "session_tag",
+        "rule_adherence_tags",
+        "setup_playbook",
+        "discipline_tag",
+        "planned_risk_usd",
+        "realized_pnl_usd",
+        "payload_json"
+      ],
+      "same": true
+    },
+    {
+      "name": "10,000-run browser cache reload uses zero new MC Worker messages and real Chart.js",
+      "pass": true,
+      "runs": 10000,
+      "reloadMcWorkerMessages": 0,
+      "cacheHits": 1,
+      "realChartJs": "4.6.1",
+      "charts": 6
+    },
+    {
+      "name": "Changing Risk Profile invalidates persisted cache on reload",
+      "pass": true,
+      "messages": 1,
+      "misses": 1
+    },
+    {
+      "name": "21 trading days default, monthly parameter changes result while payout remains 10 days",
+      "pass": true,
+      "days": 22,
+      "payoutDays": 10,
+      "monthly22": 21706.66666666667
+    },
+    {
+      "name": "RoR numerical explanation and RCK semantic mapping match PDF; hard stops remain active",
+      "pass": true,
+      "lambda": 6.455696235812881,
+      "tier3Locked": true
     }
   ],
   "pageErrors": [],
   "consoleErrors": [],
-  "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
-  "timestamp": "2026-10-25T06:32:09.918Z"
+  "timestamp": "2026-10-25T07:10:34.756Z"
 }
 ```

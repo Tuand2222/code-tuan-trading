@@ -20,14 +20,14 @@
     {
       "name": "Snapshot stores available shared Worker results and original parameters; no synthetic Monte Carlo",
       "pass": true,
-      "snapshotId": "386ca112-b739-4afd-997f-cc7e4e7d81ff",
+      "snapshotId": "0fcedadc-e5e6-4aad-a6ff-b693a8394dd7",
       "verifiedR": 16
     },
     {
       "name": "JSON schema and SQL download contain full state; SQL escaped and ownership explicitly required",
       "pass": true,
       "jsonTrades": 17,
-      "sqlBytes": 59630,
+      "sqlBytes": 87359,
       "databaseExecution": "NOT RUN"
     },
     {
@@ -76,5 +76,5 @@
   ],
   "pageErrors": [],
   "consoleErrors": [],
-  "timestamp": "2026-10-25T06:22:21.015Z"
+  "timestamp": "2026-10-25T07:09:06.321Z"
 }

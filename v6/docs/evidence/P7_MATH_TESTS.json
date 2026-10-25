@@ -56,7 +56,7 @@
         "roiPdfFunded": 11711.945540036053,
         "roiPdfCycle": 3647.249504700081,
         "theoCycleProfit": 6857.142857142859,
-        "theoMonthlyProfit": 13714.285714285717,
+        "theoMonthlyProfit": 14400,
         "totalFeeIfPass": 175,
         "cyc": 0.025398017539376865
       },
@@ -82,7 +82,7 @@
         "roiPdfFunded": 10861.676930250473,
         "roiPdfCycle": 3552.476033199649,
         "theoCycleProfit": 6857.142857142859,
-        "theoMonthlyProfit": 13714.285714285717,
+        "theoMonthlyProfit": 14400,
         "totalFeeIfPass": 175,
         "cyc": 0.02736807533271691
       }
@@ -134,5 +134,5 @@
       "pass": true
     }
   ],
-  "timestamp": "2026-10-25T06:28:02.658Z"
+  "timestamp": "2026-10-25T07:07:05.825Z"
 }

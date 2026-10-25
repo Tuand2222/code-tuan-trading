@@ -5,6 +5,8 @@
 
 ---
 
+> **Cập nhật sau khi có PDF + chạy thử v9:** xem `04_PDF_DOI_CHIEU_VA_KIEM_TRA_V9.md` (bổ sung quy định cho trang `zones`, 5 điểm lệch giữa PDF và v9, và bằng chứng chạy thử). Nếu mâu thuẫn, mục 6 ở đây và file 04 cùng áp dụng; riêng ví dụ số sai của PDF **không** được dùng làm chuẩn kiểm thử.
+
 ## 0. Ba file và vai trò
 
 | Ký hiệu | File | Vai trò |
@@ -172,8 +174,8 @@ Hàm `migrateLegacy()` chạy 1 lần khi chưa có `tuannhatky_pro_unified_v1`:
 
 | Chủ đề | B (v9) | A (V3) | **Quyết định** |
 |---|---|---|---|
-| Vốn & Drawdown | `peak = max(netCashflow, currentEquity)`; DD không theo dõi đỉnh chạy; nạp/rút làm méo DD | `capitalNAV()`: NAV theo đơn vị (unit), đỉnh chạy, nạp/rút không đổi NAV | **A** |
-| Ngân sách ngày (hiển thị đầu trang) | `equity×0,04/4` gán cứng | `min(Equity×rủi ro%×hệ số Tier, hạn mức ÷ k)` | **A** (trùng cả công thức B 1823) |
+| Vốn & Drawdown | Bản gốc (dòng 1082) `peak = max(netCashflow, currentEquity)` **nhưng bị ghi đè** bởi bản v7 (dòng 1812): đỉnh chạy, nạp cộng vào đỉnh, rút co đỉnh theo tỷ lệ (`P*=k`) → DD không bị méo (đã chạy thử: rút 1.000$ không đổi DD −1,08%) | `capitalNAV()`: NAV theo đơn vị, đỉnh chạy | **Hai bản tương đương về hành vi → dùng `capitalNAV()` của A làm bản duy nhất**, bắt buộc test đối chiếu Mục 10-#10. Bản gốc 1082 là mã chết |
+| Ngân sách ngày (hiển thị đầu trang) | Bản gốc `equity×0,04/4` gán cứng (mã chết); bản cuối (dòng 1823) `min(Equity×f_tier×hệ số Tier, DLL÷k)` đúng PDF | `min(Equity×rủi ro%×hệ số Tier, hạn mức ÷ k)` | **Cùng công thức** → giữ 1 hàm |
 | Tier | >5% = 3, >3% = 2, còn lại 1; hệ số [1, 1, 0,5, 0] | `tier(dd)` cùng ngưỡng; hệ số 1 / 0,5 / 0 | **Giống nhau** → 1 hằng số/Risk Profile |
 | Cổng Lớp 3 | Tier ≤ `safeTierMax` ∧ μ>0 ∧ Ω(0)>1 | DD ≤ 3% ∧ ≥ 30 lệnh R xác minh ∧ μ>0 ∧ Ω(0)>1 | **Hợp nhất**: Safety(Tier ≤ `safeTierMax`) ∧ Edge(μ>0, Ω(0)>1) ∧ **N ≥ 30 lệnh R xác minh** (của A). `safeTierMax` mặc định 1 (cho phép đổi 2 qua hộp 5 giả định) |
 | RCK | 3 bản, có bản gán cứng | `rckEmpirical` (bisection, ràng buộc phi tuyến) + `rckBernoulli` (η hiệu chỉnh cỡ mẫu) | **A** |

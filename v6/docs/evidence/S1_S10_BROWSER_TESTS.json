@@ -1,0 +1,108 @@
+{
+  "suite": "S1-S10 browser",
+  "passed": 7,
+  "total": 7,
+  "cases": [
+    {
+      "name": "Tier probability and real buffer; account changes reset defaults and custom thresholds survive reload",
+      "pass": true,
+      "bufferBefore": 5,
+      "bufferAfter": 10,
+      "prop": [
+        2,
+        3.5
+      ],
+      "personal": [
+        3,
+        5
+      ],
+      "customAfterReload": [
+        4,
+        6
+      ]
+    },
+    {
+      "name": "All six account enum options export; unsupported legacy preset is flagged, not relabeled FTMO",
+      "pass": true,
+      "accountTypes": [
+        "PERSONAL",
+        "FTMO",
+        "THE5ERS_HYPER",
+        "THE5ERS_HIGH_STAKES",
+        "THE5ERS_BOOTCAMP",
+        "TOPSTEP_TRAILING"
+      ],
+      "legacyUnsupportedNotGuessed": true
+    },
+    {
+      "name": "Snapshot button completes real MC first; all 12 canonical fields populated, backup roundtrip exact",
+      "pass": true,
+      "fields": 12,
+      "missing": [],
+      "worker": "worker",
+      "currentEquity": 11850,
+      "columns": [
+        "trade_id",
+        "profile_id",
+        "seq_no",
+        "symbol",
+        "side",
+        "lots",
+        "entry_time",
+        "close_time",
+        "entry_price",
+        "sl_price",
+        "tp_price",
+        "exit_price",
+        "planned_rr_ratio",
+        "realized_r_multiple",
+        "mae_r",
+        "mfe_r",
+        "slippage_r",
+        "asset_class",
+        "liquidity_horizon_days",
+        "holding_hours",
+        "strategy_id",
+        "session_tag",
+        "rule_adherence_tags",
+        "setup_playbook",
+        "discipline_tag",
+        "planned_risk_usd",
+        "realized_pnl_usd",
+        "payload_json"
+      ],
+      "same": true
+    },
+    {
+      "name": "10,000-run browser cache reload uses zero new MC Worker messages and real Chart.js",
+      "pass": true,
+      "runs": 10000,
+      "reloadMcWorkerMessages": 0,
+      "cacheHits": 1,
+      "realChartJs": "4.6.1",
+      "charts": 6
+    },
+    {
+      "name": "Changing Risk Profile invalidates persisted cache on reload",
+      "pass": true,
+      "messages": 1,
+      "misses": 1
+    },
+    {
+      "name": "21 trading days default, monthly parameter changes result while payout remains 10 days",
+      "pass": true,
+      "days": 22,
+      "payoutDays": 10,
+      "monthly22": 21706.66666666667
+    },
+    {
+      "name": "RoR numerical explanation and RCK semantic mapping match PDF; hard stops remain active",
+      "pass": true,
+      "lambda": 6.455696235812881,
+      "tier3Locked": true
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "timestamp": "2026-10-25T07:10:34.756Z"
+}

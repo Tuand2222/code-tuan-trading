@@ -32,7 +32,7 @@
       "pass": true,
       "tables": 3,
       "policies": 3,
-      "bytes": 34405,
+      "bytes": 42275,
       "databaseExecution": "NOT RUN"
     },
     {
@@ -40,5 +40,5 @@
       "pass": true
     }
   ],
-  "timestamp": "2026-10-25T06:28:03.566Z"
+  "timestamp": "2026-10-25T07:07:06.708Z"
 }
