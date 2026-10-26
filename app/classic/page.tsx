@@ -2213,7 +2213,7 @@ export default function Home() {
       const progressRows=new Map((isDemo?[]:trades).map(t=>[t.id,t]));
       if (dataMode === "cloud" && selected.length) {
         const summary=await saveTradeBatches(selected,accountId,async(rows,done)=>{for(const t of rows)progressRows.set(t.id,t);await saveLocal('import-progress:'+accountId,{file:tradeImportPreview.fileName,done,total:selected.length,receipt:rows});if(done%5000===0||done===selected.length){await persistClassicLedger(tradesStorageKey,[...progressRows.values()]);setTrades([...progressRows.values()]);setIsDemo(false);}if(done%5000===0||done===selected.length)setToast(`Đã lưu ${done}/${selected.length} dòng; các lô đã hoàn tất được giữ nếu gián đoạn.`);});
-        accepted=[...progressRows.values()];receipt={...receipt,...summary};
+        accepted=[...progressRows.values()];receipt={...receipt,...summary};setLocalFallback(false);
       }
       const base = isDemo ? [] : trades;
       const merged = new Map(base.map((t) => [t.id, t]));

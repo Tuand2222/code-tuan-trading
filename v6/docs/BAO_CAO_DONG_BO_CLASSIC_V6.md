@@ -114,3 +114,7 @@ Số đo phụ thuộc máy và bộ dữ liệu; không phải cam kết tốc 
 Lượt xuất bản đầu đã bộc lộ lỗi khởi động Classic do tạo mã tab ngẫu nhiên ở cấp module khi Worker nạp SSR. Đã đổi sang tạo mã này chỉ trong trình duyệt và bổ sung `tests/classic-ssr.test.mjs` mô phỏng môi trường cấm tạo số ngẫu nhiên ở cấp module. Toàn bộ 23/23 kiểm tra backend đạt; typecheck và hai workflow GitHub của commit sửa `0dd13bdb24c97057c5881e7152be3f14965f61ce` đều đạt.
 
 Sau bản sửa, Chromium mở tên miền thật: V6 HTTP 200, Classic HTTP 200, không có page error, nhãn đã bỏ và nút đồng bộ hiện đúng. HTML phục vụ khớp SHA-256 ở trên sau khi bỏ script do Cloudflare chèn. API nhật ký không đăng nhập trả 401; bài smoke không ghi bản ghi nào vào production. Xem [output production thực tế](evidence/classic-sync/PRODUCTION_SMOKE.json). Việc xác nhận tải lớn vẫn giới hạn ở hai môi trường kiểm thử đã nêu, không chuyển thành tuyên bố đã nhập 50.000 dòng lên tài khoản production.
+
+### Classic có bản cục bộ khi cloud đang trống
+
+Sau khi file nhập đã được cloud xác nhận, Classic thoát chế độ giữ bản cục bộ để nhận lại các chỉnh sửa từ V6. Đã thử riêng với cache nhật ký cũ được nạp trước khi mở Classic, nhập 100 dòng, tải lại V6, sửa P&L về Classic và giữ/gửi lại ghi chú khi gặp 503: đều đạt, không có page error. Đây là kiểm tra nhánh khôi phục, bổ sung cho bài tải 10.000–50.000 dòng phía trên. [Output thực tế](evidence/classic-sync/CLASSIC_FALLBACK.json).
