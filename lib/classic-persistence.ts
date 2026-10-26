@@ -22,7 +22,8 @@ class ClassicStore extends Dexie {
   }
 }
 let store: ClassicStore | undefined;
-export const classicSender='classic-'+crypto.randomUUID();
+// Worker SSR imports this module outside a request; random values are browser-only.
+export const classicSender=typeof window==='undefined'?'classic-server':'classic-'+crypto.randomUUID();
 const db = () => (store ??= new ClassicStore());
 export async function saveLocal(key: string, value: unknown) {
   await db().values.put({ key, value, updatedAt: new Date().toISOString() });
