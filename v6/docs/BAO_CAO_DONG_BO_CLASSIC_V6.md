@@ -31,7 +31,7 @@ Hai lớp kiểm tra được chạy riêng: (a) API thật với cơ sở dữ 
 - Giao diện: cập nhật file 50.000 dòng, trong đó 10.000 đã có → 200 lô → tổng cuối đúng 50.000, IndexedDB đúng 50.000, bảng vẽ 200 dòng, tổng P&L ròng 2,283,260,000 VNĐ, 123.45 giây.
 - Sau reload vẫn 50.000. Sửa P&L tại V6 thành 123.456 VNĐ → API Classic và cache Classic cùng nhận 123.456. Lỗi mạng 503 giữ bản chờ; thử lại gửi được ghi chú `offline-note-preserved`. Page errors = 0.
 - Kiểm tra an toàn: vốn chung không lệch do sửa riêng ở V6; sửa sớm trước init được xếp hàng; lỗi IndexedDB không bị báo là đã lưu; xung đột có bản sao; không gửi hàng đợi sai tài khoản; đọc/ghi lại nhật ký Classic trên cùng thiết bị khi chưa đăng nhập đều đạt.
-- 66/66 kiểm tra lõi V6; 76/76 kiểm tra trình duyệt V6; 122/122 kiểm tra Classic/miền nghiệp vụ/D1; 22/22 kiểm tra backend Node; typecheck đạt. Ba script inline qua kiểm tra cú pháp, ID trùng = 0, hàm có tên trùng = 0. Build HTML và Worker đã được kiểm tra; bản đóng gói được helper build lại trước khi xuất bản.
+- 66/66 kiểm tra lõi V6; 76/76 kiểm tra trình duyệt V6; 122/122 kiểm tra Classic/miền nghiệp vụ/D1; 23/23 kiểm tra backend Node; typecheck đạt. Ba script inline qua kiểm tra cú pháp, ID trùng = 0, hàm có tên trùng = 0. Build HTML và Worker đã được kiểm tra; bản đóng gói được helper build lại trước khi xuất bản.
 
 Số đo phụ thuộc máy và bộ dữ liệu; không phải cam kết tốc độ hạ tầng thật. Lượt đầu dùng máy chủ dev bị ngắt bởi tự tải lại lúc đang sửa/build; kết quả tải lớn cuối cùng nêu trên chạy build production, không có HMR. Lỗi đồng bộ phát hiện ở các lượt trước đã có kiểm tra hồi quy riêng.
 
@@ -108,3 +108,9 @@ Số đo phụ thuộc máy và bộ dữ liệu; không phải cam kết tốc 
 - [Kết quả tổng hợp](evidence/classic-sync/CHECKS.json), [D1](evidence/classic-sync/SERVER_SCALE.json), [trình duyệt tải lớn](evidence/classic-sync/BROWSER_SCALE.json), [an toàn đồng bộ](evidence/classic-sync/SYNC_SAFETY.json), [công thức/ánh xạ](evidence/classic-sync/SYNC_CORE.json).
 - HTML chính: `v6/index.html`, SHA-256 `257467ce77222f166f476c17b98273aacfdbb609bfbc5748d50ccd1162c98945`.
 - PR cập nhật: https://github.com/Tuand2222/code-tuan-trading/pull/9 . Giữ nhánh feature theo CONTRIBUTING/AGENTS; không tự merge main. D1/R2 và audience hiện có được giữ nguyên khi triển khai.
+
+## Kiểm tra cuối trên tên miền thật
+
+Lượt xuất bản đầu đã bộc lộ lỗi khởi động Classic do tạo mã tab ngẫu nhiên ở cấp module khi Worker nạp SSR. Đã đổi sang tạo mã này chỉ trong trình duyệt và bổ sung `tests/classic-ssr.test.mjs` mô phỏng môi trường cấm tạo số ngẫu nhiên ở cấp module. Toàn bộ 23/23 kiểm tra backend đạt; typecheck và hai workflow GitHub của commit sửa `0dd13bdb24c97057c5881e7152be3f14965f61ce` đều đạt.
+
+Sau bản sửa, Chromium mở tên miền thật: V6 HTTP 200, Classic HTTP 200, không có page error, nhãn đã bỏ và nút đồng bộ hiện đúng. HTML phục vụ khớp SHA-256 ở trên sau khi bỏ script do Cloudflare chèn. API nhật ký không đăng nhập trả 401; bài smoke không ghi bản ghi nào vào production. Xem [output production thực tế](evidence/classic-sync/PRODUCTION_SMOKE.json). Việc xác nhận tải lớn vẫn giới hạn ở hai môi trường kiểm thử đã nêu, không chuyển thành tuyên bố đã nhập 50.000 dòng lên tài khoản production.

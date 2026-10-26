@@ -16,8 +16,8 @@
     "total": 122
   },
   "backendNode": {
-    "passed": 22,
-    "total": 22
+    "passed": 23,
+    "total": 23
   },
   "syncSafetyCases": [
     {
@@ -41,5 +41,6 @@
   ],
   "sourceSha256": "257467ce77222f166f476c17b98273aacfdbb609bfbc5748d50ccd1162c98945",
   "browserEvidenceDirectory": "unified-1792956181379",
-  "browserErrors": []
+  "browserErrors": [],
+  "workerSsrGlobalsSafe": true
 }
