@@ -1,3 +1,4 @@
+import {QuantV34 as Quant} from '../src/core/quant-v34.js';
 export type ImportedJournalTrade = {
   id: string;
   externalId: string;
@@ -33,6 +34,8 @@ export type TradeImportResult = {
   trades: ImportedJournalTrade[];
   errors: string[];
   detected: number;
+  numberDecisions?: Array<{field:string;separator:string;ambiguous:boolean;examples:string[]}>;
+  needsNumberConfirmation?: boolean;
 };
 
 type Field =
@@ -330,6 +333,7 @@ function tradeRows(
   rows: unknown[][],
   sourceName: string,
   serialDate?: (serial: number) => string | null,
+  separatorOverride?: "." | ",",
 ): TradeImportResult {
   const headerIndex = rows.slice(0, 40).findIndex((row) => {
     const headers = row.map(normalizeHeader);
@@ -361,6 +365,9 @@ function tradeRows(
   const trades: ImportedJournalTrade[] = [];
   const errors: string[] = [];
 
+  const numericNames: Field[]=['pnl','quantity','entryPrice','exitPrice','fees','risk','stopLoss','takeProfit','discipline','durationMin'];
+  const numberDecisions=numericNames.filter(field=>positions[field]>=0).map(field=>{const values=dataRows.map(row=>row[positions[field]]);const decision=Quant.decimalSeparator(values,'.');return {field,separator:decision.ambiguous&&separatorOverride?separatorOverride:decision.separator,ambiguous:decision.ambiguous&&values.some(v=>typeof v==='string'&&/[.,]/.test(v)),examples:values.filter(v=>typeof v==='string'&&/[.,]/.test(v)).slice(0,3).map(String)};});
+  const columnNumber=(field:Field,value:unknown):number=>{if(value===null||value===undefined||value==='')return 0;const rule=numberDecisions.find(d=>d.field===field);const parsed=Quant.parseNumber(value,rule?.separator||'.');return parsed===null?Number.NaN:Number(parsed);};
   dataRows.forEach((row, index) => {
     const get = (field: Field) =>
       positions[field] >= 0 ? row[positions[field]] : undefined;
@@ -380,7 +387,7 @@ function tradeRows(
       );
       return;
     }
-    const pnl = parseNumber(pnlValue);
+    const pnl = columnNumber("pnl",pnlValue);
     const numericFields: Field[] = [
       "pnl",
       "quantity",
@@ -396,7 +403,7 @@ function tradeRows(
         (field) =>
           get(field) !== undefined &&
           String(get(field)).trim() !== "" &&
-          !Number.isFinite(parseNumber(get(field))),
+          !Number.isFinite(columnNumber(field,get(field))),
       )
     ) {
       errors.push(
@@ -414,10 +421,10 @@ function tradeRows(
       sideText.includes("ban")
         ? "Sell"
         : "Buy";
-    const quantity = parseNumber(get("quantity"));
-    const entryPrice = parseNumber(get("entryPrice"));
-    const exitPrice = parseNumber(get("exitPrice"));
-    const suppliedRisk = Math.abs(parseNumber(get("risk")));
+    const quantity = columnNumber("quantity",get("quantity"));
+    const entryPrice = columnNumber("entryPrice",get("entryPrice"));
+    const exitPrice = columnNumber("exitPrice",get("exitPrice"));
+    const suppliedRisk = Math.abs(columnNumber("risk",get("risk")));
     const rawNote = String(get("note") ?? "").trim();
     const importedNote = `Nhập từ ${sourceName}`;
     trades.push({
@@ -446,34 +453,36 @@ function tradeRows(
           : null;
       })(),
       pnl,
-      discipline: Math.max(0, Math.min(100, parseNumber(get("discipline")))),
+      discipline: Math.max(0, Math.min(100, columnNumber("discipline",get("discipline")))),
       psychology: String(get("psychology") ?? "").trim() || "Chưa review",
       note: [rawNote, importedNote].filter(Boolean).join(" · "),
-      durationMin: Math.max(0, parseNumber(get("durationMin"))),
+      durationMin: Math.max(0, columnNumber("durationMin",get("durationMin"))),
       market: marketFromValue(get("market"), symbol),
       source: String(get("source") ?? "").trim() || `Nhập ${sourceName}`,
       quantity,
       entryPrice,
-      stopLoss: parseNumber(get("stopLoss")),
-      takeProfit: parseNumber(get("takeProfit")),
+      stopLoss: columnNumber("stopLoss",get("stopLoss")),
+      takeProfit: columnNumber("takeProfit",get("takeProfit")),
       exitPrice,
-      fees: Math.abs(parseNumber(get("fees"))),
+      fees: Math.abs(columnNumber("fees",get("fees"))),
       feesKnown: positions.fees >= 0 && String(get("fees") ?? "").trim() !== "",
     });
   });
 
-  return { trades, errors, detected: dataRows.length };
+  return { trades, errors, detected: dataRows.length, numberDecisions, needsNumberConfirmation:!separatorOverride&&numberDecisions.some(d=>d.ambiguous) };
 }
 
 export function parseTradeCsv(
   input: string,
   sourceName = "CSV",
+  separatorOverride?: "." | ",",
 ): TradeImportResult {
-  return tradeRows(parseRows(input), sourceName);
+  return tradeRows(parseRows(input), sourceName,undefined,separatorOverride);
 }
 
 export async function parseTradeWorkbook(
   file: File,
+  separatorOverride?: "." | ",",
 ): Promise<TradeImportResult> {
   const XLSX = (await import("xlsx-js-style")).default;
   const workbook = XLSX.read(await file.arrayBuffer(), {
@@ -502,7 +511,7 @@ export async function parseTradeWorkbook(
       const parts = XLSX.SSF.parse_date_code(serial);
       if (!parts) return null;
       return `${String(parts.y).padStart(4, "0")}-${String(parts.m).padStart(2, "0")}-${String(parts.d).padStart(2, "0")}`;
-    });
+    },separatorOverride);
     if (result.detected || result.trades.length) return result;
   }
   return {

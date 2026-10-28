@@ -22,6 +22,8 @@ test('A stale generated artifact fails verification without being silently rebui
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'journal-source-drift-'));
   fs.mkdirSync(path.join(dir,'scripts'));fs.mkdirSync(path.join(dir,'v6'));
   fs.cpSync(path.join(repo,'src'),path.join(dir,'src'),{recursive:true});
+  // The generator now bundles the existing Decimal dependency; use installed deps in the isolated fixture.
+  fs.symlinkSync(fs.realpathSync(path.join(repo,'node_modules')),path.join(dir,'node_modules'),'junction');
   fs.copyFileSync(path.join(repo,'scripts/render-v6.mjs'),path.join(dir,'scripts/render-v6.mjs'));
   const target=path.join(dir,'v6/index.html'),text=renderV6()+'\n<!-- stale fixture -->';fs.writeFileSync(target,text);
   const run=spawnSync(process.execPath,[path.join(dir,'scripts/render-v6.mjs'),'--check'],{encoding:'utf8'});

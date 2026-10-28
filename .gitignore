@@ -46,3 +46,6 @@ next-env.d.ts
 /public/v6/
 
 /.vinext/
+__pycache__/
+.pytest_cache/
+*.pyc

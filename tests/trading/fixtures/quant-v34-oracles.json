@@ -1,0 +1,665 @@
+{
+  "normalize": [
+    [
+      "XAUUSDm",
+      "XAUUSD"
+    ],
+    [
+      "EURUSDc",
+      "EURUSD"
+    ],
+    [
+      "BTC",
+      "BTC"
+    ],
+    [
+      "Btc",
+      "BTC"
+    ],
+    [
+      "VNM",
+      "VNM"
+    ],
+    [
+      "BTCUSDT.P",
+      "BTCUSDT"
+    ],
+    [
+      "ETHUSDT-PERP",
+      "ETHUSDT"
+    ],
+    [
+      "XAUUSD.pro",
+      "XAUUSD"
+    ],
+    [
+      "EURUSD_i",
+      "EURUSD"
+    ],
+    [
+      "BTC/USDT",
+      "BTCUSDT"
+    ],
+    [
+      " xauusd ",
+      "XAUUSD"
+    ]
+  ],
+  "classify": [
+    {
+      "input": {
+        "symbol": "BTC",
+        "context": null
+      },
+      "expected": {
+        "symbol": "BTCUSDT",
+        "cls": "crypto_linear",
+        "base": "BTC",
+        "quote": "USDT",
+        "status": "auto_notice",
+        "note": "BTC->BTCUSDT"
+      }
+    },
+    {
+      "input": {
+        "symbol": "FPT",
+        "context": null
+      },
+      "expected": {
+        "symbol": "FPT",
+        "cls": "stock_vn",
+        "status": "auto"
+      }
+    },
+    {
+      "input": {
+        "symbol": "NAS100",
+        "context": null
+      },
+      "expected": {
+        "symbol": "NAS100",
+        "cls": "index",
+        "status": "auto",
+        "note": null
+      }
+    },
+    {
+      "input": {
+        "symbol": "SP100",
+        "context": null
+      },
+      "expected": {
+        "symbol": "SP100",
+        "cls": null,
+        "status": "unknown",
+        "suggest": [
+          "SP500",
+          "SPX500",
+          "UK100"
+        ]
+      }
+    },
+    {
+      "input": {
+        "symbol": "USOLIU",
+        "context": null
+      },
+      "expected": {
+        "symbol": "USOLIU",
+        "cls": null,
+        "status": "unknown",
+        "suggest": [
+          "USOIL"
+        ]
+      }
+    },
+    {
+      "input": {
+        "symbol": "EUR",
+        "context": null
+      },
+      "expected": {
+        "symbol": "EUR",
+        "cls": null,
+        "status": "needs_confirm",
+        "why": "chi la tien te",
+        "suggest": [
+          "EURUSD"
+        ]
+      }
+    },
+    {
+      "input": {
+        "symbol": "XAU",
+        "context": null
+      },
+      "expected": {
+        "symbol": "XAUUSD",
+        "cls": "metal",
+        "status": "auto_notice",
+        "note": "XAU->XAUUSD"
+      }
+    },
+    {
+      "input": {
+        "symbol": "XAG",
+        "context": null
+      },
+      "expected": {
+        "symbol": "XAGUSD",
+        "cls": "metal",
+        "status": "auto_notice",
+        "note": "XAG->XAGUSD"
+      }
+    },
+    {
+      "input": {
+        "symbol": "XAUUSD",
+        "context": null
+      },
+      "expected": {
+        "symbol": "XAUUSD",
+        "cls": "metal",
+        "status": "auto",
+        "note": null
+      }
+    },
+    {
+      "input": {
+        "symbol": "AUDUSD",
+        "context": null
+      },
+      "expected": {
+        "symbol": "AUDUSD",
+        "cls": "forex",
+        "sub": "quote_usd",
+        "status": "auto"
+      }
+    },
+    {
+      "input": {
+        "symbol": "USDJPY",
+        "context": null
+      },
+      "expected": {
+        "symbol": "USDJPY",
+        "cls": "forex",
+        "sub": "usd_base",
+        "status": "auto"
+      }
+    },
+    {
+      "input": {
+        "symbol": "EURGBP",
+        "context": null
+      },
+      "expected": {
+        "symbol": "EURGBP",
+        "cls": "forex",
+        "sub": "cross",
+        "status": "auto"
+      }
+    },
+    {
+      "input": {
+        "symbol": "BTCUSD",
+        "context": null
+      },
+      "expected": {
+        "symbol": "BTCUSD",
+        "cls": "crypto_usd",
+        "status": "needs_confirm",
+        "why": "linear CFD / inverse?"
+      }
+    },
+    {
+      "input": {
+        "symbol": "VN30F1M",
+        "context": null
+      },
+      "expected": {
+        "symbol": "VN30F1M",
+        "cls": "futures_vn",
+        "status": "auto"
+      }
+    },
+    {
+      "input": {
+        "symbol": "VN30F2511",
+        "context": null
+      },
+      "expected": {
+        "symbol": "VN30F2511",
+        "cls": "futures_vn",
+        "status": "auto"
+      }
+    },
+    {
+      "input": {
+        "symbol": "US100",
+        "context": null
+      },
+      "expected": {
+        "symbol": "NAS100",
+        "cls": "index",
+        "status": "auto_notice",
+        "note": "US100->NAS100"
+      }
+    },
+    {
+      "input": {
+        "symbol": "AMD",
+        "context": null
+      },
+      "expected": {
+        "symbol": "AMD",
+        "cls": null,
+        "status": "unknown",
+        "suggest": []
+      }
+    },
+    {
+      "input": {
+        "symbol": "XAU",
+        "context": "stock_vn"
+      },
+      "expected": {
+        "symbol": "XAUUSD",
+        "cls": "metal",
+        "status": "auto_notice",
+        "note": "XAU->XAUUSD"
+      }
+    },
+    {
+      "input": {
+        "symbol": "BTC",
+        "context": "stock_vn"
+      },
+      "expected": {
+        "symbol": "BTC",
+        "cls": null,
+        "status": "needs_confirm",
+        "why": "ma trung giua crypto va co phieu VN",
+        "suggest": [
+          "BTCUSDT",
+          "BTC"
+        ]
+      }
+    }
+  ],
+  "sizing": [
+    {
+      "input": {
+        "symbol": "EURUSD",
+        "entry": "1.085",
+        "sl": "1.083",
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "buy"
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "0.5",
+        "vRaw": "0.5",
+        "lossPerLot": "200.000",
+        "riskActual": "100.0000",
+        "minLotRisk": "2.00000"
+      }
+    },
+    {
+      "input": {
+        "symbol": "USDJPY",
+        "entry": "155",
+        "sl": "154",
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "buy"
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "0.15",
+        "vRaw": "0.1540000000000000000000000000000000000000",
+        "lossPerLot": "649.3506493506493506493506493506493506494",
+        "riskActual": "97.40259740259740259740259740259740259741",
+        "minLotRisk": "6.493506493506493506493506493506493506494"
+      }
+    },
+    {
+      "input": {
+        "symbol": "USDJPY",
+        "entry": "155",
+        "sl": "156",
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "sell"
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "0.15",
+        "vRaw": "0.1560000000000000000000000000000000000000",
+        "lossPerLot": "641.0256410256410256410256410256410256410",
+        "riskActual": "96.15384615384615384615384615384615384615",
+        "minLotRisk": "6.410256410256410256410256410256410256410"
+      }
+    },
+    {
+      "input": {
+        "symbol": "XAUUSD",
+        "entry": 2650,
+        "sl": 2640,
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "buy"
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "0.1",
+        "vRaw": "0.1",
+        "lossPerLot": "1000",
+        "riskActual": "100.0",
+        "minLotRisk": "10.00"
+      }
+    },
+    {
+      "input": {
+        "symbol": "XAGUSD",
+        "entry": 31,
+        "sl": "30.5",
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "buy"
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "0.04",
+        "vRaw": "0.04",
+        "lossPerLot": "2500.0",
+        "riskActual": "100.000",
+        "minLotRisk": "25.000"
+      }
+    },
+    {
+      "input": {
+        "symbol": "USOIL",
+        "entry": 70,
+        "sl": "69.5",
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "buy"
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "0.2",
+        "vRaw": "0.2",
+        "lossPerLot": "500.0",
+        "riskActual": "100.00",
+        "minLotRisk": "5.000"
+      }
+    },
+    {
+      "input": {
+        "symbol": "NAS100",
+        "entry": 20000,
+        "sl": 19900,
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "buy"
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "1",
+        "vRaw": "1",
+        "lossPerLot": "100",
+        "riskActual": "100",
+        "minLotRisk": "1.00"
+      }
+    },
+    {
+      "input": {
+        "symbol": "NAS100",
+        "entry": 20000,
+        "sl": 19900,
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "buy",
+        "contractSize": 10
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "0.1",
+        "vRaw": "0.1",
+        "lossPerLot": "1000",
+        "riskActual": "100.0",
+        "minLotRisk": "10.00"
+      }
+    },
+    {
+      "input": {
+        "symbol": "BTCUSDT",
+        "entry": 60000,
+        "sl": 59000,
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "buy",
+        "currency": "USDT"
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "0.1",
+        "vRaw": "0.1",
+        "lossPerLot": "1000",
+        "riskActual": "100.0",
+        "minLotRisk": "1.000"
+      }
+    },
+    {
+      "input": {
+        "symbol": "EURGBP",
+        "entry": ".86",
+        "sl": ".858",
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "buy",
+        "rates": {
+          "GBP/USD": "1.30"
+        }
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "0.38",
+        "vRaw": "0.3846153846153846153846153846153846153846",
+        "lossPerLot": "260.00000",
+        "riskActual": "98.8000000",
+        "minLotRisk": "2.6000000"
+      }
+    },
+    {
+      "input": {
+        "symbol": "EURGBP",
+        "entry": ".86",
+        "sl": ".858",
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "buy"
+      },
+      "expected": {
+        "status": "error"
+      }
+    },
+    {
+      "input": {
+        "symbol": "EURUSD",
+        "entry": "1.085",
+        "sl": "1.083",
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "buy",
+        "commission": 7
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "0.48",
+        "vRaw": "0.4830917874396135265700483091787439613527",
+        "lossPerLot": "207.000",
+        "riskActual": "99.36000",
+        "minLotRisk": "2.07000"
+      }
+    },
+    {
+      "input": {
+        "symbol": "EURUSD",
+        "entry": "1.085",
+        "sl": "1.083",
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "buy",
+        "slip": ".0002"
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "0.45",
+        "vRaw": "0.4545454545454545454545454545454545454545",
+        "lossPerLot": "220.0000",
+        "riskActual": "99.000000",
+        "minLotRisk": "2.200000"
+      }
+    },
+    {
+      "input": {
+        "symbol": "EURUSD",
+        "entry": "1.085",
+        "sl": "1.084",
+        "equity": 7000,
+        "riskPct": 1,
+        "side": "buy"
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "0.7",
+        "vRaw": "0.7",
+        "lossPerLot": "100.000",
+        "riskActual": "70.0000",
+        "minLotRisk": "1.00000"
+      }
+    },
+    {
+      "input": {
+        "symbol": "EURUSD",
+        "entry": "1.085",
+        "sl": "1.08",
+        "equity": 500,
+        "riskPct": ".5",
+        "side": "buy"
+      },
+      "expected": {
+        "status": "below_min",
+        "volume": "0",
+        "vRaw": "0.005",
+        "lossPerLot": "500.000",
+        "riskActual": "0.000",
+        "minLotRisk": "5.00000"
+      }
+    },
+    {
+      "input": {
+        "symbol": "EURUSD",
+        "entry": "1.085",
+        "sl": "1.09",
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "buy"
+      },
+      "expected": {
+        "status": "error"
+      }
+    },
+    {
+      "input": {
+        "symbol": "FPT",
+        "entry": 120000,
+        "sl": 114000,
+        "equity": 500000000,
+        "riskPct": 1,
+        "side": "buy",
+        "currency": "VND"
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "800",
+        "vRaw": "833.3333333333333333333333333333333333333",
+        "lossPerLot": "6000",
+        "riskActual": "4800000",
+        "minLotRisk": "600000"
+      }
+    },
+    {
+      "input": {
+        "symbol": "FPT",
+        "entry": 120000,
+        "sl": 114000,
+        "equity": 500000000,
+        "riskPct": 1,
+        "side": "buy",
+        "currency": "VND",
+        "feeBuy": ".0015",
+        "feeSell": ".0015",
+        "taxSell": ".001"
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "700",
+        "vRaw": "773.3952049497293116782675947409126063418",
+        "lossPerLot": "6465.0000",
+        "riskActual": "4525500.0000",
+        "minLotRisk": "646500.0000"
+      }
+    },
+    {
+      "input": {
+        "symbol": "FPT",
+        "entry": 120000,
+        "sl": 114000,
+        "equity": 500000000,
+        "riskPct": 1,
+        "side": "buy",
+        "currency": "VND",
+        "feeBuy": ".15"
+      },
+      "expected": {
+        "status": "error"
+      }
+    },
+    {
+      "input": {
+        "symbol": "VN30F1M",
+        "entry": 1300,
+        "sl": 1295,
+        "equity": 500000000,
+        "riskPct": 1,
+        "side": "buy",
+        "currency": "VND"
+      },
+      "expected": {
+        "status": "ok",
+        "volume": "10",
+        "vRaw": "10",
+        "lossPerLot": "500000",
+        "riskActual": "5000000",
+        "minLotRisk": "500000"
+      }
+    },
+    {
+      "input": {
+        "symbol": "SP100",
+        "entry": 100,
+        "sl": 90,
+        "equity": 10000,
+        "riskPct": 1,
+        "side": "buy"
+      },
+      "expected": {
+        "status": "needs_confirm"
+      }
+    }
+  ]
+}

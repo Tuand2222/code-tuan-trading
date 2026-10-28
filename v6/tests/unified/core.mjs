@@ -29,8 +29,8 @@ check('Cashflow-neutral NAV after loss: deposit and withdrawal',()=>{
   const t=[{date:'2026-01-01',netPnl:1000},{date:'2026-01-02',netPnl:-1100}],base=M.capitalNAV(10000,t,[]);
   close(base.dd,.1);for(const [type,amount] of [['DEPOSIT',5000],['WITHDRAWAL',4000]]){const v=M.capitalNAV(10000,t,[{time:'2026-01-03T00:00',type,amount}]);close(v.dd,base.dd);close(v.nav,base.nav);close(v.maxdd,base.maxdd);close(v.equity,base.equity+(type==='DEPOSIT'?amount:-amount));}return {baseDD:base.dd};
 });
-check('Flow preceding PnL on same day; correct share issuance',()=>{
- const v=M.capitalNAV(10000,[{date:'2026-01-01',netPnl:-2000}],[{time:'2026-01-01T00:00',type:'DEPOSIT',amount:10000}]);close(v.dd,.1);return {dd:v.dd};
+check('Date-only day applies trade before EOD cashflow; intraday sequence unknown',()=>{
+ const v=M.capitalNAV(10000,[{date:'2026-01-01',netPnl:-2000}],[{time:'2026-01-01T00:00',type:'DEPOSIT',amount:10000}]);close(v.dd,.2);assert.ok(v.flags.includes('intraday_order_unknown'));return {dd:v.dd};
 });
 check('Mixed timestamp offsets sort by actual instant, not lexical text',()=>{
  const trades=[{date:'2026-01-01',closeTime:'2026-01-01T01:00:00Z',netPnl:-2000}],flows=[{time:'2026-01-01T07:30:00+07:00',type:'DEPOSIT',amount:10000}];const v=M.capitalNAV(10000,trades,flows);close(v.dd,.1);return {dd:v.dd};

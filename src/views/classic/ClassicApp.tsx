@@ -216,6 +216,8 @@ type DraftTrade = Omit<
 };
 
 type TradeImportPreview = {
+  numberDecisions?: Array<{field:string;separator:string;ambiguous:boolean;examples:string[]}>;
+  needsNumberConfirmation?: boolean;
   fileName: string;
   detected: number;
   trades: Trade[];
@@ -1355,6 +1357,8 @@ export default function Home() {
   const [tradeImportPreview, setTradeImportPreview] =
     useState<TradeImportPreview | null>(null);
   const [tradeImportBusy, setTradeImportBusy] = useState(false);
+  const importFileV33=useRef<File|null>(null);
+  const [numberChoice,setNumberChoice]=useState<""|"."|",">("");
   const [notes, setNotes] = useState<string>(NOTE_TEMPLATES[0].content);
   const [riskSettings, setRiskSettings] = useState<RiskSettings>(DEFAULT_RISK);
   const [persistenceOwner, setPersistenceOwner] = useState<string | null>(null);
@@ -2063,16 +2067,17 @@ export default function Home() {
     fees: item.fees,
     externalId: item.externalId,
   });
-  const prepareTradeImport = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = "";
+  const prepareTradeImport = async (event: ChangeEvent<HTMLInputElement>|File,separator?:"."|",") => {
+    const file = event instanceof File?event:event.target.files?.[0];
+    if(!(event instanceof File))event.target.value = "";
+    importFileV33.current=file||null;setNumberChoice(separator||"");
     if (!file) return;
     setTradeImportPreview(null);
     setTradeImportBusy(true);
     try {
       const extension = file.name.toLowerCase().split(".").pop();
       const isPdf = extension === "pdf" || file.type === "application/pdf";
-      let result: { trades: Trade[]; errors: string[]; detected: number };
+      let result: { trades: Trade[]; errors: string[]; detected: number;numberDecisions?:TradeImportPreview["numberDecisions"];needsNumberConfirmation?:boolean };
       if (isPdf) {
         const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
         pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -2095,9 +2100,9 @@ export default function Home() {
         const parsed = parseBinanceFuturesText(text);
         result = { ...parsed, trades: parsed.trades.map(binanceToTrade) };
       } else if (extension === "csv") {
-        result = parseTradeCsv(await file.text(), "CSV");
+        result = parseTradeCsv(await file.text(), "CSV",separator);
       } else if (["xlsx", "xls", "xlsm"].includes(extension ?? "")) {
-        result = await parseTradeWorkbook(file);
+        result = await parseTradeWorkbook(file,separator);
       } else {
         throw new Error(
           "Định dạng chưa hỗ trợ. Hãy chọn PDF Binance Futures, Excel hoặc CSV.",
@@ -2126,6 +2131,7 @@ export default function Home() {
         detected: result.detected,
         trades: identified,
         errors: result.errors,
+        numberDecisions:result.numberDecisions,needsNumberConfirmation:result.needsNumberConfirmation,
       });
     } catch (error) {
       setToast(
@@ -3233,6 +3239,7 @@ export default function Home() {
               {tradeImportPreview.detected} dòng nhận diện
             </span>
           </div>
+          {tradeImportPreview.numberDecisions?.some(d=>d.ambiguous)&&<div className="import-summary" role="alert"><strong>Cần xác nhận dấu thập phân</strong><p>{tradeImportPreview.numberDecisions.filter(d=>d.ambiguous).map(d=>d.field+': '+d.examples.join(' / ')).join(' · ')}</p><label>Dấu thập phân của cột mơ hồ<select aria-label="Dấu thập phân nhập file" value={numberChoice} onChange={e=>{const value=e.target.value as '.'|',';if(importFileV33.current&&value)void prepareTradeImport(importFileV33.current,value);}}><option value="">Chọn để đối chiếu lại Preview</option><option value=".">Dấu chấm: 1.085 = 1,085 đơn vị</option><option value=",">Dấu phẩy: 1.085 = 1.085 đơn vị nguyên</option></select></label></div>}
           <div className="cockpit-form">
             <label>
               Đơn vị P&L trong file
@@ -3456,6 +3463,7 @@ export default function Home() {
               disabled={
                 tradeImportBusy ||
                 !tradeImportPreview.trades.length ||
+                tradeImportPreview.needsNumberConfirmation ||
                 (importCurrency !== "VND" && !(Number(importFx) > 0)) ||
                 !!ingestionPlan?.candidates.some(
                   (c) => !resolutions[c.incoming.id],

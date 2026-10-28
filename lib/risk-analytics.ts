@@ -1,4 +1,5 @@
 /** Classic's financial boundary: pnl is gross, fees/swap are positive costs. */
+import {QuantV34 as Quant} from '../src/core/quant-v34.js';
 import {AccountBaselineSettings} from './journal-lifecycle.js';
 export interface RiskTrade {
   id: string;
@@ -66,7 +67,7 @@ export const DEFAULT_RISK: RiskSettings = {
   recoveryPlan: "",
 };
 export function netPnl(t: Pick<RiskTrade, "pnl" | "fees" | "swap">) {
-  return t.pnl - (t.fees ?? 0) - (t.swap ?? 0);
+  const D=Quant.decimal;return Number(D(t.pnl)!.minus(D(t.fees??0)!).minus(D(t.swap??0)!));
 }
 export function followed(t: RiskTrade) {
   return t.rules && Object.keys(t.rules).length
@@ -101,6 +102,8 @@ export function analyzeRiskTrades(
   const r = known
     .filter((t) => t.riskKnown !== false && t.risk > 0)
     .map((t) => netPnl(t) / t.risk);
+  const standard = Quant.metrics(r);
+  const tierReplay=Quant.replay(capital,known.map(t=>({id:t.id,status:'closed',openTime:t.openedAt,closeTime:t.closedAt,netPnl:netPnl(t)})),cashFlows);
   const averageR = mean(r);
   const sdR =
     r.length > 1 && averageR !== null
@@ -113,51 +116,18 @@ export function analyzeRiskTrades(
     : null;
   const profit = values.reduce((s, n) => s + Math.max(n, 0), 0);
   const loss = values.reduce((s, n) => s + Math.max(-n, 0), 0);
-  let balance = capital,
-    peak = capital,
-    maxDD = 0,
-    maxDDPercent = 0,
-    hypothetical = capital;
-  const balances: number[] = [];
-  const external = [...cashFlows].sort((a, b) => a.date.localeCompare(b.date));
-  let cashIndex = 0,
-    cashTotal = 0;
-  const applyCash = (until: string) => {
-    while (cashIndex < external.length && external[cashIndex].date <= until) {
-      const f = external[cashIndex++],
-        amount = f.type === "deposit" ? f.amount : -f.amount;
-      balance += amount;
-      peak += amount;
-      hypothetical += amount;
-      cashTotal += amount;
-    }
-  };
-  let rolling = 0;
-  const curve = known.map((trade, i) => {
-    applyCash(trade.date);
-    const net = netPnl(trade);
-    balance += net;
-    peak = Math.max(peak, balance);
-    const drawdown = peak - balance;
-    const drawdownPercent = peak > 0 ? (100 * drawdown) / peak : null;
-    maxDD = Math.max(maxDD, drawdown);
-    maxDDPercent = Math.max(maxDDPercent, drawdownPercent ?? 0);
-    if (followed(trade)) hypothetical += net;
-    balances.push(balance);
-    rolling += balance;
-    if (i >= 20) rolling -= balances[i - 20];
-    return {
-      id: trade.id,
-      date: trade.date,
-      balance,
-      peak,
-      drawdown,
-      drawdownPercent,
-      hypothetical,
-      sma20: i >= 19 ? rolling / 20 : null,
-    };
-  });
-  applyCash("9999-12-31");
+  const quantTrades=known.map(t=>({id:t.id,date:t.date,closeTime:t.closedAt||t.date,netPnl:netPnl(t)}));
+  const events=[...quantTrades.map(t=>({kind:'trade',id:t.id,time:t.closeTime,amount:t.netPnl})),...cashFlows.map(f=>({kind:'cash',time:f.date,amount:f.type==='withdrawal'?-f.amount:f.amount}))].sort((a,b)=>Date.parse(a.time)-Date.parse(b.time)||(a.kind==='cash'?-1:1));
+  const nav=Quant.nav(capital,events,quantTrades.some(t=>/^\d{4}-\d{2}-\d{2}$/.test(t.closeTime)),true);
+  const qd=Quant.decimal;
+  const cashTotal=Number(cashFlows.reduce((sum,f)=>sum.plus(qd(f.amount)!.mul(f.type==='withdrawal'?-1:1)),qd(0)!));
+  const balance=Number(nav.equity??qd(capital)!.plus(values.reduce((s,v)=>s.plus(qd(v)!),qd(0)!)).plus(cashTotal));
+  const peak=nav.status==='ok'&&Number(nav.index)>0?balance*Number(nav.peakIndex)/Number(nav.index):balance;
+  const maxDDPercent=nav.maxDD!==null&&nav.maxDD!==undefined?Number(nav.maxDD)*100:null;
+  const maxDD=Number((nav.path||[]).reduce((best:any,point:any)=>qd(point.drawdownMoney)!.gt(best)?qd(point.drawdownMoney):best,qd(0)));
+  const hypothetical=Number(known.filter(followed).reduce((sum,t)=>sum.plus(qd(netPnl(t))!),qd(capital)!))+cashTotal;
+  const byId=new Map((nav.path||[]).map((point:any)=>[point.id||String(point.time).slice(0,10),point]));
+  const curve=known.map(t=>{const point=byId.get(t.id)||byId.get(t.date) as any;const b=point?Number(point.equity):balance,dd=point?Number(point.dd)*100:nav.dd===null?null:Number(nav.dd)*100;return {id:t.id,date:t.date,balance:b,peak:dd!==null&&dd<100?b/(1-dd/100):b,drawdown:point?Number(point.drawdownMoney):0,drawdownPercent:dd,hypothetical,sma20:null};});
   const sqn =
     averageR !== null && sdR
       ? (Math.sqrt(Math.min(r.length, 100)) * averageR) / sdR
@@ -205,16 +175,12 @@ export function analyzeRiskTrades(
     noLoss: loss === 0 && profit > 0,
     expectancyR: averageR,
     sqn,
-    sqnLabel:
-      sqn === null
-        ? "Chưa xác định"
-        : sqn < 1.6
-          ? "Kém"
-          : sqn < 2.5
-            ? "Trung bình – Khá"
-            : sqn < 3
-              ? "Tốt"
-              : "Xuất sắc",
+    standard,
+    tierReplay,
+    ddR: standard.ddR,
+    maxDDR: standard.maxDDR,
+    navDDPercent: nav.dd===null||nav.dd===undefined?null:Number(nav.dd)*100,
+    sqnLabel: standard.sqnMessage || 'Chưa xác định',
     sharpe: averageR !== null && sdR ? averageR / sdR : null,
     sortino: averageR !== null && downside ? averageR / downside : null,
     mae: mean(trades.flatMap((t) => (t.mae == null ? [] : [t.mae]))),
@@ -307,14 +273,11 @@ export function riskDesk(
   const dayNet = events
     .filter((t) => t.date === today)
     .reduce((s, t) => s + netPnl(t), 0);
-  const equity = realized + (settings.unrealized ?? 0);
+  const equity = realized;
   const peak = Math.max(realizedPeak, settings.highWaterMark ?? 0, equity);
-  const ddPercent =
-    settings.initialCapital > 0 && peak > 0
-      ? (100 * (peak - equity)) / peak
-      : null;
+  const ddPercent = a.navDDPercent;
   const dailyBudget = (Math.max(0, before) * settings.dailyLossPercent) / 100;
-  const used = Math.max(0, -dayNet - Math.min(0, settings.unrealized ?? 0));
+  const used = Math.max(0, -dayNet);
   const usage = dailyBudget > 0 ? (100 * used) / dailyBudget : null;
   const floor =
     settings.floorMode === "trailing"
