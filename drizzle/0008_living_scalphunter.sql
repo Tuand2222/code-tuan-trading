@@ -1,0 +1,1 @@
+CREATE INDEX `classic_archive_queue_order` ON `classic_archive_queue` (`owner_id`,`updated_at`,`record_key`);

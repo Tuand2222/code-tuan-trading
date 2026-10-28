@@ -1,0 +1,78 @@
+{
+  "phase": "P7",
+  "passed": 11,
+  "total": 11,
+  "cases": [
+    {
+      "name": "Daily loss combines realized and floating losses; open profit cannot hide another position loss",
+      "pass": true,
+      "loss": 250,
+      "remaining": 250,
+      "remainingR": 2.5
+    },
+    {
+      "name": "Daily limit stops today only; historical date stays inspectable; zero limit is unset",
+      "pass": true
+    },
+    {
+      "name": "Exposure sweep uses exact overlap; closing-before-opening at same timestamp",
+      "pass": true,
+      "peak": 200,
+      "peakPct": 0.02
+    },
+    {
+      "name": "Capital limit static/trailing follows realized PnL, unaffected by cashflows",
+      "pass": true,
+      "staticUsed": 200,
+      "trailingUsed": 1200
+    },
+    {
+      "name": "What-if keeps both-hit ambiguity and does not invent trailing outcomes",
+      "pass": true,
+      "both": 1,
+      "lower": 0.26666666666666666,
+      "upper": 1.1333333333333333
+    },
+    {
+      "name": "Empirical robust weights match v9 haircut, applied inside audited A solver",
+      "pass": true,
+      "eta": 0.25,
+      "original": 0.5267227679379669,
+      "robust": 0.28900577097991087
+    },
+    {
+      "name": "Omega: two playbooks, 100 thresholds, source P10–P90 endpoints, undefined flat point preserved",
+      "pass": true,
+      "all": 15,
+      "comparison": 4,
+      "omegaAtMean": 0.9999999999999997
+    },
+    {
+      "name": "Seeded aggregate ES and expanding VaR backtest equal source B exactly",
+      "pass": true,
+      "aggregateES": -14.6648,
+      "aggregateVaR": -12,
+      "breaches975": 1,
+      "counted": 5
+    },
+    {
+      "name": "RiskStore RCK parameters, modes and gates invalidate one cached snapshot",
+      "pass": true,
+      "n": 30,
+      "tier": 3
+    },
+    {
+      "name": "Core rejects invalid profile k / nonfinite limit / invalid RCK without mutation",
+      "pass": true
+    },
+    {
+      "name": "Generated analytics Worker uses the same tail engine and seeded risk-cap solver",
+      "pass": true,
+      "tasks": [
+        "tail analytics",
+        "risk cap"
+      ]
+    }
+  ],
+  "timestamp": "2026-10-25T07:07:02.420Z"
+}

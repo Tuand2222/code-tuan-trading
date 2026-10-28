@@ -590,3 +590,16 @@ td { padding: 13px; border-bottom: 1px solid var(--line-soft); color: #98a2ae; f
   .account-chip > span { display: none; }
   .account-login-link span { display: none; }
 }
+
+.analysis-mode-switch { margin: 0 0 24px; padding:18px; border:1px solid var(--line); border-radius:12px; background:var(--panel); }
+.analysis-mode-switch [role=group] { display:flex; gap:8px; flex-wrap:wrap; }
+.analysis-mode-switch button { border:1px solid var(--line); border-radius:9px; padding:12px 20px; background:#111820; color:#b7c5d8; cursor:pointer; }
+.analysis-mode-switch button.active { background:var(--gold); color:#17120a; font-weight:700; }
+.analysis-mode-switch p { font-size:13px; color:#8b9bad; margin:12px 0 0; }
+.metric-card small { color:#8191a2; font-size:10px; line-height:1.5; margin-top:10px; }
+
+/* P4: retained Classic palette/layout; only large desktop journals use a bounded viewport. */
+.journal-virtual-scroll{height:560px;overflow:auto;overflow-anchor:none;contain:layout style paint}.classic-virtual-table{min-width:1650px;table-layout:fixed;border-collapse:separate;border-spacing:0}.classic-virtual-table thead{position:sticky;top:0;z-index:4}.classic-virtual-table tr[data-journal-id]{height:48px}.classic-virtual-table tr[data-journal-id] td{height:48px;max-height:48px;padding:6px 10px;line-height:20px;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box}.journal-inline-value{cursor:text}.journal-inline-value:focus-visible{outline:1px solid var(--gold)}.classic-virtual-table input{max-width:100%;min-width:0;background:var(--panel);color:var(--text);border:1px solid var(--gold)}.asset-trade-form summary{cursor:pointer;font-weight:700}.asset-trade-form p{font-size:11px;color:var(--muted)}.asset-trade-form output{display:block;padding:10px;border:1px solid var(--line);border-radius:8px;font-size:12px}.asset-checks{display:grid;gap:7px;margin:12px 0}.asset-trade-form .asset-check{display:flex;align-items:center;gap:8px}.asset-trade-form .asset-check input{width:auto;height:auto}
+
+.journal-pagination { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; padding:12px; font-size:12px; }
+.journal-pagination button:disabled { opacity:.45; cursor:default; }

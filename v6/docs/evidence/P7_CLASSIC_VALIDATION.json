@@ -1,0 +1,13 @@
+{
+  "typecheckExitCode": 0,
+  "classicUnitTests": {
+    "passed": 118,
+    "total": 118
+  },
+  "backendNodeTests": {
+    "passed": 22,
+    "total": 22,
+    "exitCode": 0
+  },
+  "note": "Lần đầu một test Miniflare quá timeout 5 giây khi chạy đồng thời; chạy lại toàn bộ với maxWorkers=1, timeout 15 giây: 118/118 đạt."
+}

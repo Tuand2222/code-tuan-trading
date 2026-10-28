@@ -1,0 +1,38 @@
+{
+  "inventoryRows": 701,
+  "inventoryCounts": {
+    "GIỮ": 406,
+    "GỘP": 256,
+    "BỎ": 39
+  },
+  "missingRetainedIds": [],
+  "duplicateIds": {},
+  "duplicateNamedFunctions": {},
+  "nodeCheck": [
+    {
+      "script": 2,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "script": 3,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "script": 4,
+      "exitCode": 0,
+      "stderr": ""
+    }
+  ],
+  "forbiddenStrings": {
+    "recalculateMasterCapital": 0,
+    "zone4-deck": 0,
+    "z4-": 0,
+    "fourZoneActive": 0,
+    "WK4_SRC": 0,
+    "nav-tabs": 0
+  },
+  "bytes": 410380,
+  "lines": 2804
+}

@@ -604,7 +604,7 @@ export function buildTradeWorkbook(trades: ExcelTrade[], exportedAt = new Date()
     Company: "Tuan Trader",
     CreatedDate: exportedAt,
   };
-  workbook.CalcPr = { calcMode: "auto", fullCalcOnLoad: true, forceFullCalc: true };
+  Object.assign(workbook, { CalcPr: { calcMode: "auto", fullCalcOnLoad: true, forceFullCalc: true } });
 
   XLSX.utils.book_append_sheet(workbook, buildSummarySheet(trades, exportedAt), "Tổng quan");
   XLSX.utils.book_append_sheet(workbook, buildAnalysisSheet(trades), "Phân tích");

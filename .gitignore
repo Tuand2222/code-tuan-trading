@@ -36,8 +36,16 @@ yarn-error.log*
 
 # typescript
 next-env.d.ts
+*.tsbuildinfo
 /dist/
 /.wrangler/
 /.sites-runtime/
 /outputs/
 /work/
+/test-results/
+/public/v6/
+
+/.vinext/
+__pycache__/
+.pytest_cache/
+*.pyc

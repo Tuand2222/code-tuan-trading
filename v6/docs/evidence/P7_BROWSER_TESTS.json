@@ -1,0 +1,178 @@
+{
+  "phase": "P7",
+  "passed": 24,
+  "total": 24,
+  "cases": [
+    {
+      "name": "Boot: 15 A trades, common header and audited KPIs",
+      "pass": true,
+      "equity": 11850,
+      "expectancy": 1.2333333333333334,
+      "sqn": 2.228984997397465,
+      "maxDDR": 2
+    },
+    {
+      "name": "Multi-select AND/OR filters preserve global equity",
+      "pass": true,
+      "and": 3,
+      "or": 9
+    },
+    {
+      "name": "Advanced R/weekday/session/MAE filters and saved views",
+      "pass": true,
+      "restoredAll17Fields": true
+    },
+    {
+      "name": "Sort all columns; keyboard inline PnL edit updates storage/header",
+      "pass": true,
+      "editedPnl": 500,
+      "inlineRNotRounded": true
+    },
+    {
+      "name": "One shared modal: add missing-R trade then verified trade and edit",
+      "pass": true,
+      "rows": 17,
+      "verifiedR": 16,
+      "missingRExcluded": true
+    },
+    {
+      "name": "Tier3 prevents manual add; existing journal remains readable",
+      "pass": true
+    },
+    {
+      "name": "Gameplan save and conversion writes one canonical trade",
+      "pass": true,
+      "pnl": 200
+    },
+    {
+      "name": "Calendar totals and month navigation",
+      "pass": true
+    },
+    {
+      "name": "Three-step weekly Review persists all notes",
+      "pass": true,
+      "notes": {
+        "r1": "Quy tắc kiểm thử",
+        "r2": "Quan sát tuần trước",
+        "r3": "Một hành động"
+      }
+    },
+    {
+      "name": "Chartbook upload/delete retains original source UI",
+      "pass": true
+    },
+    {
+      "name": "Checklist additions, check-all gate, and deletion",
+      "pass": true
+    },
+    {
+      "name": "CSV partial closes merge; dedupe; estimated risk stays unverified",
+      "pass": true,
+      "imported": 1,
+      "pnl": 120,
+      "deduped": true
+    },
+    {
+      "name": "Creatable combobox + rename/color metadata share storage",
+      "pass": true,
+      "option": {
+        "l": "Breakout P3",
+        "c": "#123456"
+      }
+    },
+    {
+      "name": "KPI visibility/order controls preserve preferences",
+      "pass": true,
+      "order": [
+        "kpi-expectancy",
+        "kpi-sqn",
+        "kpi-pf",
+        "kpi-exit-eff",
+        "kpi-dd",
+        "kpi-recovery"
+      ],
+      "hidden": [
+        "kpi-pf"
+      ],
+      "mouseDrag": true
+    },
+    {
+      "name": "Custom option apostrophe/HTML stays literal and removable",
+      "pass": true,
+      "literalLabel": "P3's <literal>, comma",
+      "urlRoundTrip": true
+    },
+    {
+      "name": "R/$/%/Pips-Ticks units share unchanged R statistics",
+      "pass": true,
+      "expectancyR": 1.3235294117647058,
+      "pipsPerR": 8
+    },
+    {
+      "name": "Help search, tooltip hover/pin/Escape, and mapping simulator",
+      "pass": true
+    },
+    {
+      "name": "Settings capital baseline updates shared equity atomically",
+      "pass": true
+    },
+    {
+      "name": "Backup download -> clear -> file restore matches every field",
+      "pass": true,
+      "restoredEveryField": true,
+      "trades": 19
+    },
+    {
+      "name": "Reload persists trades, Review, units, KPI and metadata",
+      "pass": true,
+      "persisted": true
+    },
+    {
+      "name": "Empty / one-row view; unavailable R displays a dash; no NaN KPIs",
+      "pass": true,
+      "zeroAndOneRows": true
+    },
+    {
+      "name": "Sample B selection downloads backup and preserves Review/metadata",
+      "pass": true,
+      "backupPrepared": true,
+      "sampleB": 15
+    },
+    {
+      "name": "Generated Worker still matches main thread for four P3 tasks",
+      "pass": true,
+      "tasks": [
+        {
+          "task": "mc",
+          "execution": "worker",
+          "equal": true
+        },
+        {
+          "task": "ror",
+          "execution": "worker",
+          "equal": true
+        },
+        {
+          "task": "analytics",
+          "execution": "worker",
+          "equal": true
+        },
+        {
+          "task": "prop",
+          "execution": "worker",
+          "equal": true
+        }
+      ]
+    },
+    {
+      "name": "21 routes; runtime IDs unique; dark/mobile layouts",
+      "pass": true,
+      "routes": 21,
+      "runtimeDuplicateIds": 0,
+      "mobileOverflow": false
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "timestamp": "2026-10-25T07:07:59.499Z"
+}

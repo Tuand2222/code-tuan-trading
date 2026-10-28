@@ -1,0 +1,17 @@
+/v6/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'
+  Referrer-Policy: no-referrer
+  X-Content-Type-Options: nosniff
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+/v6/
+  Cache-Control: no-cache
+
+/v6/index.html
+  Cache-Control: no-cache
+
+/v6/sw.js
+  Cache-Control: no-cache
+
+/v6/registerSW.js
+  Cache-Control: no-cache

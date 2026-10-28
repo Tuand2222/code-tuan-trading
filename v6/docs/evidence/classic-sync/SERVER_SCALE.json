@@ -1,0 +1,26 @@
+[
+  {
+    "records": 10000,
+    "persistMs": 12700.3412
+  },
+  {
+    "records": 50000,
+    "persistMs": 64432.50129999999
+  },
+  {
+    "loaded": 50000,
+    "pages": 50,
+    "loadMs": 21771.9663
+  },
+  {
+    "ownerIsolation": true,
+    "stalePatch": 409,
+    "staleDelete": 409,
+    "sourceReceiptRetained": true
+  },
+  {
+    "csvRows": 50000,
+    "duplicateRows": 50000,
+    "parseAndDedupeMs": 16054.435599999997
+  }
+]

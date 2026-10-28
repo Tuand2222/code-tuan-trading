@@ -1,0 +1,19 @@
+{
+  "pass": true,
+  "cases": [
+    {
+      "records": 100,
+      "classicToV6AndIndexedDbMs": 8946.9015,
+      "postBatches": 1,
+      "indexedDbRows": 100,
+      "renderedV6Rows": 100,
+      "netPnl": 4420000
+    },
+    {
+      "reloadRecords": 100,
+      "v6ToClassic": true,
+      "offlineQueueRetainedAndRetried": true,
+      "pageErrors": []
+    }
+  ]
+}

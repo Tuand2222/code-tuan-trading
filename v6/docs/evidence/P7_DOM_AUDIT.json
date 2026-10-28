@@ -1,0 +1,1214 @@
+{
+  "inventoryRows": 701,
+  "inventoryCounts": {
+    "GIỮ": 406,
+    "GỘP": 256,
+    "BỎ": 39
+  },
+  "missingRetainedIds": [],
+  "unresolvedRetainedFunctions": [],
+  "functionMappingCorrections": [
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "exportBackup",
+      "previous": "GỘP",
+      "destination": "exportBackup"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "importBackup",
+      "previous": "GỘP",
+      "destination": "importBackup"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "buildPool",
+      "previous": "GIỮ",
+      "destination": "RiskMath.scenarioPools"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "simulate",
+      "previous": "GIỮ",
+      "destination": "RiskMath.simulate"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "addTab",
+      "previous": "GIỮ",
+      "destination": "route / DOM tĩnh"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "nav",
+      "previous": "GIỮ",
+      "destination": "route / sidebar tĩnh"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "capitalNAV",
+      "previous": "GIỮ",
+      "destination": "RiskMath.capitalNAV"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "tier",
+      "previous": "GỘP",
+      "destination": "RiskMath.tierOf"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "renderDetails",
+      "previous": "GIỮ",
+      "destination": "renderWorkspaceTable"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "renderExposure",
+      "previous": "GIỮ",
+      "destination": "renderCapital / RiskMath.exposureStats"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "editorSave",
+      "previous": "GIỮ",
+      "destination": "submitNewTrade"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "renderEdge",
+      "previous": "GIỮ",
+      "destination": "renderRiskEdge"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "renderSerial",
+      "previous": "GIỮ",
+      "destination": "renderRiskOpt / RiskMath.serialStats"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "renderProp",
+      "previous": "GIỮ",
+      "destination": "renderPropResults"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "renderOpt",
+      "previous": "GIỮ",
+      "destination": "renderRiskOpt"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "exportUnifiedBackup",
+      "previous": "GIỮ",
+      "destination": "exportBackup"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "importUnifiedBackup",
+      "previous": "GIỮ",
+      "destination": "importBackup / Core.decodeBackup"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "attach",
+      "previous": "GIỮ",
+      "destination": "boot / bindSourceEvents / bindRiskEvents"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "range",
+      "previous": "GIỮ",
+      "destination": "RiskMath.range"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "selectedNav",
+      "previous": "GIỮ",
+      "destination": "switchSidebarTab"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "riskGate",
+      "previous": "GỘP",
+      "destination": "RiskStore.read().gates"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "rckEmpirical",
+      "previous": "GIỮ",
+      "destination": "RiskMath.rckEmpirical"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "mount",
+      "previous": "GIỮ",
+      "destination": "boot / DOM tĩnh"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "timeMs",
+      "previous": "GIỮ",
+      "destination": "RiskMath.capitalNAV (Date.parse)"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "renderTools",
+      "previous": "GIỮ",
+      "destination": "renderSizer"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "interlocks",
+      "previous": "GỘP",
+      "destination": "renderRiskHeader"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "exitBounds",
+      "previous": "GIỮ",
+      "destination": "RiskMath.exitStats"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "fullSerial",
+      "previous": "GIỮ",
+      "destination": "RiskMath.serialStats"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "rckPanel",
+      "previous": "GIỮ",
+      "destination": "renderRiskOpt"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "mcExtended",
+      "previous": "GỘP",
+      "destination": "RiskMath.simulate"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "stress",
+      "previous": "GỘP",
+      "destination": "stress / RiskMath.simulate"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "propSimulation",
+      "previous": "GỘP",
+      "destination": "propSimulation / RiskMath.propMulti"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "render",
+      "previous": "GIỮ",
+      "destination": "renderVisiblePage"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "switchTab",
+      "previous": "GỘP",
+      "destination": "showTab"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "calcTradeMetrics",
+      "previous": "GỘP",
+      "destination": "RiskMath.calcTradeMetrics"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "renderCashflowTable",
+      "previous": "GỘP",
+      "destination": "renderCashflowTable"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "saveNewTrade",
+      "previous": "GỘP",
+      "destination": "submitNewTrade"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "analyzeSimultaneousExposure",
+      "previous": "GỘP",
+      "destination": "RiskMath.exposureStats"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "calculateRollingDrift",
+      "previous": "GỘP",
+      "destination": "RiskMath.rollingStats"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "analyzeSerialPsychology",
+      "previous": "GỘP",
+      "destination": "RiskMath.serialStats"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "initAsymmetricRecoveryChart",
+      "previous": "GIỮ",
+      "destination": "renderCapital / ChartRegistry.draw"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "initSimultaneousExposureChart",
+      "previous": "GIỮ",
+      "destination": "renderCapital / ChartRegistry.draw"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "initRorCliffChart",
+      "previous": "GIỮ",
+      "destination": "renderCapital / ChartRegistry.draw"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "initWhatIfCompareChart",
+      "previous": "GIỮ",
+      "destination": "renderRiskEdge / ChartRegistry.draw"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "initRollingDriftChart",
+      "previous": "GIỮ",
+      "destination": "renderRiskEdge / ChartRegistry.draw"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "initBaselTailChart",
+      "previous": "GIỮ",
+      "destination": "renderRiskEdge / ChartRegistry.draw"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "initOmegaCurveChart",
+      "previous": "GIỮ",
+      "destination": "renderRiskEdge / ChartRegistry.draw"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "initMonteCarloFanChart",
+      "previous": "GIỮ",
+      "destination": "renderSimulationResults / ChartRegistry.draw"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "runMonteCarloSim",
+      "previous": "GỘP",
+      "destination": "runSimulation / RiskMath.simulate"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "updateCockpitAll",
+      "previous": "GỘP",
+      "destination": "renderCockpit / renderStressResults"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "cum",
+      "previous": "GỘP",
+      "destination": "RiskMath.cumulativeBootstrap"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "boot",
+      "previous": "GỘP",
+      "destination": "RiskMath.simulate"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "one",
+      "previous": "GIỮ",
+      "destination": "RiskMath.propMulti"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "prop",
+      "previous": "GIỮ",
+      "destination": "RiskMath.propMulti"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "rorOnly",
+      "previous": "GỘP",
+      "destination": "RiskMath.rorEmpirical"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "fRor",
+      "previous": "GỘP",
+      "destination": "RiskMath.rorEmpirical"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.tierCfg",
+      "previous": "GỘP",
+      "destination": "tierCfg / state.riskProfile"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.budCfg",
+      "previous": "GỘP",
+      "destination": "budCfg / state.riskProfile"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.updateRiskOfRuin",
+      "previous": "GỘP",
+      "destination": "updateRiskOfRuin / renderCapital"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.solveStanfordRCK",
+      "previous": "GỘP",
+      "destination": "renderRiskOpt / RiskMath.rckEmpirical"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.runMonteCarloSim",
+      "previous": "GỘP",
+      "destination": "runSimulation / RiskMath.simulate"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.updateES",
+      "previous": "GỘP",
+      "destination": "renderRiskEdge / RiskMath.tailAnalytics"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.refreshAll",
+      "previous": "GỘP",
+      "destination": "renderAll"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.analyzeSerialPsychology",
+      "previous": "GỘP",
+      "destination": "RiskMath.serialStats"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.analyzeSimultaneousExposure",
+      "previous": "GỘP",
+      "destination": "RiskMath.exposureStats"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.evalGates",
+      "previous": "GỘP",
+      "destination": "RiskStore.read().gates"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.runMonteCarloSim",
+      "previous": "GỘP",
+      "destination": "runSimulation / RiskMath.simulate"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "cum",
+      "previous": "GỘP",
+      "destination": "RiskMath.cumulativeBootstrap"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "tailMult",
+      "previous": "GIỮ",
+      "destination": "RiskMath.tailMult"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "esCalc",
+      "previous": "GỘP",
+      "destination": "RiskMath.tailAnalytics"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "propMulti",
+      "previous": "GIỮ",
+      "destination": "RiskMath.propMulti"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.calcTradeMetrics",
+      "previous": "GỘP",
+      "destination": "RiskMath.calcTradeMetrics"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.evaluatePlaybookSetups",
+      "previous": "GỘP",
+      "destination": "RiskMath.playbookStats"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.localDateStr",
+      "previous": "GỘP",
+      "destination": "todayISO"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.runTierProtocolActions",
+      "previous": "GỘP",
+      "destination": "renderTierProtocol"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.tradeLockReason",
+      "previous": "GỘP",
+      "destination": "allowNewTrade / RiskStore.read().gates"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.saveNewTrade",
+      "previous": "GỘP",
+      "destination": "submitNewTrade"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.updateRiskOfRuin",
+      "previous": "GỘP",
+      "destination": "updateRiskOfRuin / renderCapital"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "getSetupRArray",
+      "previous": "GIỮ",
+      "destination": "RiskMath.omegaCompare"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "ensureVarBreachChart",
+      "previous": "GIỮ",
+      "destination": "renderRiskEdge"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.updateES",
+      "previous": "GỘP",
+      "destination": "renderRiskEdge / RiskMath.tailAnalytics"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.solveStanfordRCK",
+      "previous": "GỘP",
+      "destination": "renderRiskOpt / RiskMath.rckEmpirical"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.runProp",
+      "previous": "GỘP",
+      "destination": "propSimulation / RiskMath.propMulti"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.assetClassOf",
+      "previous": "GỘP",
+      "destination": "RiskMath.assetClass"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.lhOfClass",
+      "previous": "GỘP",
+      "destination": "RiskMath.assetGroups / state.riskProfile.assumptions.lhByClass"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.effLH",
+      "previous": "GỘP",
+      "destination": "RiskMath.liquidity"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.lhVal",
+      "previous": "GỘP",
+      "destination": "RiskStore.read().liquidity.days"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.sessionTagOf",
+      "previous": "GỘP",
+      "destination": "StorageData.sessionTag"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.strategyIdOf",
+      "previous": "GỘP",
+      "destination": "StorageData.strategyId"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.omegaRange",
+      "previous": "GỘP",
+      "destination": "RiskMath.omegaCompare"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.snapshotQuant",
+      "previous": "GỘP",
+      "destination": "StorageData.snapshot"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.persistStateToStorage",
+      "previous": "GỘP",
+      "destination": "Core.commit / captureSimulationSnapshot"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.loadStateFromStorage",
+      "previous": "GỘP",
+      "destination": "Core.restore"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.switchTab",
+      "previous": "GỘP",
+      "destination": "showTab"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.evalGates",
+      "previous": "GỘP",
+      "destination": "RiskStore.read().gates"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.updateCockpitAll",
+      "previous": "GỘP",
+      "destination": "renderCockpit / renderStressResults"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "runCockpitStressLabV9",
+      "previous": "GIỮ",
+      "destination": "stress / renderStressResults"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.refreshAll",
+      "previous": "GỘP",
+      "destination": "renderAll"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.refreshAll",
+      "previous": "GỘP",
+      "destination": "renderAll"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "window.evalGates",
+      "previous": "GỘP",
+      "destination": "RiskStore.read().gates"
+    }
+  ],
+  "renamedOrMergedIds": [
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "sim-horizon",
+      "destination": "adv-mc-h",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "sim-runs",
+      "destination": "adv-mc-n",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "sim-risk",
+      "destination": "risk-profile-fTier",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "chart-sim",
+      "destination": "adv-mc-chart",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "sim-summary",
+      "destination": "adv-mc-summary",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "sim-note",
+      "destination": "mc-info",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "ck-day",
+      "destination": "dl-date-pick",
+      "reason": "D7: một ngày xét chung cho panel lỗ ngày"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "ck-daily",
+      "destination": "risk-profile-dailyLossLimit",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "ck-personal",
+      "destination": "risk-profile-personalDailyLimit",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "ck-maxdd",
+      "destination": "risk-profile-maxDrawdown",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "ck-ddmode",
+      "destination": "risk-profile-ddMode",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "risk-pct",
+      "destination": "risk-profile-fTier",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "risk-k",
+      "destination": "risk-profile-k",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "risk-dd-limit",
+      "destination": "risk-profile-maxDrawdown",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "risk-es-val",
+      "destination": "es-stats",
+      "reason": "D13: một thẻ Tail Risk"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "risk-alpha",
+      "destination": "adv-rck-alpha",
+      "reason": "D14: bỏ optimizer quét riêng, dùng tham số bộ giải A"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "risk-opt-dd",
+      "destination": "ror-floor",
+      "reason": "D14: một ngưỡng Drawdown cho phép kiểm chứng RoR"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "risk-opt-horizon",
+      "destination": "risk-ror-horizon",
+      "reason": "D14: một horizon cho kiểm chứng RoR"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "risk-opt-max",
+      "destination": "bud-f",
+      "reason": "D7/D14: trần rủi ro đọc Risk Profile, bỏ trần optimizer riêng"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "tab-riskstress",
+      "destination": "tab-simulation",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "add-trade-modal",
+      "destination": "risk-detail-modal",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "new-trade-symbol",
+      "destination": "risk-edit-symbol",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "new-trade-pnl",
+      "destination": "risk-edit-pnl",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "new-trade-risk",
+      "destination": "risk-edit-risk",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "new-trade-hold",
+      "destination": "risk-edit-hold",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "adv-interlock",
+      "destination": "interlock-banner",
+      "reason": "D9: một banner liên động"
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "adv-mc-chart",
+      "destination": "chart-sim",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "adv-mc-h",
+      "destination": "sim-horizon",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "adv-mc-mode",
+      "destination": "sel-mc-mode",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "adv-mc-n",
+      "destination": "sim-runs",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "adv-mc-revenge",
+      "destination": "chk-mc-revenge-mode",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "adv-mc-run",
+      "destination": "runSimulation",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "adv-mc-seed",
+      "destination": "sel-mc-seed",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "adv-mc-summary",
+      "destination": "sim-summary / chart-sim (RiskStore.mc.bands)",
+      "reason": "Gộp vào một điều khiển/kết quả chung, không tạo ID rỗng. Các phân vị MC nằm trong fan A; What-if MAE/MFE dùng cận, không suy ra WR/PF chính xác."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "dep-list",
+      "destination": "cashflow-table-body",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "dep-sum",
+      "destination": "top-bar-cashflow",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "dp-add",
+      "destination": "cashflow-modal",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "dp-t",
+      "destination": "cf-amount",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_A_V3_Kiem_Toan.html",
+      "name": "side-riskstress",
+      "destination": "side-simulation",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "tab-overview",
+      "destination": "tab-zones",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "trade-count-badge",
+      "destination": "filtered-count",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "trade-log-body",
+      "destination": "workspace-table-body",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "tab-layer1",
+      "destination": "tab-riskcapital",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "chartAsymmetricRecovery",
+      "destination": "risk-recovery-chart",
+      "reason": "P7/D8: giữ canvas A, thêm ô DD tự do của B"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "bud-k",
+      "destination": "risk-profile-k",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "bud-f",
+      "destination": "risk-profile-fTier",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "daily-budget-detail",
+      "destination": "risk-budget",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "tab-layer2",
+      "destination": "tab-riskedge",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "whatif-orig-exp",
+      "destination": "adv-exit-bounds / chartWhatIfCompare",
+      "reason": "Gộp vào một điều khiển/kết quả chung, không tạo ID rỗng. Các phân vị MC nằm trong fan A; What-if MAE/MFE dùng cận, không suy ra WR/PF chính xác."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "whatif-orig-winrate",
+      "destination": "adv-exit-bounds / chartWhatIfCompare",
+      "reason": "Gộp vào một điều khiển/kết quả chung, không tạo ID rỗng. Các phân vị MC nằm trong fan A; What-if MAE/MFE dùng cận, không suy ra WR/PF chính xác."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "whatif-new-exp",
+      "destination": "adv-exit-bounds / chartWhatIfCompare",
+      "reason": "Gộp vào một điều khiển/kết quả chung, không tạo ID rỗng. Các phân vị MC nằm trong fan A; What-if MAE/MFE dùng cận, không suy ra WR/PF chính xác."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "whatif-new-winrate",
+      "destination": "adv-exit-bounds / chartWhatIfCompare",
+      "reason": "Gộp vào một điều khiển/kết quả chung, không tạo ID rỗng. Các phân vị MC nằm trong fan A; What-if MAE/MFE dùng cận, không suy ra WR/PF chính xác."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "whatif-stopped-early",
+      "destination": "adv-exit-bounds / chartWhatIfCompare",
+      "reason": "Gộp vào một điều khiển/kết quả chung, không tạo ID rỗng. Các phân vị MC nằm trong fan A; What-if MAE/MFE dùng cận, không suy ra WR/PF chính xác."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "whatif-pf-change",
+      "destination": "adv-exit-bounds / chartWhatIfCompare",
+      "reason": "Gộp vào một điều khiển/kết quả chung, không tạo ID rỗng. Các phân vị MC nằm trong fan A; What-if MAE/MFE dùng cận, không suy ra WR/PF chính xác."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "half-compare-text",
+      "destination": "risk-decay-stats",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "chartRollingDrift",
+      "destination": "risk-drift-chart",
+      "reason": "P11: chỉ một Rolling Expectancy/SQN"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "chartBaselTail",
+      "destination": "risk-tail-chart",
+      "reason": "D13: một thẻ Tail Risk dùng canvas A"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "chartOmegaCurve",
+      "destination": "risk-omega-chart",
+      "reason": "D12: UI Omega nâng cấp của B dùng canvas A hiện hữu"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "tab-layer3",
+      "destination": "tab-riskopt",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "rck-alpha",
+      "destination": "adv-rck-alpha",
+      "reason": "D14/§6: quy ước tham số và bisection của A thắng B"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "rck-beta",
+      "destination": "adv-rck-beta",
+      "reason": "D14/§6: quy ước tham số và bisection của A thắng B"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "rck-winrate",
+      "destination": "RiskStore.edge.winrate",
+      "reason": "D14: chế độ nhị phân dùng cùng dữ liệu R, bỏ ô W thứ hai"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "rck-payoff",
+      "destination": "RiskStore.edge.payoff",
+      "reason": "D14: chế độ nhị phân dùng cùng dữ liệu R, bỏ ô Payoff thứ hai"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "chartMonteCarloFan",
+      "destination": "adv-mc-chart",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "mc-p5-val",
+      "destination": "sim-summary / chart-sim (RiskStore.mc.bands)",
+      "reason": "Gộp vào một điều khiển/kết quả chung, không tạo ID rỗng. Các phân vị MC nằm trong fan A; What-if MAE/MFE dùng cận, không suy ra WR/PF chính xác."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "mc-p25-val",
+      "destination": "sim-summary / chart-sim (RiskStore.mc.bands)",
+      "reason": "Gộp vào một điều khiển/kết quả chung, không tạo ID rỗng. Các phân vị MC nằm trong fan A; What-if MAE/MFE dùng cận, không suy ra WR/PF chính xác."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "mc-p50-val",
+      "destination": "sim-summary / chart-sim (RiskStore.mc.bands)",
+      "reason": "Gộp vào một điều khiển/kết quả chung, không tạo ID rỗng. Các phân vị MC nằm trong fan A; What-if MAE/MFE dùng cận, không suy ra WR/PF chính xác."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "mc-p75-val",
+      "destination": "sim-summary / chart-sim (RiskStore.mc.bands)",
+      "reason": "Gộp vào một điều khiển/kết quả chung, không tạo ID rỗng. Các phân vị MC nằm trong fan A; What-if MAE/MFE dùng cận, không suy ra WR/PF chính xác."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "mc-p95-val",
+      "destination": "sim-summary / chart-sim (RiskStore.mc.bands)",
+      "reason": "Gộp vào một điều khiển/kết quả chung, không tạo ID rỗng. Các phân vị MC nằm trong fan A; What-if MAE/MFE dùng cận, không suy ra WR/PF chính xác."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "lbl-cockpit-winrate",
+      "destination": "adv-sw-label",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "rng-cockpit-winrate",
+      "destination": "adv-sw",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "lbl-cockpit-payoff",
+      "destination": "adv-sp-label",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "rng-cockpit-payoff",
+      "destination": "adv-sp",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "lbl-cockpit-risk",
+      "destination": "adv-sf-label",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "rng-cockpit-risk",
+      "destination": "adv-sf",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "chk-stress-streak",
+      "destination": "adv-streak",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "chk-stress-degrade",
+      "destination": "adv-degrade",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "chartCockpitSim",
+      "destination": "adv-stress-chart",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "trade-modal",
+      "destination": "risk-detail-modal",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "form-add-trade",
+      "destination": "risk-detail-modal",
+      "reason": "D17: một modal thêm/sửa, không giữ form B thứ hai"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-symbol",
+      "destination": "risk-edit-symbol",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-side",
+      "destination": "risk-edit-side",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-lots",
+      "destination": "risk-edit-lots",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-entry",
+      "destination": "risk-edit-entry",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-sl",
+      "destination": "risk-edit-sl",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-tp",
+      "destination": "risk-edit-tp",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-exit",
+      "destination": "risk-edit-exit",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-open-time",
+      "destination": "risk-edit-open",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-close-time",
+      "destination": "risk-edit-close",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-mae",
+      "destination": "adv-edit-mae",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-mfe",
+      "destination": "adv-edit-mfe",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-setup",
+      "destination": "risk-edit-setup",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-exit-reason",
+      "destination": "risk-edit-exit-reason",
+      "reason": "D17: chuyển trường B vào modal chung"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-asset",
+      "destination": "risk-edit-asset",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "modal-risk-usd",
+      "destination": "risk-edit-risk",
+      "reason": "Hợp nhất vùng/ô cấu hình về một đích dùng chung."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "a-setup-datalist",
+      "destination": "risk-edit-setup",
+      "reason": "D17/P3: selector rời rạc chung đã giới hạn chính xác A-Setup; không thêm datalist giả"
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "pf-stages",
+      "destination": "adv-p-target",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "sel-mc-h",
+      "destination": "sim-horizon",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "sel-mc-n",
+      "destination": "sim-runs",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    },
+    {
+      "source": "SRC_B_v9_Risk.html",
+      "name": "sz-out",
+      "destination": "adv-size-out",
+      "reason": "Gộp vào điều khiển/kết quả duy nhất theo blueprint."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "repository": {
+    "status": 200,
+    "visibility": "public",
+    "defaultBranch": "main",
+    "permissions": {
+      "admin": true,
+      "maintain": true,
+      "push": true,
+      "triage": true,
+      "pull": true
+    }
+  },
+  "mainProtection": {
+    "status": 404,
+    "message": "Branch not protected"
+  },
+  "pages": {
+    "status": 404,
+    "message": "Not Found"
+  }
+}

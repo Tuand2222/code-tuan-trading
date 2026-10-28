@@ -1,0 +1,44 @@
+{
+  "phase": "P7",
+  "passed": 6,
+  "total": 6,
+  "cases": [
+    {
+      "name": "UnifiedTrade aliases: no fabricated prices/risk; side, discipline, negative MAE and ActualR×1R",
+      "pass": true,
+      "imported": 2,
+      "skipped": 1,
+      "pnl": 180
+    },
+    {
+      "name": "Schema dump roundtrip preserves every field, 20-year dates, duplicate snapshot IDs and custom metadata",
+      "pass": true,
+      "trades": 15,
+      "snapshots": 3,
+      "exact": true
+    },
+    {
+      "name": "Legacy A and legacy B file preview are non-destructive and retain extra/ext2/cashflows",
+      "pass": true,
+      "A": 15,
+      "B": 15
+    },
+    {
+      "name": "Raw migration backup import previews known A/B keys, dedupes without changing existing state",
+      "pass": true
+    },
+    {
+      "name": "SQL escapes apostrophes, preserves JSON/raw cashflows and separates tenants; no undefined/NaN",
+      "pass": true,
+      "tables": 3,
+      "policies": 3,
+      "bytes": 42275,
+      "databaseExecution": "NOT RUN"
+    },
+    {
+      "name": "Malformed schema or rows rejected before restore, with current ledger unchanged",
+      "pass": true
+    }
+  ],
+  "timestamp": "2026-10-25T07:07:06.708Z"
+}

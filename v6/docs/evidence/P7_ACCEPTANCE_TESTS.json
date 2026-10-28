@@ -1,0 +1,180 @@
+{
+  "phase": "P7",
+  "passed": 9,
+  "total": 9,
+  "cases": [
+    {
+      "name": "Slow IndexedDB boot keeps UI inert until defaults and data are ready",
+      "pass": true,
+      "pendingProtected": true,
+      "ready": true
+    },
+    {
+      "name": "WCAG 2 A automated checks: all routes and visible source widgets",
+      "pass": true,
+      "routes": [
+        {
+          "route": "gameplan",
+          "violations": []
+        },
+        {
+          "route": "cockpit",
+          "violations": []
+        },
+        {
+          "route": "workspace",
+          "violations": []
+        },
+        {
+          "route": "calendar",
+          "violations": []
+        },
+        {
+          "route": "review",
+          "violations": []
+        },
+        {
+          "route": "chartbook",
+          "violations": []
+        },
+        {
+          "route": "overview",
+          "violations": []
+        },
+        {
+          "route": "edge",
+          "violations": []
+        },
+        {
+          "route": "drilldown",
+          "violations": []
+        },
+        {
+          "route": "discipline",
+          "violations": []
+        },
+        {
+          "route": "pnlrisk",
+          "violations": []
+        },
+        {
+          "route": "riskcapital",
+          "violations": []
+        },
+        {
+          "route": "riskedge",
+          "violations": []
+        },
+        {
+          "route": "riskopt",
+          "violations": []
+        },
+        {
+          "route": "simulation",
+          "violations": []
+        },
+        {
+          "route": "riskprop",
+          "violations": []
+        },
+        {
+          "route": "zones",
+          "violations": []
+        },
+        {
+          "route": "risktools",
+          "violations": []
+        },
+        {
+          "route": "import",
+          "violations": []
+        },
+        {
+          "route": "mapping",
+          "violations": []
+        },
+        {
+          "route": "dictionary",
+          "violations": []
+        }
+      ]
+    },
+    {
+      "name": "Dark theme: shared headings and gain/loss labels remain readable; light palette unchanged",
+      "pass": true,
+      "headingContrast": [
+        {
+          "route": "zones",
+          "contrast": 13.399258849587758
+        },
+        {
+          "route": "riskcapital",
+          "contrast": 13.399258849587758
+        },
+        {
+          "route": "riskedge",
+          "contrast": 13.399258849587758
+        },
+        {
+          "route": "simulation",
+          "contrast": 13.399258849587758
+        },
+        {
+          "route": "mapping",
+          "contrast": 13.399258849587758
+        }
+      ],
+      "scope": "WCAG 2 A automated; no claim of full WCAG AA certification"
+    },
+    {
+      "name": "Responsive routing: 360, 768, 1280px, all pages, no document-level overflow",
+      "pass": true,
+      "widths": [
+        360,
+        768,
+        1280
+      ],
+      "routes": 21
+    },
+    {
+      "name": "Trade modal traps Tab, closes on Escape, returns focus to opener",
+      "pass": true,
+      "focusTrap": true,
+      "escape": true,
+      "returnFocus": true
+    },
+    {
+      "name": "Settings and cashflow dialogs support keyboard focus and Escape",
+      "pass": true,
+      "dialogs": 2
+    },
+    {
+      "name": "Malformed UI preferences and prototype-key payload rejected before mutation",
+      "pass": true,
+      "errors": [
+        "Cấu hình giao diện không hợp lệ: chk",
+        "Trường dữ liệu không an toàn"
+      ],
+      "unchanged": true,
+      "polluted": false
+    },
+    {
+      "name": "Cache cleanup keeps unrelated Classic cache and canonical user data",
+      "pass": true,
+      "removed": true,
+      "classic": true,
+      "unchanged": true
+    },
+    {
+      "name": "Existing V6 service worker updates to retirement worker and opens new UI without losing data",
+      "pass": true,
+      "marker": "DO NOT LOSE",
+      "caches": [
+        "classic-retain"
+      ],
+      "registrations": 0
+    }
+  ],
+  "pageErrors": [],
+  "timestamp": "2026-10-25T07:10:16.876Z"
+}

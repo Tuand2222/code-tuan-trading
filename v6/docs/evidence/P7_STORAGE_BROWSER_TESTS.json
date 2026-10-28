@@ -1,0 +1,80 @@
+{
+  "phase": "P7",
+  "passed": 11,
+  "total": 11,
+  "cases": [
+    {
+      "name": "Boot mirrors one canonical ledger in real IndexedDB; schema explorer retains three source cards",
+      "pass": true,
+      "trades": 15,
+      "exact": true
+    },
+    {
+      "name": "UnifiedTrade import: alias/risk conversion, skip missing money, dedupe and ID collision preserve original",
+      "pass": true,
+      "imported": 2,
+      "skipped": 1,
+      "collision": "1-import-1",
+      "duplicateReimport": 0
+    },
+    {
+      "name": "Snapshot stores available shared Worker results and original parameters; no synthetic Monte Carlo",
+      "pass": true,
+      "snapshotId": "0fcedadc-e5e6-4aad-a6ff-b693a8394dd7",
+      "verifiedR": 16
+    },
+    {
+      "name": "JSON schema and SQL download contain full state; SQL escaped and ownership explicitly required",
+      "pass": true,
+      "jsonTrades": 17,
+      "sqlBytes": 87359,
+      "databaseExecution": "NOT RUN"
+    },
+    {
+      "name": "Schema explorer treats stored HTML/apostrophes as text",
+      "pass": true
+    },
+    {
+      "name": "Backup → clear isolated storage and IndexedDB → restore file matches every field, including P5 config and snapshots",
+      "pass": true,
+      "fields": 16,
+      "trades": 17,
+      "snapshots": 1,
+      "archivedBeforeRestore": true,
+      "exact": true
+    },
+    {
+      "name": "Missing localStorage recovers IndexedDB before fresh sample boot; existing localStorage remains priority",
+      "pass": true,
+      "recovered": 17,
+      "noSampleOverwrite": true
+    },
+    {
+      "name": "IndexedDB failed write aborts whole transaction and keeps previous mirror",
+      "pass": true,
+      "error": "DataError",
+      "rollbackExact": true
+    },
+    {
+      "name": "Mirror failure is visible while local data survives; failed pre-restore archive does not mutate state",
+      "pass": true,
+      "failureReported": true,
+      "localDataIntact": true
+    },
+    {
+      "name": "Legacy A file restore normalizes data and keeps notes/ext2; raw invalid file has no side effects",
+      "pass": true,
+      "legacyTrades": 1,
+      "metadataPreserved": true
+    },
+    {
+      "name": "Mapping schema on dark/mobile has unique IDs and no page overflow; other A mapping UI remains",
+      "pass": true,
+      "runtimeDuplicateIds": 0,
+      "mobileOverflow": false
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "timestamp": "2026-10-25T07:09:06.321Z"
+}

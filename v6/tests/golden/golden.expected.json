@@ -1,0 +1,303 @@
+{
+  "specVersion": 6,
+  "timezone": "Asia/Ho_Chi_Minh",
+  "currency": "VND",
+  "tolerances": {
+    "moneyVND": 0.5,
+    "ratio": 0.005,
+    "percentPoints": 0.05,
+    "count": 0,
+    "bootstrapR": 0.1
+  },
+  "summary": {
+    "total": 30,
+    "wins": 18,
+    "losses": 12,
+    "breakeven": 0,
+    "winRate": 60,
+    "grossProfit": 7658330,
+    "grossLoss": -4356040,
+    "avgWin": 425462.78,
+    "avgLoss": -363003.33,
+    "net": 3302290,
+    "profitFactor": 1.76,
+    "averageR": 0.32,
+    "expectancy": 110076.33,
+    "maxDrawdown": 1243950,
+    "currentDrawdown": 639220,
+    "recovery": 2.65,
+    "longestWin": 2,
+    "longestLoss": 1,
+    "currentStreak": 1,
+    "biggestWin": 1064900,
+    "biggestLoss": -1243950,
+    "sharpe": 0.22,
+    "discipline": 85,
+    "meanRisk": 266667,
+    "top5ProfitShare": 52.6
+  },
+  "fees": {
+    "gross": 4330000,
+    "commissionAndTax": 1027710,
+    "carryingPaid": 0,
+    "carryingReceived": 0,
+    "net": 3302290,
+    "erosionPercent": 23.73,
+    "completeCount": 30,
+    "unknownCount": 0
+  },
+  "rBuckets": [
+    {
+      "max": -1,
+      "count": 8
+    },
+    {
+      "max": 0,
+      "count": 4
+    },
+    {
+      "max": 1,
+      "count": 6
+    },
+    {
+      "max": 2,
+      "count": 7
+    },
+    {
+      "max": 3,
+      "count": 5
+    }
+  ],
+  "months": [
+    {
+      "month": "2026-09",
+      "net": 1912660,
+      "events": 18
+    },
+    {
+      "month": "2026-10",
+      "net": 1389630,
+      "events": 12
+    }
+  ],
+  "octoberDays": {
+    "2026-10-01": -38020,
+    "2026-10-02": 871550,
+    "2026-10-05": -212040,
+    "2026-10-06": 678560,
+    "2026-10-07": 728800,
+    "2026-10-08": -1243950,
+    "2026-10-09": 460780,
+    "2026-10-12": -24570,
+    "2026-10-13": 159620,
+    "2026-10-14": 228160,
+    "2026-10-15": -469820,
+    "2026-10-16": 250560
+  },
+  "octoberWeeks": [
+    {
+      "from": "2026-10-01",
+      "to": "2026-10-04",
+      "net": 833530
+    },
+    {
+      "from": "2026-10-05",
+      "to": "2026-10-11",
+      "net": 412150
+    },
+    {
+      "from": "2026-10-12",
+      "to": "2026-10-18",
+      "net": 143950
+    }
+  ],
+  "week42": {
+    "closed": 5,
+    "events": 5,
+    "net": 143950,
+    "reviewed": 4
+  },
+  "review": {
+    "reviewed": 24,
+    "total": 30,
+    "winsReviewed": 12,
+    "wins": 18,
+    "lossesReviewed": 12,
+    "losses": 12,
+    "pending": 6,
+    "excludedShadow": 7,
+    "thresholdPoints": 15
+  },
+  "pendingTrades": [
+    {
+      "symbol": "HPG",
+      "date": "2026-10-02",
+      "net": 871550,
+      "r": 1.74
+    },
+    {
+      "symbol": "FPT",
+      "date": "2026-10-09",
+      "net": 460780,
+      "r": 2.3
+    },
+    {
+      "symbol": "VCB",
+      "date": "2026-09-25",
+      "net": 268500,
+      "r": 0.9
+    },
+    {
+      "symbol": "VNM",
+      "date": "2026-10-16",
+      "net": 250560,
+      "r": 0.63
+    },
+    {
+      "symbol": "MWG",
+      "date": "2026-09-11",
+      "net": 237830,
+      "r": 2.38
+    },
+    {
+      "symbol": "SSI",
+      "date": "2026-09-18",
+      "net": 81140,
+      "r": 0.41
+    }
+  ],
+  "setups": [
+    {
+      "name": "Hỗ trợ / Kháng cự",
+      "count": 10,
+      "reviewed": 8,
+      "winRate": 60,
+      "pf": 0.57,
+      "expectancyR": -0.15,
+      "ci": [
+        -0.93,
+        0.57
+      ]
+    },
+    {
+      "name": "Breakout + Retest",
+      "count": 10,
+      "reviewed": 8,
+      "winRate": 60,
+      "pf": 4.92,
+      "expectancyR": 0.79,
+      "ci": [
+        -0.27,
+        1.7
+      ]
+    },
+    {
+      "name": "Pullback xu hướng",
+      "count": 10,
+      "reviewed": 8,
+      "winRate": 60,
+      "pf": 2.02,
+      "expectancyR": 0.33,
+      "ci": [
+        -0.66,
+        1.26
+      ]
+    }
+  ],
+  "rolling": [
+    {
+      "window": 20,
+      "available": 20,
+      "expectancyR": 0.34,
+      "pf": 2.18,
+      "winRate": 60,
+      "ci": [
+        -0.3,
+        0.94
+      ]
+    },
+    {
+      "window": 50,
+      "available": 30,
+      "expectancyR": 0.32,
+      "pf": 1.76,
+      "winRate": 60,
+      "ci": [
+        -0.23,
+        0.87
+      ]
+    },
+    {
+      "window": 100,
+      "available": 30,
+      "expectancyR": 0.32,
+      "pf": 1.76,
+      "winRate": 60,
+      "ci": [
+        -0.23,
+        0.87
+      ]
+    }
+  ],
+  "sampleTrade": {
+    "symbol": "VCB",
+    "date": "2026-10-13",
+    "gross": 180000,
+    "net": 159620,
+    "setup": "Hỗ trợ / Kháng cự",
+    "risk": 200000,
+    "r": 0.7981,
+    "discipline": 90,
+    "reviewed": true
+  },
+  "wilson": {
+    "all": [
+      42.32,
+      75.41
+    ],
+    "setup": [
+      31.27,
+      83.18
+    ]
+  },
+  "holding": {
+    "specNumericValue": 234.33,
+    "specUnit": "hours",
+    "status": "RESOLVED_SOURCE_MINUTES",
+    "observedUnit": "minutes",
+    "observedMeanMinutes": 234.33333333333334,
+    "evidence": "v3 timestamps and replayBook.ts divide elapsed milliseconds by 60000; never multiply fixture times to satisfy an incorrect hours assumption"
+  },
+  "reviewScenarios": [
+    {
+      "additionalWins": 0,
+      "gapPoints": 33.33333333333333,
+      "warning": true
+    },
+    {
+      "additionalWins": 3,
+      "gapPoints": 16.66666666666667,
+      "warning": true
+    },
+    {
+      "additionalWins": 4,
+      "gapPoints": 11.11111111111111,
+      "warning": false
+    },
+    {
+      "additionalWins": 6,
+      "gapPoints": 0,
+      "warning": false
+    }
+  ],
+  "verification": {
+    "v6Core": "S1_GOLDEN_VERIFIED",
+    "v3Reference": "tests/trading/v6-baseline.test.ts",
+    "unresolved": [],
+    "decisions": {
+      "holding": "Original timestamps: 234.333333 minutes; display hours divides by 60",
+      "winrate": "User confirmed wins / (wins + losses) on 2026-10-19",
+      "closedAt": "Derived repository index metadata, never a persisted Trade fact"
+    }
+  }
+}

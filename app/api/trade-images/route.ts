@@ -1,16 +1,12 @@
 import { and, desc, eq } from "drizzle-orm";
 import { env } from "cloudflare:workers";
 import { getDb } from "../../../db";
-import { tradeImages, trades } from "../../../db/schema";
+import { tradeImages, trades, tradeAudit } from "../../../db/schema";
 import { requireUser, routeError } from "../../../lib/server-auth";
 
 const MAX_IMAGE_BYTES = 6 * 1024 * 1024;
 const MAX_IMAGES_PER_TRADE = 6;
-const ACCEPTED_IMAGE_TYPES = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-]);
+const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 function getBucket(): R2Bucket {
   if (!env.BUCKET) throw new Error("Image storage is unavailable");
@@ -43,7 +39,9 @@ export async function GET(request: Request) {
       const [row] = await db
         .select()
         .from(tradeImages)
-        .where(and(eq(tradeImages.id, id), eq(tradeImages.userId, accountUser.id)))
+        .where(
+          and(eq(tradeImages.id, id), eq(tradeImages.userId, accountUser.id)),
+        )
         .limit(1);
       if (!row) return new Response("Image not found", { status: 404 });
 
@@ -69,9 +67,14 @@ export async function GET(request: Request) {
         createdAt: tradeImages.createdAt,
       })
       .from(tradeImages)
-      .where(tradeId
-        ? and(eq(tradeImages.userId, accountUser.id), eq(tradeImages.tradeId, tradeId))
-        : eq(tradeImages.userId, accountUser.id))
+      .where(
+        tradeId
+          ? and(
+              eq(tradeImages.userId, accountUser.id),
+              eq(tradeImages.tradeId, tradeId),
+            )
+          : eq(tradeImages.userId, accountUser.id),
+      )
       .orderBy(desc(tradeImages.createdAt))
       .limit(300);
 
@@ -87,9 +90,12 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const tradeId = String(formData.get("tradeId") ?? "").trim();
     const file = formData.get("file");
-    if (!tradeId || !(file instanceof File)) throw new Error("Trade and image are required");
-    if (!ACCEPTED_IMAGE_TYPES.has(file.type)) throw new Error("Unsupported image type");
-    if (file.size <= 0 || file.size > MAX_IMAGE_BYTES) throw new Error("Invalid image size; max 6 MB");
+    if (!tradeId || !(file instanceof File))
+      throw new Error("Trade and image are required");
+    if (!ACCEPTED_IMAGE_TYPES.has(file.type))
+      throw new Error("Unsupported image type");
+    if (file.size <= 0 || file.size > MAX_IMAGE_BYTES)
+      throw new Error("Invalid image size; max 6 MB");
 
     const db = getDb();
     const [ownedTrade] = await db
@@ -102,9 +108,17 @@ export async function POST(request: Request) {
     const existing = await db
       .select({ id: tradeImages.id })
       .from(tradeImages)
-      .where(and(eq(tradeImages.tradeId, tradeId), eq(tradeImages.userId, accountUser.id)))
+      .where(
+        and(
+          eq(tradeImages.tradeId, tradeId),
+          eq(tradeImages.userId, accountUser.id),
+        ),
+      )
       .limit(MAX_IMAGES_PER_TRADE);
-    if (existing.length >= MAX_IMAGES_PER_TRADE) throw new Error("Invalid image limit; each trade can store up to 6 images");
+    if (existing.length >= MAX_IMAGES_PER_TRADE)
+      throw new Error(
+        "Invalid image limit; each trade can store up to 6 images",
+      );
 
     const id = crypto.randomUUID();
     const objectKey = `trade-images/${id}`;
@@ -154,15 +168,30 @@ export async function DELETE(request: Request) {
     const [row] = await db
       .select()
       .from(tradeImages)
-      .where(and(eq(tradeImages.id, id), eq(tradeImages.userId, accountUser.id)))
+      .where(
+        and(eq(tradeImages.id, id), eq(tradeImages.userId, accountUser.id)),
+      )
       .limit(1);
     if (!row) return new Response("Image not found", { status: 404 });
 
-    await getBucket().delete(row.objectKey);
-    await db
-      .delete(tradeImages)
-      .where(and(eq(tradeImages.id, id), eq(tradeImages.userId, accountUser.id)));
-    return Response.json({ deleted: true });
+    // Remove from the current journal while retaining evidence for recovery.
+    // UUID object keys are never overwritten and this archive has no expiry job.
+    await db.batch([
+      db.insert(tradeAudit).values({
+        id: crypto.randomUUID(),
+        userId: accountUser.id,
+        tradeId: row.tradeId,
+        batchId: row.id,
+        action: "IMAGE_ARCHIVE",
+        detailsJson: JSON.stringify(row),
+      }),
+      db
+        .delete(tradeImages)
+        .where(
+          and(eq(tradeImages.id, id), eq(tradeImages.userId, accountUser.id)),
+        ),
+    ]);
+    return Response.json({ deleted: true, archived: true });
   } catch (error) {
     return routeError(error);
   }

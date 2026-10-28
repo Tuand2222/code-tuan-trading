@@ -1,0 +1,20 @@
+{
+  "name": "tuannhatky-pro-unified",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/verify.mjs",
+    "verify": "node scripts/verify.mjs",
+    "e2e": "node tests/unified/browser.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@axe-core/playwright": "4.14.0",
+    "acorn": "8.15.0"
+  }
+}

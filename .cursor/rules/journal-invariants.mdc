@@ -1,0 +1,13 @@
+---
+description: Shared journal invariants and safe delivery workflow
+alwaysApply: true
+---
+
+- Read and follow AGENTS.md and CONTRIBUTING.md.
+- Preserve Classic, Legacy, backend, data keys, migrations and Site identity.
+- One canonical trade ledger, cashflow ledger, RiskMath and RiskStore.
+- Never infer missing fees or 1R; require explicit verification for risk statistics.
+- Preserve origins and the no-mock lock after clearing sample data.
+- Download and verify JSON before destructive actions; use synthetic fixtures.
+- Work on a feature branch; no direct main writes, force-push or merge without human approval.
+- Run npm run ci:check before proposing a PR; report actual results and unresolved limits.

@@ -1,0 +1,102 @@
+{
+  "phase": "P7",
+  "passed": 12,
+  "total": 12,
+  "cases": [
+    {
+      "name": "A sample: risk pages render from same cached numbers; no illustrative values",
+      "pass": true,
+      "equity": 11850,
+      "expectancy": 1.2333333333333334,
+      "omega0": 4.083333333333333,
+      "n": 15,
+      "recommendation": 0
+    },
+    {
+      "name": "Risk Profile is reachable inside settings; k, f, capital limits and Prop thresholds persist",
+      "pass": true,
+      "budget": 60,
+      "k": 5,
+      "propTier2": 2,
+      "propTier3": 3.5
+    },
+    {
+      "name": "Cashflow modal: deposit and withdrawal preserve NAV drawdown while updating all shared values",
+      "pass": true,
+      "dd": 0.04219409282700426,
+      "equityChange": 2000,
+      "rows": 2
+    },
+    {
+      "name": "B open positions: floating loss enters daily budget, persists edits, locks at limit, keeps historical view usable",
+      "pass": true,
+      "initialFloating": -100,
+      "editedFloating": -700,
+      "stopAndRelease": true
+    },
+    {
+      "name": "Tier 2 permits only A-Setup, halves cap; Tier3 locks new trades but history editing works",
+      "pass": true,
+      "tier2Budget": 116.25,
+      "aSetups": [
+        "Liquidity Sweep",
+        "FVG Retest",
+        "Breakout",
+        "Session Open Sweep"
+      ],
+      "historyEditable": true
+    },
+    {
+      "name": "Complete trade editor derives PnL, actual/planned R, pips, duration and manual-vs-SL slippage",
+      "pass": true,
+      "manualPnl": -50,
+      "slPnl": -120,
+      "slippageR": 0.2
+    },
+    {
+      "name": "One journal table switches basic/price/risk columns; editing and original sorting survive roundtrip",
+      "pass": true,
+      "tableCount": 1,
+      "rows": 16
+    },
+    {
+      "name": "Omega comparison, quantile grid, rolling window, exit bounds and expanding VaR render with source math",
+      "pass": true,
+      "n2": 4,
+      "points": 100,
+      "mu": 0.9999999999999997,
+      "breaches": 0,
+      "count": 5
+    },
+    {
+      "name": "RoR inputs and zoom use actual W/b; empirical result runs in real Worker",
+      "pass": true,
+      "W": 0.6,
+      "payoff": 2,
+      "execution": "worker"
+    },
+    {
+      "name": "RCK 30 verified trades: gates open, parameters and modes persist, MC verification bounds recommendation",
+      "pass": true,
+      "verifiedN": 30,
+      "recommendation": 0.009124087591240875,
+      "worker": "worker"
+    },
+    {
+      "name": "Capital stop is enforced at Tier1; settings does not lose original saved data",
+      "pass": true,
+      "tier": 1,
+      "maxDrawdown": 10,
+      "stop": true
+    },
+    {
+      "name": "Risk routes: no duplicate runtime IDs, dark/mobile cards usable, profile scrolls inside drawer",
+      "pass": true,
+      "runtimeDuplicateIds": 0,
+      "mobileOverflow": false,
+      "routes": 4
+    }
+  ],
+  "pageErrors": [],
+  "timestamp": "2026-10-25T07:08:29.547Z"
+}
