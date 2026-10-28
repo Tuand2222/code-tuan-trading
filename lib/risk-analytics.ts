@@ -1,4 +1,5 @@
 /** Classic's financial boundary: pnl is gross, fees/swap are positive costs. */
+import {AccountBaselineSettings} from './journal-lifecycle.js';
 export interface RiskTrade {
   id: string;
   date: string;
@@ -49,7 +50,7 @@ export interface RiskSettings {
 }
 export const DEFAULT_RISK: RiskSettings = {
   weeklyAutoPack: true,
-  initialCapital: 0,
+  initialCapital: AccountBaselineSettings.initialCapital,
   riskPercent: 1,
   dailyLossPercent: 3,
   defensivePercent: 5,

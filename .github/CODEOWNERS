@@ -1,0 +1,13 @@
+# Enable required code-owner reviews in the main branch protection/ruleset.
+# Repository owner has write/admin rights; AI cannot approve its own PR.
+/schema/ @Tuand2222
+/src/core/ @Tuand2222
+/scripts/render-v6.mjs @Tuand2222
+/scripts/check-financial-guards.mjs @Tuand2222
+/scripts/ci-check.mjs @Tuand2222
+/tests/trading/ @Tuand2222
+/v6/tests/unified/ @Tuand2222
+/.github/ @Tuand2222
+/AGENTS.md @Tuand2222
+/CLAUDE.md @Tuand2222
+/.cursor/rules/ @Tuand2222

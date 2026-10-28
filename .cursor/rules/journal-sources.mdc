@@ -1,0 +1,13 @@
+---
+description: Authoritative journal source paths and financial regression checks
+globs: "src/**,schema/**,lib/journal-*.js,lib/trade-*.js,v6/**,scripts/**,.github/**"
+alwaysApply: false
+---
+
+- Edit shared implementations in src/core, Classic view in src/views/classic, V6 view in src/views/v6.
+- lib compatibility entries and app/classic/page.tsx only re-export; do not copy implementations there.
+- Generate the single-file V6 with node scripts/render-v6.mjs; npm run verify must reject stale output before build.
+- Runtime and generated Worker use the same RiskMath functions; no override wrappers or second math engine.
+- Add independent numerical regression cases before formula changes; keep financial tests mandatory in CI.
+- Run mutation guards with node scripts/check-financial-guards.mjs: intentionally wrong formulas must fail the real regression suite.
+- Keep Tailwind/Chart CDN and Inter/JetBrains Mono; no new application libraries.

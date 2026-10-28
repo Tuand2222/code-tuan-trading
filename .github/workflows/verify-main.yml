@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  merge_group:
   workflow_dispatch:
 
 concurrency:
@@ -15,10 +16,10 @@ permissions:
   contents: read
 
 jobs:
-  verify:
+  journal:
     name: Install, build, test and validate
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 35
 
     steps:
       - name: Checkout repository
@@ -32,5 +33,35 @@ jobs:
       - name: Install dependencies using Sites-compatible installer
         run: npm run install:ci
 
+      - name: Install Chromium for isolated browser tests
+        run: npx --prefix v6 playwright install --with-deps chromium
+
       - name: Build, test and validate Sites artifact
-        run: npm test
+        run: npm run ci:check
+
+      - name: Save regression evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: journal-regression-evidence
+          path: |
+            test-results/ci/
+            test-results/financial-guards/
+            test-results/unified-two-tab/
+            test-results/lifecycle-classic/
+            test-results/sync-scale/
+            v6/test-results/
+          retention-days: 14
+
+  required:
+    name: Journal required checks
+    if: ${{ always() }}
+    needs: [journal]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.19.0
+      - run: node scripts/ci-gate.mjs "${{ needs.journal.result }}"

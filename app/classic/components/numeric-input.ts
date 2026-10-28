@@ -18,5 +18,7 @@ export function parseNumericInput(value: string) {
 export function selectNumericInput(event: FocusEvent<HTMLInputElement>) {
   const input = event.currentTarget;
   input.select();
-  window.requestAnimationFrame(() => input.select());
+  window.requestAnimationFrame(() => {
+    if (document.activeElement === input) input.select();
+  });
 }

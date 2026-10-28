@@ -1,0 +1,125 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:tuannhatky:risk-assumptions:1",
+  "title": "Current V6 assumptions â€” phase 1 contract",
+  "type": "object",
+  "required": [
+    "tierCapMode",
+    "tail25Mode",
+    "safeTierMax",
+    "recRule",
+    "lockStressLab"
+  ],
+  "properties": {
+    "tierCapMode": {
+      "enum": [
+        "ftier_mult",
+        "fixed_t1_t2"
+      ]
+    },
+    "tail25Mode": {
+      "enum": [
+        "losing_only",
+        "all_trades"
+      ]
+    },
+    "safeTierMax": {
+      "enum": [
+        1,
+        2
+      ]
+    },
+    "recRule": {
+      "enum": [
+        "min3",
+        "rck_only"
+      ]
+    },
+    "lockStressLab": {
+      "type": "boolean"
+    },
+    "rckMode": {
+      "enum": [
+        "empirical",
+        "binary"
+      ]
+    },
+    "rorZoom": {
+      "type": "boolean"
+    },
+    "lhByClass": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    },
+    "tailMinN": {
+      "type": "integer",
+      "minimum": 40,
+      "maximum": 100000
+    },
+    "tailMinMass": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "fatTailThreshold": {
+      "type": "number",
+      "minimum": 0.01,
+      "maximum": 100
+    },
+    "tailBootstrapRuns": {
+      "type": "number",
+      "minimum": 200,
+      "maximum": 2000
+    },
+    "tailBootstrapSeed": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4294967295
+    },
+    "compareMinN": {
+      "type": "integer",
+      "minimum": 10,
+      "maximum": 10000
+    },
+    "recentWindow": {
+      "type": "integer",
+      "minimum": 10,
+      "maximum": 1000
+    },
+    "baselEnabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "platEnabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "platConfirmed": {
+      "type": "boolean",
+      "default": false
+    },
+    "baselFactor": {
+      "type": "string",
+      "enum": [
+        "FX_SPECIFIED",
+        "FX_OTHER",
+        "FX_VOL",
+        "EQUITY_LARGE",
+        "EQUITY_SMALL",
+        "EQUITY_OTHER",
+        "ENERGY_PRICE",
+        "METAL_PRICE",
+        "OTHER_COMMODITY_PRICE",
+        "COMMODITY_VOL",
+        "CREDIT_VOL",
+        "OTHER_COMMODITY_VOL",
+        "LEGACY_SCENARIO"
+      ]
+    }
+  },
+  "additionalProperties": true,
+  "description": "Existing V6 assumptions plus P5 evidence thresholds and optional Basel/PLAT references. No second settings store; no automatic gate/Tier changes from advanced advice."
+}

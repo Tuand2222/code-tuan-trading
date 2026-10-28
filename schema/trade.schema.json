@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:tuannhatky:canonical-trade:1",
+  "title": "Canonical trade boundary v1 — no lifecycle migration",
+  "type": "object",
+  "required": ["schema_version", "id", "date", "origin", "symbol", "asset_class", "direction", "quantity", "quantity_unit", "quantity_step", "quote_ccy", "account_ccy", "initial_1r_money", "is_1r_verified", "net_pnl", "is_net_pnl_verified", "risk_basis", "r_net", "raw"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"type": "string", "minLength": 1},
+    "date": {"type": "string", "format": "date"},
+    "origin": {"enum": ["MOCK_SEED_V3", "USER_LIVE", "IMPORTED_VERIFIED"]},
+    "symbol": {"type": "string", "minLength": 1},
+    "asset_class": {"enum": ["EQUITY_STOCK", "COMMODITY_FUTURES", "FOREX_CFD", "CRYPTO_ASSET"]},
+    "direction": {"enum": ["LONG", "SHORT"]},
+    "quantity": {"type": "number", "exclusiveMinimum": 0},
+    "quantity_unit": {"enum": ["SHARES", "CONTRACTS", "LOTS", "UNITS"]},
+    "quantity_step": {"type": "number", "exclusiveMinimum": 0},
+    "quote_ccy": {"type": "string", "pattern": "^[A-Z][A-Z0-9]{2,7}$"},
+    "account_ccy": {"type": "string", "pattern": "^[A-Z][A-Z0-9]{2,7}$"},
+    "fx_rate": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "contract_multiplier": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "net_pnl": {"type": ["number", "null"], "description": "Account currency; reported verified net is authoritative. Otherwise gross minus verified signed quote costs times FX, once."},
+    "is_net_pnl_verified": {"type": "boolean"},
+    "initial_1r_money": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "is_1r_verified": {"type": "boolean"},
+    "risk_basis": {"const": "PRICE_ONLY", "description": "Initial stop price risk excludes fees, taxes and funding. Inclusive-cost reported risk must be explicitly reconciled before using this schema."},
+    "r_net": {"type": ["number", "null"]},
+    "notional_account": {"type": ["number", "null"], "minimum": 0},
+    "raw": {"type": "object", "description": "Non-destructive source payload; origin is declared by the caller, never inferred from an import filename."}
+  },
+  "allOf": [
+    {"if": {"properties": {"asset_class": {"const": "EQUITY_STOCK"}}}, "then": {"properties": {"quantity_unit": {"const": "SHARES"}}}},
+    {"if": {"properties": {"asset_class": {"const": "COMMODITY_FUTURES"}}}, "then": {"properties": {"quantity_unit": {"const": "CONTRACTS"}, "quantity": {"type": "integer"}}}},
+    {"if": {"properties": {"asset_class": {"const": "FOREX_CFD"}}}, "then": {"properties": {"quantity_unit": {"const": "LOTS"}}}},
+    {"if": {"properties": {"asset_class": {"const": "CRYPTO_ASSET"}}}, "then": {"properties": {"quantity_unit": {"const": "UNITS"}}}},
+    {"if": {"properties": {"is_1r_verified": {"const": true}}}, "then": {"properties": {"initial_1r_money": {"type": "number", "exclusiveMinimum": 0}}}, "else": {"properties": {"initial_1r_money": {"type": "null"}, "r_net": {"type": "null"}}}},
+    {"if": {"properties": {"is_net_pnl_verified": {"const": true}}}, "then": {"properties": {"net_pnl": {"type": "number"}}}, "else": {"properties": {"net_pnl": {"type": "null"}, "r_net": {"type": "null"}}}},
+    {"if": {"properties": {"is_1r_verified": {"const": true}, "is_net_pnl_verified": {"const": true}}}, "then": {"properties": {"r_net": {"type": "number"}}}}
+  ],
+  "additionalProperties": true
+}
