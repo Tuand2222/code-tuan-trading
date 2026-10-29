@@ -1370,6 +1370,9 @@ const TradeNormalizer={
 
 
 const JournalForm={
+  metadata(t){let stored={};try{const p=JSON.parse(t.rawPayloadJson||'{}');stored=p.unifiedV6||p.edited?.unifiedV6||{};}catch{}return {...stored,...t.unifiedV6};},
+  netVerified(t){const finite=x=>typeof x==='number'&&Number.isFinite(x),meta=JournalForm.metadata(t);if(t.normalized?.is_net_pnl_verified===false||meta.is_net_pnl_verified===false)return false;const certified=t.pnlKnown===true&&meta.is_net_pnl_verified===true&&meta.netPnlSource==='file_net';return t.recordKind!=='fill'&&t.pnlKnown!==false&&(t.feesKnown!==false||certified)&&finite(t.pnl)&&finite(t.fees??0)&&finite(t.swap??0);},
+  riskVerified(t){return t.riskKnown!==false&&t.normalized?.is_1r_verified!==false&&t.unifiedV6?.is_1r_verified!==false&&typeof t.risk==='number'&&Number.isFinite(t.risk)&&t.risk>0;},
   /** @type {Record<string, any>} */
   profiles:{EQUITY_STOCK:{label:'Cổ phiếu',quantity:'Số cổ phiếu',step:1,market:'STOCKS',classic:'Chứng khoán'},COMMODITY_FUTURES:{label:'Hợp đồng tương lai',quantity:'Số hợp đồng',step:1,market:'FUTURES',classic:'Hàng hóa'},FOREX_CFD:{label:'Forex / CFD',quantity:'Số lot',step:.01,market:'FOREX_CFD',classic:'Forex'},CRYPTO_ASSET:{label:'Crypto',quantity:'Số đơn vị coin',step:.00000001,market:'CRYPTO',classic:'Crypto'}},
   fields:[['asset_class','Lớp tài sản','asset'],['quote_ccy','Tiền tệ yết giá','text'],['quantity_step','Bước khối lượng đã xác nhận','number'],['contract_multiplier','Hệ số nhân hợp đồng / đơn vị giá','number'],['tick_size','Kích cỡ tick (tùy chọn)','number'],['tick_value','Giá trị một tick (tùy chọn)','number'],['fx_rate','Tỷ giá yết giá → tài khoản','number'],['fees','Phí (tiền yết giá)','number'],['taxes','Thuế (tiền yết giá)','number'],['swap_cost','Swap/funding: chi phí dương, khoản nhận âm','number']],
@@ -1395,11 +1398,170 @@ const JournalWindow={
 const JournalAdapters={
   finite(value){return value!==null&&value!==''&&value!==undefined&&Number.isFinite(Number(value));},
   meta(raw){try{const p=JSON.parse(raw||'{}');return {...(p.unifiedV6||p.edited?.unifiedV6||{}),...(p.origin||p.sourceReceipt?.origin?{origin:p.origin||p.sourceReceipt.origin}:{})};}catch{return {};}},
-  fromClassic(t){const meta={...this.meta(t.rawPayloadJson),...(t.unifiedV6||{})},risk=t.riskKnown!==false&&t.risk>0?Number(t.risk):null,net=Number(t.pnl)-Number(t.fees||0)-Number(t.swap||0),known=t.feesKnown!==false;
-    return {...meta,id:String(t.id),date:t.date,symbol:t.symbol,side:t.side==='Sell'?'Short':'Long',market:({Crypto:'CRYPTO',Forex:'FOREX_CFD','Chứng khoán':'STOCKS'})[t.market]||'FUTURES',setup:t.setup||'Chưa phân loại',netPnl:net,initialRisk:risk,is_1r_verified:risk>0&&meta.is_1r_verified!==false,is_net_pnl_verified:known&&t.pnlKnown!==false,realizedR:risk>0&&known&&t.pnlKnown!==false&&meta.is_1r_verified!==false?net/risk:null,riskEstimated:!risk,openTime:t.openedAt||'',closeTime:t.closedAt||'',hour:(t.openedAt||'').slice(11,16)||'00:00',weekday:['CN','T2','T3','T4','T5','T6','T7'][new Date(t.date+'T00:00:00Z').getUTCDay()],entryPrice:t.entryPrice||null,exitPrice:t.exitPrice||null,slPrice:t.stopLoss||null,tpPrice:t.takeProfit||null,lots:t.quantity||null,maeR:this.finite(t.mae)?-Math.abs(t.mae):null,mfeR:this.finite(t.mfe)?Math.abs(t.mfe):null,discipline:(meta.classicDiscipline===t.discipline?meta.discipline:null)||(t.discipline===100?'NONE':'FOMO'),note:t.note||'',review:meta.review||'PENDING',tag:meta.tag||'',...(known?{grossPnl:Number(t.pnl),feeR:risk>0?(Number(t.fees||0)+Number(t.swap||0))/risk:null}:{grossPnl:null,feeR:null}),origin:t.origin||meta.origin||'USER_LIVE',_classic:{raw:{...t},id:String(t.id),version:t.version,fees:Number(t.fees||0),swap:Number(t.swap||0),feesKnown:known,pnlKnown:t.pnlKnown!==false,discipline:t.discipline,source:t.source,accountId:t.accountId,externalId:t.externalId,recordKind:t.recordKind}};
+  fromClassic(t){const meta={...this.meta(t.rawPayloadJson),...(t.unifiedV6||{})},risk=t.riskKnown!==false&&t.risk>0?Number(t.risk):null,net=Number(t.pnl)-Number(t.fees||0)-Number(t.swap||0),known=JournalForm.netVerified(t);
+    return {...meta,id:String(t.id),date:t.date,symbol:t.symbol,side:t.side==='Sell'?'Short':'Long',market:({Crypto:'CRYPTO',Forex:'FOREX_CFD','Chứng khoán':'STOCKS'})[t.market]||'FUTURES',setup:t.setup||'Chưa phân loại',netPnl:net,initialRisk:risk,is_1r_verified:risk>0&&meta.is_1r_verified!==false,is_net_pnl_verified:known&&t.pnlKnown!==false,realizedR:risk>0&&known&&t.pnlKnown!==false&&meta.is_1r_verified!==false?net/risk:null,riskEstimated:!risk,openTime:t.openedAt||'',closeTime:t.closedAt||'',hour:(t.openedAt||'').slice(11,16)||'00:00',weekday:['CN','T2','T3','T4','T5','T6','T7'][new Date(t.date+'T00:00:00Z').getUTCDay()],entryPrice:t.entryPrice||null,exitPrice:t.exitPrice||null,slPrice:t.stopLoss||null,tpPrice:t.takeProfit||null,lots:t.quantity||null,maeR:this.finite(t.mae)?-Math.abs(t.mae):null,mfeR:this.finite(t.mfe)?Math.abs(t.mfe):null,discipline:(meta.classicDiscipline===t.discipline?meta.discipline:null)||(t.discipline===100?'NONE':'FOMO'),note:t.note||'',review:meta.review||'PENDING',tag:meta.tag||'',...(known&&t.feesKnown!==false?{grossPnl:Number(t.pnl),feeR:risk>0?(Number(t.fees||0)+Number(t.swap||0))/risk:null}:{grossPnl:null,feeR:null}),origin:t.origin||meta.origin||'USER_LIVE',_classic:{raw:{...t},id:String(t.id),version:t.version,fees:Number(t.fees||0),swap:Number(t.swap||0),feesKnown:t.feesKnown!==false,pnlKnown:t.pnlKnown!==false,discipline:t.discipline,source:t.source,accountId:t.accountId,externalId:t.externalId,recordKind:t.recordKind}};
   },
   toClassic(t){const c=t._classic||{},metadata={...t};delete metadata._classic;for(const key of ['id','date','symbol','side','market','setup','netPnl','initialRisk','realizedR','openTime','closeTime','hour','weekday','entryPrice','exitPrice','slPrice','tpPrice','lots','maeR','mfeR','note','grossPnl','feeR'])delete metadata[key];const discipline=t.discipline===(c.discipline===100?'NONE':'FOMO')&&Number.isFinite(c.discipline)?c.discipline:t.discipline==='NONE'?100:0;metadata.classicDiscipline=discipline;return {...(c.raw||{}),id:String(t.id),origin:t.origin||'USER_LIVE',version:c.version,date:t.date,symbol:t.symbol,side:t.side==='Short'?'Sell':'Buy',market:({CRYPTO:'Crypto',STOCKS:'Chứng khoán',FOREX_CFD:'Forex'})[t.market]||'Hàng hóa',source:c.source||'V6',accountId:c.accountId||null,externalId:c.externalId||null,recordKind:c.recordKind||'position',openedAt:t.openTime||null,closedAt:t.closeTime||null,pnl:Number(t.netPnl)+Number(c.fees||0)+Number(c.swap||0),fees:Number(c.fees||0),swap:Number(c.swap||0),feesKnown:c.feesKnown??this.finite(t.feeR),pnlKnown:t.is_net_pnl_verified===true&&(c.pnlKnown??true),risk:Number(t.initialRisk)||0,riskKnown:t.is_1r_verified===true&&t.initialRisk>0&&!t.riskEstimated,entryPrice:Number(t.entryPrice)||0,stopLoss:Number(t.slPrice)||0,takeProfit:Number(t.tpPrice)||0,exitPrice:Number(t.exitPrice)||0,quantity:Number(t.lots)||0,mae:this.finite(t.maeR)?Math.abs(t.maeR):null,mfe:this.finite(t.mfeR)?Math.abs(t.mfeR):null,setup:t.setup,discipline,note:t.note||'',unifiedV6:metadata};},
 };
+
+const PositionProjection={
+ closedCycles(receipts) {
+  const groups = new Map();
+  for (const t of receipts.filter((t) => t.recordKind === "fill")) {
+    let positionSide = "";
+    try {
+      positionSide = JournalForm.metadata(t).positionSide || JSON.parse(t.rawPayloadJson ?? "{}").positionSide || "";
+    } catch {
+      /* source remains available for review */
+    }
+    const key = JSON.stringify([t.accountId, t.source, t.symbol, positionSide]);
+    const items=groups.get(key);if(items)items.push(t);else groups.set(key,[t]);
+  }
+  const closed=[];
+  const open=[];
+  for (const fills of groups.values()) {
+    fills.sort(
+      (a, b) =>
+        (a.closedAt ?? a.date).localeCompare(b.closedAt ?? b.date) ||
+        (() => {
+          const left = (a.externalId ?? "").split(":").at(-1) ?? "",
+            right = (b.externalId ?? "").split(":").at(-1) ?? "";
+          return /^\d+$/.test(left) && /^\d+$/.test(right)
+            ? BigInt(left) < BigInt(right)
+              ? -1
+              : BigInt(left) > BigInt(right)
+                ? 1
+                : 0
+            : 0;
+        })(),
+    );
+    let qty = QuantV34.decimal(0),
+      entryValue = QuantV34.decimal(0),
+      exitValue = QuantV34.decimal(0),
+      openedQty = QuantV34.decimal(0),
+      closedQty = QuantV34.decimal(0),
+      gross = QuantV34.decimal(0),
+      fees = QuantV34.decimal(0),swap = QuantV34.decimal(0);
+    let first;
+    let ids=[];
+    let complete = true;
+    let costsKnown = true,profitKnown=true,batchIncomplete=false;
+    let direction = 1;
+    for (const fill of fills) {
+      const amount = QuantV34.decimal(fill.quantity ?? 0);
+      if (!amount || !amount.isFinite() || amount.lte(0) || !(fill.entryPrice > 0) || ![fill.pnl,fill.fees??0,fill.swap??0].every(Number.isFinite)) {
+        complete = false;
+        continue;
+      }
+      costsKnown = costsKnown && fill.feesKnown !== false;
+      profitKnown=profitKnown&&fill.pnlKnown!==false;
+      batchIncomplete=batchIncomplete||JournalForm.metadata(fill).batchIncomplete===true;
+      let delta = amount.mul(fill.side === "Buy" ? 1 : -1);
+      const price = QuantV34.decimal(fill.entryPrice);
+      if (qty.isZero()) {
+        first = fill;
+        direction = delta.isPositive() ? 1 : -1;
+        entryValue = QuantV34.decimal(0);
+        exitValue = QuantV34.decimal(0);
+        openedQty = QuantV34.decimal(0);
+        closedQty = QuantV34.decimal(0);
+        gross = QuantV34.decimal(0);
+        fees = QuantV34.decimal(0);
+        swap = QuantV34.decimal(0);
+        ids = [];
+        // A first receipt with realized P&L means our history starts mid-position.
+        complete = fill.pnl === 0;
+        costsKnown = fill.feesKnown !== false;
+        profitKnown=fill.pnlKnown!==false;
+        batchIncomplete=JournalForm.metadata(fill).batchIncomplete===true;
+      }
+      if (qty.isZero() || qty.isPositive() === delta.isPositive()) {
+        entryValue = entryValue.add(amount.mul(price));
+        openedQty = openedQty.add(amount);
+        qty = qty.add(delta);
+        gross = gross.add(fill.pnl);
+        fees = fees.add(fill.fees ?? 0);
+        swap=swap.add(fill.swap??0);
+        ids.push(fill.id);
+        continue;
+      }
+      const closing = (qty.abs().lt(amount)?qty.abs():amount);
+      exitValue = exitValue.add(closing.mul(price));
+      closedQty = closedQty.add(closing);
+      gross = gross.add(fill.pnl);
+      fees = fees.add(QuantV34.decimal(fill.fees ?? 0).mul(closing).div(amount));
+      swap=swap.add(QuantV34.decimal(fill.swap??0).mul(closing).div(amount));
+      ids.push(fill.id);
+      const next = qty.add(delta);
+      const finishes = next.isZero() || next.isPositive() !== qty.isPositive();
+      if (finishes && complete && first && openedQty.eq(closedQty))
+        closed.push({
+          ...first,
+          id: "cycle:" + first.id + ":" + fill.id,
+          recordKind: "position",
+          externalId: null,
+          date: fill.date,
+          openedAt: first.closedAt ?? first.date,
+          closedAt: fill.closedAt ?? fill.date,
+          side: direction > 0 ? "Buy" : "Sell",
+          quantity: openedQty.toNumber(),
+          entryPrice: entryValue.div(openedQty).toNumber(),
+          exitPrice: exitValue.div(closedQty).toNumber(),
+          pnl: gross.toNumber(),
+          fees: fees.toNumber(),swap:swap.toNumber(),pnlKnown:profitKnown,
+          unifiedV6:{sourceFillIds:[...ids],is_net_pnl_verified:costsKnown&&profitKnown,is_1r_verified:false,netPnlSource:"execution_cycle",batchIncomplete},
+          normalized:undefined,
+          risk: 0,
+          riskKnown: false,
+          feesKnown: costsKnown,
+          source: first.source,
+          setup: "Chưa phân loại",
+          discipline: 0,
+          durationMin: Math.max(
+            0,
+            (Date.parse(fill.closedAt ?? fill.date) -
+              Date.parse(first.closedAt ?? first.date)) /
+              60000,
+          ),
+          note:
+            "Chu kỳ dựng từ " +
+            ids.length +
+            " execution; giữ nguyên phiếu gốc.",
+          rawPayloadJson: JSON.stringify({ fillIds: ids, complete: true }),
+        });
+      if (finishes && !next.isZero()) {
+        const residual = next.abs();
+        first = fill;
+        direction = next.isPositive() ? 1 : -1;
+        entryValue = residual.mul(price);
+        openedQty = residual;
+        exitValue = QuantV34.decimal(0);
+        closedQty = QuantV34.decimal(0);
+        gross = QuantV34.decimal(0);
+        fees = QuantV34.decimal(fill.fees ?? 0).mul(residual).div(amount);
+        swap = QuantV34.decimal(fill.swap ?? 0).mul(residual).div(amount);
+        ids = [fill.id];
+        complete = true;
+      }
+      qty = next;
+    }
+    if (!qty.isZero())
+      open.push({
+        symbol: fills[0].symbol,
+        accountId: fills[0].accountId,
+        quantity: qty.toString(),
+        complete,
+      });
+  }
+  return { closed, open };
+ },
+ analytics(trades){
+  const raw=trades.filter(t=>t._classic?.recordKind==="fill").map(t=>({...JournalAdapters.toClassic(t),pnlKnown:t._classic.pnlKnown,feesKnown:t._classic.feesKnown}));
+  const projected=PositionProjection.closedCycles(raw),matched=new Set(projected.closed.flatMap(t=>t.unifiedV6.sourceFillIds));
+  return [...trades.filter(t=>t._classic?.recordKind!=="fill"||!matched.has(t.id)),...projected.closed.map(t=>JournalAdapters.fromClassic(t))];
+ }
+};
+const positionCycles=PositionProjection.closedCycles;
 
 
 // Native IndexedDB is the only authoritative browser ledger. Old keys/databases are recovery mirrors.
@@ -1581,7 +1743,7 @@ const RiskMath = {
   esW(a,al=.975){if(!a.length||!(al>0&&al<1))return NaN;const s=[...a].sort((x,y)=>x-y),m=1-al,w=1/s.length;let rem=m,t=0;for(const x of s){const k=Math.min(w,rem);t+=k*x;rem-=k;if(rem<1e-12)break;}return t/m;},
   varW(a,al=.975){if(!a.length||!(al>0&&al<1))return NaN;const s=[...a].sort((x,y)=>x-y),m=1-al;let c=0;for(const x of s){c+=1/s.length;if(c>=m-1e-12)return x;}return s[s.length-1];},
   omega(a,L=0){if(!a.length)return NaN;let g=0,d=0;for(const x of a){g+=Math.max(0,x-L);d+=Math.max(0,L-x);}return d?g/d:g?Infinity:NaN;},
-  verifiedNet(t){return finiteValue(t.netPnl)&&t.is_net_pnl_verified!==false&&t.feesKnown!==false&&t.pnlKnown!==false&&t._classic?.feesKnown!==false&&t._classic?.pnlKnown!==false;},
+  verifiedNet(t){return finiteValue(t.netPnl)&&t.is_net_pnl_verified!==false&&t.feesKnown!==false&&t.pnlKnown!==false&&(t._classic?.feesKnown!==false||t.netPnlSource==='file_net'&&t.is_net_pnl_verified===true)&&t._classic?.pnlKnown!==false;},
   netR(t,gross=false){const risk=Number(t.initialRisk),pnl=t.netPnl==null?NaN:Number(t.netPnl);if(!(risk>0)||!Number.isFinite(risk)||!RiskMath.verifiedNet(t)||t.riskEstimated||t.is_1r_verified===false||t.riskKnown===false)return NaN;if(gross){if(finiteValue(t.grossPnl))return Number(t.grossPnl)/risk;if(finiteValue(t.feeR))return pnl/risk+Number(t.feeR);return NaN;}return pnl/risk;},
   validTrade(t,gross=false){return finiteValue(t.initialRisk)&&Number(t.initialRisk)>0&&!t.riskEstimated&&Number.isFinite(RiskMath.netR(t,gross));},
   capitalNAV(initialCapital,trades,cashflows){
@@ -1860,7 +2022,7 @@ const RiskStore={
   controls:{date:'',today:'',override:null,floating:null,one:'ALL',two:'NONE',L:0,tp:2,sl:.6,window:10,floor:.2,risk:.01,w:null,b:null,horizon:100},controlVersion:0,cachedControls:-1,verified:null,verificationKey:null,
   configure(values){if(Object.entries(values).some(([k,v])=>this.controls[k]!==v)){Object.assign(this.controls,values);this.controlVersion++;}},
   read(){if(this.revision===coreRevision&&this.cachedSelection===this.selectionVersion&&this.cachedControls===this.controlVersion&&this.value)return this.value;
-    const p=state.riskProfile;if(!this.globalValue||this.globalRevision!==coreRevision||this.globalControls!==this.controlVersion){const provenMoney=state.trades.filter(t=>t.is_net_pnl_verified===true&&RiskMath.verifiedNet(t)),computedCapital=RiskMath.capitalNAV(state.initialCapital,provenMoney,state.cashflows),capital={...computedCapital,warning:computedCapital.warning||provenMoney.length!==state.trades.length},tier=RiskMath.tierOf(capital.dd,p),budget=RiskMath.dailyBudget(capital.equity,tier,p),daily=RiskMath.dailyTracker(provenMoney,state.openPositions||[],p,budget,this.controls.date,this.controls.today,this.controls.override,this.controls.floating),limits=RiskMath.capitalLimits(provenMoney,p);this.globalValue={capital,tier,budget,daily,limits,tierReplay:QuantV34.replay(state.initialCapital,provenMoney,state.cashflows,p.t3)};this.globalRevision=coreRevision;this.globalControls=this.controlVersion;this.globalComputeCount++;}const {capital,tier,budget,daily,limits}=this.globalValue,selected=this.selection===null?state.trades:state.trades.filter((()=>{const ids=new Set(this.selection);return t=>ids.has(String(t.id));})()),provenSelected=selected.filter(t=>t.is_1r_verified===true&&t.is_net_pnl_verified===true&&RiskMath.validTrade(t,false)),edge=RiskMath.edgeStats(provenSelected,false,state.sqnCapEnabled),journal=RiskMath.journalStats(provenSelected,edge,false),tail=RiskMath.tailStats(edge.returns),alpha=p.rckBeta??.2,beta=p.rckAlpha??.05,weights=RiskMath.robustWeights(edge.returns),empirical=RiskMath.rckEmpirical(edge.returns,alpha,beta),empiricalRobust=RiskMath.rckEmpirical(edge.returns,alpha,beta,weights.weights),binary=RiskMath.rckBinary(edge.winrate,edge.payoff,alpha,beta,edge.n),rck=p.assumptions.rckMode==='binary'?binary:{...empiricalRobust,eta:weights.eta},orderedR=selected.filter(t=>t.is_1r_verified===true&&t.is_net_pnl_verified===true&&RiskMath.validTrade(t,false)).slice().sort((a,b)=>Date.parse(a.closeTime||a.date)-Date.parse(b.closeTime||b.date)||String(a.id).localeCompare(String(b.id))).map(t=>RiskMath.netR(t,false)),advancedConfig=RiskMath.advancedConfig(p.assumptions),advancedTrades=provenSelected,advancedReturns=advancedTrades.map(t=>RiskMath.netR(t,false)),advancedSummary=RiskMath.tailEvidence(advancedReturns,advancedConfig),advancedInput={advanced:true,purpose:'advanced',R:advancedReturns,rows:advancedTrades.map(t=>({id:String(t.id),date:t.closeTime||t.date,asset_class:t.asset_class||t.normalized?.asset_class||({STOCKS:'EQUITY_STOCK',FUTURES:'COMMODITY_FUTURES',FOREX_CFD:'FOREX_CFD',CRYPTO:'CRYPTO_ASSET'})[t.market]||'',setup:t.setup,discipline:t.discipline})),config:advancedConfig,platPairs:cloneValue(state.extra.platPairs||[])},simConfig={...SIM_DEFAULTS,...state.extra.sim},stressConfig={...STRESS_DEFAULTS,...state.extra.stress},propConfig={...PROP_DEFAULTS,...state.extra.propConfig},sizerConfig={...SIZER_DEFAULTS,...state.extra.sizer},legacyLiquidity=RiskMath.liquidity(provenSelected,p.assumptions.lhByClass||{},simConfig.liquidity),baselReference=RiskMath.baselReference(advancedConfig,legacyLiquidity.days),liquidity={...legacyLiquidity,legacyDays:legacyLiquidity.days,days:baselReference.days,basel:baselReference},tailAnalytics=RiskMath.tailAnalytics({R:orderedR,w:simConfig.tailWindow,slip:simConfig.tailSlip,lh:liquidity.days,tailMode:p.assumptions.tail25Mode}),details=RiskMath.riskDetails(provenSelected,state.openPositions||[],capital,p,edge,journal,tail,budget,this.controls,false),gates={safety:!capital.warning&&tier<=p.assumptions.safeTierMax&&!daily.stopped&&!limits.stopped&&!details.exposure.blocked,edge:edge.expectancy>0&&edge.omega0>1,sample:edge.n>=30};gates.pass=gates.safety&&gates.edge&&gates.sample;gates.stress=gates.pass||!p.assumptions.lockStressLab;
+    const analyticsTrades=PositionProjection.analytics(state.trades),p=state.riskProfile;if(!this.globalValue||this.globalRevision!==coreRevision||this.globalControls!==this.controlVersion){const provenMoney=analyticsTrades.filter(t=>t.is_net_pnl_verified===true&&RiskMath.verifiedNet(t)),computedCapital=RiskMath.capitalNAV(state.initialCapital,provenMoney,state.cashflows),capital={...computedCapital,warning:computedCapital.warning||provenMoney.length!==analyticsTrades.length||analyticsTrades.some(t=>t.batchIncomplete===true)},tier=RiskMath.tierOf(capital.dd,p),budget=RiskMath.dailyBudget(capital.equity,tier,p),daily=RiskMath.dailyTracker(provenMoney,state.openPositions||[],p,budget,this.controls.date,this.controls.today,this.controls.override,this.controls.floating),limits=RiskMath.capitalLimits(provenMoney,p);this.globalValue={capital,tier,budget,daily,limits,tierReplay:QuantV34.replay(state.initialCapital,provenMoney,state.cashflows,p.t3)};this.globalRevision=coreRevision;this.globalControls=this.controlVersion;this.globalComputeCount++;}const {capital,tier,budget,daily,limits}=this.globalValue,selected=this.selection===null?analyticsTrades:analyticsTrades.filter((()=>{const ids=new Set(this.selection);return t=>ids.has(String(t.id))||t.sourceFillIds?.length&&ids.has(String(t.sourceFillIds.at(-1)));})()),provenSelected=selected.filter(t=>t.is_1r_verified===true&&t.is_net_pnl_verified===true&&RiskMath.validTrade(t,false)),edge=RiskMath.edgeStats(provenSelected,false,state.sqnCapEnabled),journal=RiskMath.journalStats(provenSelected,edge,false),tail=RiskMath.tailStats(edge.returns),alpha=p.rckBeta??.2,beta=p.rckAlpha??.05,weights=RiskMath.robustWeights(edge.returns),empirical=RiskMath.rckEmpirical(edge.returns,alpha,beta),empiricalRobust=RiskMath.rckEmpirical(edge.returns,alpha,beta,weights.weights),binary=RiskMath.rckBinary(edge.winrate,edge.payoff,alpha,beta,edge.n),rck=p.assumptions.rckMode==='binary'?binary:{...empiricalRobust,eta:weights.eta},orderedR=selected.filter(t=>t.is_1r_verified===true&&t.is_net_pnl_verified===true&&RiskMath.validTrade(t,false)).slice().sort((a,b)=>Date.parse(a.closeTime||a.date)-Date.parse(b.closeTime||b.date)||String(a.id).localeCompare(String(b.id))).map(t=>RiskMath.netR(t,false)),advancedConfig=RiskMath.advancedConfig(p.assumptions),advancedTrades=provenSelected,advancedReturns=advancedTrades.map(t=>RiskMath.netR(t,false)),advancedSummary=RiskMath.tailEvidence(advancedReturns,advancedConfig),advancedInput={advanced:true,purpose:'advanced',R:advancedReturns,rows:advancedTrades.map(t=>({id:String(t.id),date:t.closeTime||t.date,asset_class:t.asset_class||t.normalized?.asset_class||({STOCKS:'EQUITY_STOCK',FUTURES:'COMMODITY_FUTURES',FOREX_CFD:'FOREX_CFD',CRYPTO:'CRYPTO_ASSET'})[t.market]||'',setup:t.setup,discipline:t.discipline})),config:advancedConfig,platPairs:cloneValue(state.extra.platPairs||[])},simConfig={...SIM_DEFAULTS,...state.extra.sim},stressConfig={...STRESS_DEFAULTS,...state.extra.stress},propConfig={...PROP_DEFAULTS,...state.extra.propConfig},sizerConfig={...SIZER_DEFAULTS,...state.extra.sizer},legacyLiquidity=RiskMath.liquidity(provenSelected,p.assumptions.lhByClass||{},simConfig.liquidity),baselReference=RiskMath.baselReference(advancedConfig,legacyLiquidity.days),liquidity={...legacyLiquidity,legacyDays:legacyLiquidity.days,days:baselReference.days,basel:baselReference},tailAnalytics=RiskMath.tailAnalytics({R:orderedR,w:simConfig.tailWindow,slip:simConfig.tailSlip,lh:liquidity.days,tailMode:p.assumptions.tail25Mode}),details=RiskMath.riskDetails(provenSelected,state.openPositions||[],capital,p,edge,journal,tail,budget,this.controls,false),gates={safety:!capital.warning&&tier<=p.assumptions.safeTierMax&&!daily.stopped&&!limits.stopped&&!details.exposure.blocked,edge:edge.expectancy>0&&edge.omega0>1,sample:edge.n>=30};gates.pass=gates.safety&&gates.edge&&gates.sample;gates.stress=gates.pass||!p.assumptions.lockStressLab;
     const tierContext=RiskMath.tierContext(capital,p,edge);
     const verificationProfile={...p,assumptions:Object.fromEntries(Object.entries(p.assumptions).filter(([k])=>!Object.hasOwn(advancedConfig,k)||k==='tail25Mode'))},verificationKey=JSON.stringify([edge.returns,verificationProfile,this.selectionVersion,this.controls.floor,this.controls.horizon]),verified=this.verificationKey===verificationKey?this.verified:null,tierCap=capital.equity>0?budget/capital.equity:0,recommendation=!gates.pass?0:p.assumptions.recRule==='rck_only'?Math.min(rck.f*[0,1,.5,0][tier],tierCap):verified===null?0:Math.min(rck.f,tierCap,verified);
 const inputs=RiskMath.simulationInputs(provenSelected,false,simConfig,stressConfig,p),propSamples=provenSelected.slice().sort((a,b)=>String(a.closeTime||a.date).localeCompare(String(b.closeTime||b.date))).map(t=>({r:RiskMath.netR(t,false),feeKnown:true,mae:finiteValue(t.maeR)?Number(t.maeR):null,mfe:finiteValue(t.mfeR)?Number(t.mfeR):null,dayTime:t.closeTime||t.date})),propInput={engine:'3.4',samples:propSamples,mode:propConfig.mode,serverTimeZone:propConfig.serverTimeZone,dailyResetTime:propConfig.dailyResetTime,fundedRules:propConfig.mode==='evaluation'&&propConfig.fundedPreset!=='same'?QuantV34.propPresetRules(propConfig.fundedPreset):null,resample:propConfig.resample,outer:propConfig.outer,trailingType:propConfig.trailingType,afterPayout:propConfig.afterPayout,minPayout:propConfig.minPayout,payoutFraction:propConfig.payoutFraction/100,payoutCap:propConfig.payoutCap,lockInitial:propConfig.lockInitial,lockOffset:propConfig.lockOffset,dailyMode:propConfig.dailyMode,consistencyScope:propConfig.consistencyScope,consistencyShare:propConfig.consistencyShare/100,consistencyBehavior:propConfig.consistencyBehavior,refund:propConfig.refund,bound:propConfig.bound,phaseRules:propConfig.phaseRules,verified:false,R:propSamples.map(x=>x.r),n:propConfig.runs,f:propConfig.risk/100,size:propConfig.size,fee:propConfig.fee,actFee:propConfig.actFee,stages:propConfig.stages.map(x=>x/100),ml:propConfig.ml/100,dl:propConfig.dl/100,tpd:propConfig.tpd,maxT:propConfig.horizon,fT:propConfig.fundedH,sp:propConfig.split/100,payoutDays:propConfig.payoutDays,tradingDays:propConfig.tradingDays,comp:propConfig.comp,seed:propConfig.seed},compareInput={...inputs.mc,compare:true,purpose:'compare',risks:[.5,1,2,3,...(recommendation>0&&![.5,1,2,3].some(x=>Math.abs(x-recommendation*100)<1e-9)?[recommendation*100]:[])].sort((a,b)=>a-b),options:{...inputs.mc.options,runs:Math.min(5000,simConfig.runs),revenge:false}},sizer=RiskMath.positionSize(capital.equity,tier,budget,capital.warning||tier===3||daily.stopped||limits.stopped||details.exposure.blocked||(tier===2&&!details.setups.some(x=>x.isGradeA)),sizerConfig),quality=RiskMath.toolQuality(selected,state.grossMode);
@@ -1990,7 +2152,6 @@ const UnifiedView={
   async push(data){if(this.applying||ClassicSync.privateHidden||data.sampleSource||data.trades.some(t=>t.origin==='MOCK_SEED_V3'))return;const owner=data.extra.classicSync?.owner||'device';if(!this.snapshot||this.snapshot.owner!==owner)this.snapshot=await UnifiedJournal.ensure(owner);const prior=this.snapshot;if(prior.settings?.currency&&data.currency&&prior.settings.currency!==data.currency&&(data.trades.length||data.cashflows.length||data.initialCapital>0))throw Error('Đơn vị tiền khác kho chung; giữ bản JSON và xác minh tỷ giá trước khi gộp.');const settings=this.settings(data,prior.settings),options={generation:prior.generation};if(!settings.currency&&(data.trades.length||data.cashflows.length||data.initialCapital>0))settings.currency=data.currency||'USD';if(!UnifiedJournal.same(settings,prior.settings)){options.settings=settings;options.beforeSettings=prior.settings;}try{this.snapshot=await UnifiedJournal.commit(owner,prior.rows,data.trades.map(t=>ClassicSync.toClassic(t)),options);}catch(error){await StorageVault.archive(data);throw error;}},
 };
 Object.assign(globalThis.Unified,{UnifiedJournal,JournalAdapters,UnifiedView});
-
 const TABS={"gameplan": "tab-gameplan", "cockpit": "tab-cockpit", "workspace": "tab-workspace", "calendar": "tab-calendar", "review": "tab-review", "chartbook": "tab-chartbook", "overview": "tab-edge", "edge": "tab-edge", "drilldown": "tab-edge", "discipline": "tab-edge", "pnlrisk": "tab-pnlrisk", "riskcapital": "tab-riskcapital", "riskedge": "tab-riskedge", "riskopt": "tab-riskopt", "simulation": "tab-simulation", "riskprop": "tab-riskprop", "zones": "tab-zones", "risktools": "tab-risktools", "import": "tab-import", "mapping": "tab-mapping", "dictionary": "tab-dictionary"};
 const TITLES={"gameplan": "Kế hoạch và lệnh dự kiến", "calendar": "Lịch giao dịch", "review": "Ghi chú và Review", "chartbook": "Chartbook: thư viện ảnh chụp theo setup", "import": "Nhập nâng cao MT4/MT5 và kết nối sàn", "riskcapital": "Lớp 1 · Bảo vệ vốn & phơi nhiễm", "riskedge": "Lớp 2 · Lợi thế, Omega & ES", "riskopt": "Lớp 3 · Tối ưu vốn & hành vi chuỗi", "riskprop": "Prop Firm Simulator", "risktools": "Trade Engine & Sizer", "zones": "Bảng 4 vùng", "overview": "Tổng quan sức khỏe tài khoản", "workspace": "Giao dịch và bộ lọc", "edge": "Kiểm toán lợi thế thống kê (SQN)", "drilldown": "Phân tích khoan sâu: thời gian, thị trường, phiên", "discipline": "Kỷ luật và quản lý lệnh (MAE/MFE)", "pnlrisk": "Lợi nhuận, rủi ro và drawdown", "simulation": "Mô phỏng Monte Carlo và what-if", "cockpit": "Buồng lái rủi ro: hạn mức lỗ ngày và sụt giảm", "mapping": "Dữ liệu và kết nối", "dictionary": "Trợ giúp và thuật ngữ"};
 const TAB_ALIAS={plans:'workspace',journal:'workspace',backup:'mapping',connect:'mapping',sync:'mapping',mt4:'mapping',setup:'dictionary',ui:'dictionary',terms:'dictionary'};

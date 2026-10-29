@@ -1,3 +1,4 @@
+import {JournalForm} from '../src/core/trade-form.js';
 /** Classic's financial boundary: pnl is gross, fees/swap are positive costs. */
 import {QuantV34 as Quant} from '../src/core/quant-v34.js';
 import {AccountBaselineSettings} from './journal-lifecycle.js';
@@ -7,6 +8,7 @@ export interface RiskTrade {
   closedAt?: string | null;
   openedAt?: string | null;
   symbol: string;
+  source?:string;
   side: string;
   pnl: number;
   risk: number;
@@ -19,17 +21,22 @@ export interface RiskTrade {
   mae?: number | null;
   mfe?: number | null;
   recordKind?: string;
+  unifiedV6?:Record<string,any>;
+  normalized?:any;
   feesKnown?: boolean;
   pnlKnown?: boolean;
   rules?: Record<string, boolean>;
   riskKnown?: boolean;
 }
 export interface RiskSettings {
+  currency?: string;
   cashFlows?: Array<{
     id: string;
     date: string;
     type: "deposit" | "withdrawal";
     amount: number;
+    origin?:string;
+    unifiedV6?:Record<string,unknown>;
   }>;
   disciplineLock?: boolean;
   weeklyAutoPack?: boolean;
@@ -92,15 +99,16 @@ export function analyzeRiskTrades(
         Date.parse(a.closedAt || a.date) - Date.parse(b.closedAt || b.date) ||
         a.id.localeCompare(b.id),
     );
-  const financialComplete = trades.every(
-    (t) => t.feesKnown !== false && t.pnlKnown !== false,
+  const coveredFills=new Set(trades.flatMap(t=>JournalForm.metadata(t).sourceFillIds||[]));
+  const financialComplete = input.every(t=>t.recordKind!=="fill" || coveredFills.has(t.id)&&t.feesKnown!==false&&t.pnlKnown!==false) && trades.every(
+    (t) => JournalForm.netVerified(t)&&JournalForm.metadata(t).batchIncomplete!==true,
   );
   const known = trades.filter(
-    (t) => t.feesKnown !== false && t.pnlKnown !== false,
+    (t) => JournalForm.netVerified(t),
   );
   const values = known.map(netPnl);
   const r = known
-    .filter((t) => t.riskKnown !== false && t.risk > 0)
+    .filter((t) => JournalForm.riskVerified(t))
     .map((t) => netPnl(t) / t.risk);
   const standard = Quant.metrics(r);
   const tierReplay=Quant.replay(capital,known.map(t=>({id:t.id,status:'closed',openTime:t.openedAt,closeTime:t.closedAt,netPnl:netPnl(t)})),cashFlows);
@@ -137,7 +145,7 @@ export function analyzeRiskTrades(
     for (const t of known) {
       const label =
         key === "compliance" ? (followed(t) ? "Tuân thủ" : "Vi phạm") : t[key];
-      grouped.set(label, [...(grouped.get(label) ?? []), t]);
+      const items=grouped.get(label);if(items)items.push(t);else grouped.set(label,[t]);
     }
     return [...grouped]
       .map(([label, items]) => ({
@@ -151,8 +159,8 @@ export function analyzeRiskTrades(
       }))
       .sort((a, b) => b.net - a.net);
   };
-  const days = [...new Set(known.map((t) => t.date))].map((date) => {
-    const items = known.filter((t) => t.date === date);
+  const groupedDays=new Map<string,RiskTrade[]>();for(const t of known){const items=groupedDays.get(t.date);if(items)items.push(t);else groupedDays.set(t.date,[t]);}
+  const days = [...groupedDays].map(([date,items]) => {
     return {
       date,
       net: items.reduce((s, t) => s + netPnl(t), 0),
@@ -233,7 +241,7 @@ export function riskDesk(
   );
   const events = trades
     .map((t) => ({ ...t, date: eventDay(t, settings.timezone) }))
-    .filter((t) => !t.id.startsWith("cycle:"));
+    .filter((t) => t.recordKind!=="fill" && JournalForm.netVerified(t));
   const flows = (settings.cashFlows ?? [])
     .filter((f) => f.date <= today)
     .sort((a, b) => a.date.localeCompare(b.date));
@@ -278,15 +286,13 @@ export function riskDesk(
   const ddPercent = a.navDDPercent;
   const dailyBudget = (Math.max(0, before) * settings.dailyLossPercent) / 100;
   const used = Math.max(0, -dayNet);
-  const usage = dailyBudget > 0 ? (100 * used) / dailyBudget : null;
+  const usage = a.financialComplete && dailyBudget > 0 ? (100 * used) / dailyBudget : null;
   const floor =
     settings.floorMode === "trailing"
       ? peak - (settings.initialCapital * settings.maxDrawdownPercent) / 100
       : settings.initialCapital * (1 - settings.maxDrawdownPercent / 100) +
         flowTotal;
-  const dataComplete = events.every(
-    (t) => t.feesKnown !== false && t.pnlKnown !== false,
-  );
+  const dataComplete = a.financialComplete;
   const observedTier =
     !dataComplete || ddPercent === null
       ? "unknown"

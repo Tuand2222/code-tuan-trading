@@ -1,6 +1,9 @@
 import {TradeNormalizer} from './trade-normalizer.js';
 
 export const JournalForm={
+  metadata(t){let stored={};try{const p=JSON.parse(t.rawPayloadJson||'{}');stored=p.unifiedV6||p.edited?.unifiedV6||{};}catch{}return {...stored,...t.unifiedV6};},
+  netVerified(t){const finite=x=>typeof x==='number'&&Number.isFinite(x),meta=JournalForm.metadata(t);if(t.normalized?.is_net_pnl_verified===false||meta.is_net_pnl_verified===false)return false;const certified=t.pnlKnown===true&&meta.is_net_pnl_verified===true&&meta.netPnlSource==='file_net';return t.recordKind!=='fill'&&t.pnlKnown!==false&&(t.feesKnown!==false||certified)&&finite(t.pnl)&&finite(t.fees??0)&&finite(t.swap??0);},
+  riskVerified(t){return t.riskKnown!==false&&t.normalized?.is_1r_verified!==false&&t.unifiedV6?.is_1r_verified!==false&&typeof t.risk==='number'&&Number.isFinite(t.risk)&&t.risk>0;},
   /** @type {Record<string, any>} */
   profiles:{EQUITY_STOCK:{label:'Cổ phiếu',quantity:'Số cổ phiếu',step:1,market:'STOCKS',classic:'Chứng khoán'},COMMODITY_FUTURES:{label:'Hợp đồng tương lai',quantity:'Số hợp đồng',step:1,market:'FUTURES',classic:'Hàng hóa'},FOREX_CFD:{label:'Forex / CFD',quantity:'Số lot',step:.01,market:'FOREX_CFD',classic:'Forex'},CRYPTO_ASSET:{label:'Crypto',quantity:'Số đơn vị coin',step:.00000001,market:'CRYPTO',classic:'Crypto'}},
   fields:[['asset_class','Lớp tài sản','asset'],['quote_ccy','Tiền tệ yết giá','text'],['quantity_step','Bước khối lượng đã xác nhận','number'],['contract_multiplier','Hệ số nhân hợp đồng / đơn vị giá','number'],['tick_size','Kích cỡ tick (tùy chọn)','number'],['tick_value','Giá trị một tick (tùy chọn)','number'],['fx_rate','Tỷ giá yết giá → tài khoản','number'],['fees','Phí (tiền yết giá)','number'],['taxes','Thuế (tiền yết giá)','number'],['swap_cost','Swap/funding: chi phí dương, khoản nhận âm','number']],

@@ -603,3 +603,5 @@ td { padding: 13px; border-bottom: 1px solid var(--line-soft); color: #98a2ae; f
 
 .journal-pagination { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; padding:12px; font-size:12px; }
 .journal-pagination button:disabled { opacity:.45; cursor:default; }
+
+.toast.toast-warning{background:#382b18;border-color:#bb8838;color:#ffdf9e}.sync-conflict{position:fixed;bottom:24px;right:24px;z-index:200;max-width:520px;border:1px solid #bb8838}.sync-conflict button{margin:6px}

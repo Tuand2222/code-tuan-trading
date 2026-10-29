@@ -2,58 +2,7 @@ import { cloudHash } from "../../../lib/journal-cloud";
 import { env } from "cloudflare:workers";
 import { requireUser, routeError } from "../../../lib/server-auth";
 import { POST as saveCloud } from "../journal-cloud/route";
-import { z } from "zod";
-const amount = z.number().finite().min(0).max(1e15),
-  percent = z.number().finite().min(0).max(100);
-const riskSchema = z
-  .object({
-    initialCapital: amount,
-    riskPercent: percent,
-    dailyLossPercent: percent,
-    defensivePercent: percent,
-    stopPercent: percent,
-    maxDrawdownPercent: percent,
-    floorMode: z.enum(["static", "trailing"]),
-    accountMode: z.enum(["personal", "prop"]),
-    unrealized: z.number().finite().nullable(),
-    highWaterMark: amount.nullable(),
-    timezone: z.string().refine((v) => {
-      try {
-        new Intl.DateTimeFormat("en", { timeZone: v });
-        return true;
-      } catch {
-        return false;
-      }
-    }),
-    colorMode: z.enum(["standard", "accessible"]),
-    recoveryReview: z.string().max(10000),
-    recoveryPlan: z.string().max(10000),
-    weeklyAutoPack: z.boolean().optional(),
-    disciplineLock: z.boolean().optional(),
-    exposures: z
-      .array(
-        z.object({
-          id: z.string(),
-          group: z.string(),
-          side: z.string(),
-          risk: amount,
-        }),
-      )
-      .max(10000)
-      .optional(),
-    cashFlows: z
-      .array(
-        z.object({
-          id: z.string(),
-          date: z.string().date(),
-          type: z.enum(["deposit", "withdrawal"]),
-          amount: amount,
-        }),
-      )
-      .max(100000)
-      .optional(),
-  })
-  .strict();
+import {normalizeRiskSettings,riskSettingsSchema} from '../../../lib/risk-settings-schema';
 export async function GET(request: Request) {
   try {
     const owner = await requireUser(request);
@@ -76,7 +25,7 @@ export async function GET(request: Request) {
       throw Error("Risk checksum mismatch");
     return Response.json({
       owner: owner.id,
-      settings: riskSchema.parse(JSON.parse(raw)),
+      settings: normalizeRiskSettings(JSON.parse(raw)),
       version: row.revision,
     });
   } catch (e) {
@@ -93,7 +42,7 @@ export async function PUT(request: Request) {
       };
     if (body.expectedOwner !== owner.id)
       return Response.json({ error: "Account changed" }, { status: 409 });
-    const settings = riskSchema.parse(body.settings);
+    const settings = riskSettingsSchema.parse(body.settings);
     const head = await env.DB.prepare(
       "SELECT revision FROM journal_cloud_heads WHERE owner_id=?",
     )

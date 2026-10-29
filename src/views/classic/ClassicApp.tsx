@@ -150,7 +150,7 @@ type Trade = {
   date: string;
   symbol: string;
   side: "Buy" | "Sell";
-  session: "Châu Á" | "London" | "New York";
+  session: "Châu Á" | "London" | "New York" | "Chưa rõ";
   setup: string;
   timeframe: string;
   risk: number;
@@ -1126,12 +1126,12 @@ function makeDraftFromTrade(trade: Trade): DraftTrade {
     session: trade.session,
     setup: trade.setup,
     timeframe: trade.timeframe,
-    risk: String(trade.risk),
-    pnl: String(trade.pnl),
+    risk: JournalForm.riskVerified(trade)?String(trade.risk):"",
+    pnl: trade.pnlKnown===false?"":String(trade.pnl),
     psychology: trade.psychology,
     note: trade.note,
     durationMin: trade.durationMin ? String(trade.durationMin) : "",
-    fees: trade.fees ? String(trade.fees) : "",
+    fees: trade.feesKnown===false?"":String(trade.fees??0),
     quantity: trade.quantity ? String(trade.quantity) : "",
     entryPrice: trade.entryPrice ? String(trade.entryPrice) : "",
     stopLoss: trade.stopLoss ? String(trade.stopLoss) : "",
@@ -1172,7 +1172,7 @@ function makeConnectionDraft(provider: Provider): ConnectionDraft {
 
 function calculateStats(raw: Trade[]) {
   const source = raw
-    .filter((t) => t.recordKind !== "fill")
+    .filter((t) => t.recordKind !== "fill" && JournalForm.netVerified(t))
     .map((t) => ({ ...t, pnl: netPnl(t) }));
   const ordered = [...source].sort(
     (a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id),
@@ -1261,7 +1261,7 @@ function groupTrades(
   key: "symbol" | "setup" | "session" | "weekday",
 ) {
   const source = raw
-    .filter((t) => t.recordKind !== "fill")
+    .filter((t) => t.recordKind !== "fill" && JournalForm.netVerified(t))
     .map((t) => ({ ...t, pnl: netPnl(t) }));
   const map = new Map<
     string,
@@ -1373,7 +1373,7 @@ export default function Home() {
   const [resolutions, setResolutions] = useState<Record<string, Resolution>>(
     {},
   );
-  const [importCurrency, setImportCurrency] = useState("VND");
+  const [importCurrency, setImportCurrency] = useState("");
   const [importFx, setImportFx] = useState("");
   const importRaw = useRef<Trade[]>([]);
   const [importAccount, setImportAccount] = useState("");
@@ -1393,7 +1393,7 @@ export default function Home() {
     setToast,
     NOTE_TEMPLATES[0].content,
   );
-  useSharedRisk(
+  const riskSync=useSharedRisk(
     dataMode === "cloud" && persistenceOwner === accountId
       ? accountId
       : undefined,
@@ -1785,11 +1785,11 @@ export default function Home() {
             .toLowerCase()
             .includes(query.toLowerCase())) &&
         (resultFilter === "all" ||
-          (resultFilter === "win"
+          (JournalForm.netVerified(t) && (resultFilter === "win"
             ? netPnl(t) > 0
             : resultFilter === "loss"
               ? netPnl(t) < 0
-              : netPnl(t) === 0)),
+              : netPnl(t) === 0))),
     );
     if (range === "all") return scoped;
     const maxDate = new Date();
@@ -2101,11 +2101,11 @@ export default function Home() {
         result = { ...parsed, trades: parsed.trades.map(binanceToTrade) };
       } else if (extension === "csv") {
         result = parseTradeCsv(await file.text(), "CSV",separator);
-      } else if (["xlsx", "xls", "xlsm"].includes(extension ?? "")) {
+      } else if (["xlsx", "xls", "xlsm", "html", "htm"].includes(extension ?? "")) {
         result = await parseTradeWorkbook(file,separator);
       } else {
         throw new Error(
-          "Định dạng chưa hỗ trợ. Hãy chọn PDF Binance Futures, Excel hoặc CSV.",
+          "Định dạng chưa hỗ trợ. Hãy chọn PDF Binance Futures, Excel, HTML hoặc CSV.",
         );
       }
       if (!result.detected && !result.trades.length)
@@ -2115,7 +2115,7 @@ export default function Home() {
       const fileHash = await sha256(new Uint8Array(await file.arrayBuffer()));
       const identified = await identifyTrades(result.trades.map((t,i)=>({...t,id:t.externalId&&!t.externalId.startsWith('import-')?t.id:`file:${fileHash}:${i}`,rawPayloadJson:JSON.stringify(t)})),accountId);
       importRaw.current = identified;
-      setImportCurrency(isPdf || /binance/i.test(file.name) || result.trades.some(t=>/binance/i.test(t.source||"")) ? "USDT" : "VND");
+      setImportCurrency("");
       setImportFx("");
       setImportAccount("");
       setImportBroker("");
@@ -2145,17 +2145,20 @@ export default function Home() {
     setImportCurrency(currency);
     setImportFx(fx);
     if (!tradeImportPreview) return;
-    const rate = currency === "VND" ? 1 : Number(fx);
+    const rate = currency === "VND" ? 1 : currency?Number(fx):0;
     if (!(rate > 0)) return;
     const incoming = importRaw.current.map((t) => ({
       ...t,
       pnl: t.pnl * rate,
       fees: (t.fees ?? 0) * rate,
+      swap: (t.swap ?? 0) * rate,
       risk: t.risk * rate,
+      unifiedV6:{...t.unifiedV6,accountCurrency:"VND",sourceCurrency:currency,fxRate:rate},
       accountId: importAccount || t.accountId,
       ...(importBroker ? { source: importBroker } : {}),
       rawPayloadJson: JSON.stringify({
         original: t.rawPayloadJson ?? t,
+        unifiedV6:{...t.unifiedV6,accountCurrency:"VND",sourceCurrency:currency,fxRate:rate},
         conversion: { currency, rateToVND: rate },
       }),
     }));
@@ -2182,7 +2185,8 @@ export default function Home() {
   };
   const commitTradeImport = async () => {
     if (!tradeImportPreview || !ingestionPlan) return;
-    if (importCurrency !== "VND" && !(Number(importFx) > 0)) {
+    if(tradeImportPreview.trades.some(t=>t.recordKind==="fill")&&!importAccount.trim()){setToast("Chọn hoặc nhập mã tài khoản để không ghép execution của nhiều tài khoản.");return;}
+    if (!importCurrency || (importCurrency !== "VND" && !(Number(importFx) > 0))) {
       setToast("Nhập tỷ giá về VNĐ trước khi lưu file tiền ngoại tệ.");
       return;
     }
@@ -2229,10 +2233,10 @@ export default function Home() {
       for (const d of ingestionPlan.duplicates)
         selected.push({
           ...d.existing,
-          pnl: d.incoming.pnl,
-          fees: d.incoming.fees,
-          quantity: d.incoming.quantity,
-          exitPrice: d.incoming.exitPrice,
+          ...(JournalForm.netVerified(d.incoming)?{pnl:d.incoming.pnl,fees:d.incoming.fees,swap:d.incoming.swap,pnlKnown:d.incoming.pnlKnown,feesKnown:d.incoming.feesKnown,unifiedV6:{...d.existing.unifiedV6,...d.incoming.unifiedV6},rawPayloadJson:JSON.stringify({previous:d.existing.rawPayloadJson,sourceReceipt:d.incoming.rawPayloadJson,unifiedV6:{...d.existing.unifiedV6,...d.incoming.unifiedV6}})}:{}),
+          ...(JournalForm.riskVerified(d.incoming)?{risk:d.incoming.risk,riskKnown:true}:{}),
+          quantity:d.incoming.quantity||d.existing.quantity,
+          exitPrice:d.incoming.exitPrice||d.existing.exitPrice,
         });
       let accepted: Trade[] = selected;
       let receipt: import("@/lib/governance-report").AuditReceipt = {
@@ -2278,13 +2282,16 @@ export default function Home() {
   const saveTrade = async (event: FormEvent) => {
     if(editingTradeId&&editBaseline.current&&editBaseline.current!==UnifiedJournal.stable(trades.find(t=>t.id===editingTradeId))){event.preventDefault();setToast('Lệnh đã thay đổi ở giao diện khác; bản nhập của bạn được giữ trong form. Hãy đối chiếu trước khi lưu.');return;}
     event.preventDefault();
-    const risk = Number(draft.risk);
-    const pnl = Number(draft.pnl);
+    const priorTrade=trades.find(t=>t.id===editingTradeId);
+    const keepUnknownRisk=!!priorTrade&&priorTrade.riskKnown===false&&!draft.risk.trim();
+    const keepUnknownPnl=!!priorTrade&&priorTrade.pnlKnown===false&&!draft.pnl.trim();
+    const risk = keepUnknownRisk?priorTrade!.risk:Number(draft.risk);
+    const pnl = keepUnknownPnl?priorTrade!.pnl:Number(draft.pnl);
     if (
       !draft.date ||
       !draft.symbol.trim() ||
       draft.setup === UNCLASSIFIED_SETUP ||
-      (!assetInput.enabled&&(!Number.isFinite(risk)||risk<=0||!Number.isFinite(pnl)))
+      (!assetInput.enabled&&(!Number.isFinite(risk)||(!keepUnknownRisk&&risk<=0)||!Number.isFinite(pnl)||(!keepUnknownPnl&&!draft.pnl.trim())))
     ) {
       setToast("Vui lòng nhập ngày, sản phẩm, setup, rủi ro và P&L trước phí.");
       return;
@@ -2309,6 +2316,7 @@ export default function Home() {
       timeframe: draft.timeframe,
       risk,
       pnl,
+      pnlKnown: draft.pnl.trim()!=="",
       discipline: Math.round(
         (checks.filter(Boolean).length / checks.length) * 100,
       ),
@@ -2319,7 +2327,7 @@ export default function Home() {
       source: draft.source,
       fees: Number(draft.fees) || 0,
       feesKnown: draft.fees.trim() !== "",
-      riskKnown: risk > 0,
+      riskKnown: !keepUnknownRisk&&risk > 0,
       quantity: Number(draft.quantity) || 0,
       entryPrice: Number(draft.entryPrice) || 0,
       stopLoss: Number(draft.stopLoss) || 0,
@@ -2343,6 +2351,9 @@ export default function Home() {
       externalId: existing?.externalId,
       accountId: existing?.accountId,
     };
+    if(existing?.unifiedV6?.netPnlSource==="file_net" && (existing.pnl!==trade.pnl || (existing.fees??0)!==(trade.fees??0) || existing.symbol!==trade.symbol || existing.side!==trade.side)){
+      trade.unifiedV6={...existing.unifiedV6,netPnlSource:"manual_edit",is_net_pnl_verified:trade.feesKnown&&trade.pnlKnown};
+    }
     if(assetInput.enabled){try{const approved=JournalForm.requireReady(assetPreview);const n=JournalForm.requireReady(JournalForm.preview({...approved.raw,id:trade.id}));trade=JournalForm.toClassic(n,trade) as Trade;}catch(e){setToast(e instanceof Error?e.message:String(e));return;}}
     const imagesToUpload = [...draftImages];
     if (imagesToUpload.length)
@@ -3076,6 +3087,7 @@ export default function Home() {
 
   const renderJournal = () => (
     <>
+      <p className="import-summary" role="status">Nhật ký giữ nguyên mọi dòng gốc. Các lệnh thiếu phí/P&L không đi vào hiệu suất; thiếu 1R không đi vào thống kê R. Nguồn/broker, tiền tệ và tài khoản phải khớp báo cáo gốc.</p>
       <section className="quote-strip">
         <div>
           <span>NGUYÊN TẮC CỐT LÕI</span>
@@ -3101,7 +3113,7 @@ export default function Home() {
             {tradeImportBusy ? "Đang đọc…" : "Nhập file nhật ký"}
             <input
               type="file"
-              accept="application/pdf,.pdf,.xlsx,.xls,.xlsm,.csv,text/csv"
+              accept="application/pdf,.pdf,.xlsx,.xls,.xlsm,.html,.htm,.csv,text/csv"
               onChange={(event) => {
                 void prepareTradeImport(event);
               }}
@@ -3239,6 +3251,7 @@ export default function Home() {
               {tradeImportPreview.detected} dòng nhận diện
             </span>
           </div>
+          <p className="import-summary" role="status">Đọc được {tradeImportPreview.trades.length}/{tradeImportPreview.detected} dòng · Net hợp lệ: {tradeImportPreview.trades.filter(t=>JournalForm.netVerified(t)).length} · Có 1R: {tradeImportPreview.trades.filter(t=>JournalForm.riskVerified(t)).length}. Lệnh khớp riêng lẻ chưa phải vị thế đã đóng; dữ kiện thiếu được giữ trạng thái chờ xác minh.</p>
           {tradeImportPreview.numberDecisions?.some(d=>d.ambiguous)&&<div className="import-summary" role="alert"><strong>Cần xác nhận dấu thập phân</strong><p>{tradeImportPreview.numberDecisions.filter(d=>d.ambiguous).map(d=>d.field+': '+d.examples.join(' / ')).join(' · ')}</p><label>Dấu thập phân của cột mơ hồ<select aria-label="Dấu thập phân nhập file" value={numberChoice} onChange={e=>{const value=e.target.value as '.'|',';if(importFileV33.current&&value)void prepareTradeImport(importFileV33.current,value);}}><option value="">Chọn để đối chiếu lại Preview</option><option value=".">Dấu chấm: 1.085 = 1,085 đơn vị</option><option value=",">Dấu phẩy: 1.085 = 1.085 đơn vị nguyên</option></select></label></div>}
           <div className="cockpit-form">
             <label>
@@ -3248,7 +3261,7 @@ export default function Home() {
                 value={importCurrency}
                 onChange={(e) => void changeImportFx(e.target.value, importFx)}
               >
-                <option>VND</option>
+                <option value="">Chọn tiền tệ đúng theo báo cáo</option><option>VND</option>
                 <option>USDT</option>
                 <option>USD</option>
                 <option>EUR</option>
@@ -3270,6 +3283,7 @@ export default function Home() {
               </label>
             )}
           </div>
+          {tradeImportPreview.trades.some(t=>t.recordKind==="fill")&&<label className="import-summary">Mã tài khoản của file (bắt buộc nếu chưa chọn tài khoản API)<input aria-label="Mã tài khoản execution" defaultValue={importAccount} placeholder="Ví dụ: Binance Futures cá nhân" onBlur={e=>void setImportScope(e.target.value.trim(),importBroker)}/></label>}
           <p className="import-summary">
             Xác nhận tiền tệ của P&L; không tự đổi USDT thành VNĐ. Giá và khối
             lượng giữ nguyên.
@@ -3284,7 +3298,7 @@ export default function Home() {
                   void setImportScope(e.target.value, importBroker)
                 }
               >
-                <option value="">Chưa gắn tài khoản API</option>
+                <option value="">Chưa gắn tài khoản API</option>{importAccount&&!connections.some(c=>c.id===importAccount)&&<option value={importAccount}>{importAccount}</option>}
                 {connections.map((c) => (
                   <option value={c.id} key={c.id}>
                     {c.label}
@@ -3358,7 +3372,7 @@ export default function Home() {
                         netPnl(trade) >= 0 ? "positive-text" : "negative-text"
                       }
                     >
-                      {trade.feesKnown === false || trade.pnlKnown === false
+                      {!JournalForm.netVerified(trade)
                         ? "Thiếu phí / P&L"
                         : money(netPnl(trade), true)}
                     </td>
@@ -3463,8 +3477,9 @@ export default function Home() {
               disabled={
                 tradeImportBusy ||
                 !tradeImportPreview.trades.length ||
+                (tradeImportPreview.trades.some(t=>t.recordKind==="fill")&&!importAccount.trim()) ||
                 tradeImportPreview.needsNumberConfirmation ||
-                (importCurrency !== "VND" && !(Number(importFx) > 0)) ||
+                (!importCurrency || (importCurrency !== "VND" && !(Number(importFx) > 0))) ||
                 !!ingestionPlan?.candidates.some(
                   (c) => !resolutions[c.incoming.id],
                 )
@@ -3596,17 +3611,17 @@ export default function Home() {
                           <td>{trade.session}</td>
                           <td><JournalInlineCell value={trade.setup} label={"setup "+trade.symbol} disabled={isDemo} onSave={(value,baseline)=>saveInlineTrade(trade.id,"setup",value,baseline)}/></td>
                           <td>{trade.timeframe}</td>
-                          <td>{money(trade.risk, true)}</td>
+                          <td>{JournalForm.riskVerified(trade)?money(trade.risk,true):"Chưa có 1R"}</td>
                           <td>
-                            {trade.riskKnown!==false&&trade.risk>0&&trade.feesKnown!==false&&trade.pnlKnown!==false
+                            {trade.riskKnown!==false&&trade.risk>0&&JournalForm.netVerified(trade)
                               ? (netPnl(trade)/trade.risk).toFixed(2)+' R'
                               : '○ Chưa xác minh'}
                           </td>
                           <td>
                             <span
-                              className={`result ${JournalForm.outcome(netPnl(trade),trade.feesKnown!==false&&trade.pnlKnown!==false).tone}`}
+                              className={`result ${JournalForm.outcome(netPnl(trade),JournalForm.netVerified(trade)).tone}`}
                             >
-                              {JournalForm.outcome(netPnl(trade),trade.feesKnown!==false&&trade.pnlKnown!==false).label}
+                              {JournalForm.outcome(netPnl(trade),JournalForm.netVerified(trade)).label}
                             </span>
                           </td>
                           <td
@@ -3616,8 +3631,7 @@ export default function Home() {
                                 : "negative-text"
                             }
                           >
-                            {trade.feesKnown === false ||
-                            trade.pnlKnown === false
+                            {!JournalForm.netVerified(trade)
                               ? "Thiếu phí / P&L"
                               : money(netPnl(trade), true)}
                           </td>
@@ -3625,7 +3639,7 @@ export default function Home() {
                             <span
                               className={`score ${trade.discipline >= 90 ? "good" : "warn"}`}
                             >
-                              {trade.discipline}%
+                              {trade.discipline>0||Object.keys(trade.rules||{}).length||JournalForm.metadata(trade).disciplineKnown?trade.discipline+"%":"Chưa review"}
                             </span>
                           </td>
                           <td>
@@ -3689,9 +3703,9 @@ export default function Home() {
                         </span>
                       </div>
                       <span
-                        className={`result ${JournalForm.outcome(netPnl(trade),trade.feesKnown!==false&&trade.pnlKnown!==false).tone}`}
+                        className={`result ${JournalForm.outcome(netPnl(trade),JournalForm.netVerified(trade)).tone}`}
                       >
-                        {JournalForm.outcome(netPnl(trade),trade.feesKnown!==false&&trade.pnlKnown!==false).label}
+                        {JournalForm.outcome(netPnl(trade),JournalForm.netVerified(trade)).label}
                       </span>
                     </header>
                     <div className="journal-trade-summary">
@@ -3704,7 +3718,7 @@ export default function Home() {
                               : "negative-text"
                           }
                         >
-                          {trade.feesKnown === false || trade.pnlKnown === false
+                          {!JournalForm.netVerified(trade)
                             ? "Thiếu phí / P&L"
                             : money(netPnl(trade), true)}
                         </strong>
@@ -3712,15 +3726,12 @@ export default function Home() {
                       <div>
                         <span>R:R</span>
                         <strong>
-                          {trade.risk
-                            ? (netPnl(trade) / trade.risk).toFixed(2)
-                            : "0.00"}
-                          R
+                          {JournalForm.riskVerified(trade)&&JournalForm.netVerified(trade)?(netPnl(trade)/trade.risk).toFixed(2)+" R":"Chưa xác minh"}
                         </strong>
                       </div>
                       <div>
                         <span>Kỷ luật</span>
-                        <strong>{trade.discipline}%</strong>
+                        <strong>{trade.discipline>0||Object.keys(trade.rules||{}).length||JournalForm.metadata(trade).disciplineKnown?trade.discipline+"%":"Chưa review"}</strong>
                       </div>
                     </div>
                     <dl>
@@ -4622,7 +4633,7 @@ export default function Home() {
         <label>
           Tiền tệ
           <select defaultValue="VND">
-            <option>VND</option>
+            <option value="">Chọn tiền tệ đúng theo báo cáo</option><option>VND</option>
             <option>USD</option>
           </select>
         </label>
@@ -4743,17 +4754,14 @@ export default function Home() {
         return renderCockpit("risk");
       case "statistics":
         return (
-          <TradingMetrix
-            trades={trades
-              .filter((t) => t.recordKind !== "fill")
-              .map((t) => ({ ...t, pnl: netPnl(t) }))}
+          <TradingMetrix trades={projected as Trade[]} settings={riskSettings} onSettings={setRiskSettings}
           />
         );
       case "system-tracker":
         return (
           <SystemTracker
             trades={trades
-              .filter((t) => t.recordKind !== "fill")
+              .filter((t) => t.recordKind !== "fill" && JournalForm.netVerified(t))
               .map((t) => ({ ...t, pnl: netPnl(t) }))}
             onOpenJournal={() => navigate("journal")}
           />
@@ -4852,8 +4860,8 @@ export default function Home() {
     Boolean(draft.date),
     Boolean(draft.symbol.trim()),
     draft.setup !== UNCLASSIFIED_SETUP,
-    assetInput.enabled ? !assetPreview.error : Number.isFinite(draftRiskValue) && draftRiskValue > 0,
-    assetInput.enabled ? Boolean(assetPreview.value?.is_net_pnl_verified && JournalForm.costs(assetPreview.value)) : draftPnlValue !== null && Number.isFinite(draftPnlValue),
+    assetInput.enabled ? !assetPreview.error : (Number.isFinite(draftRiskValue) && draftRiskValue > 0)||!!editingTradeId&&trades.find(t=>t.id===editingTradeId)?.riskKnown===false&&!draft.risk.trim(),
+    assetInput.enabled ? Boolean(assetPreview.value?.is_net_pnl_verified && JournalForm.costs(assetPreview.value)) : draftPnlValue !== null && Number.isFinite(draftPnlValue)||!!editingTradeId&&trades.find(t=>t.id===editingTradeId)?.pnlKnown===false&&!draft.pnl.trim(),
   ];
   const draftQualitySignals = [
     ...draftRequired,
@@ -5439,7 +5447,7 @@ export default function Home() {
                           })
                         }
                         placeholder="Ví dụ: 1.000.000"
-                        required={!assetInput.enabled}
+                        required={!assetInput.enabled&&!editingTradeId}
                       />
                       <small>Số tiền chấp nhận mất nếu SL bị chạm.</small>
                     </label>
@@ -5594,7 +5602,7 @@ export default function Home() {
                           })
                         }
                         placeholder="Lãi dương, lỗ âm"
-                        required={!assetInput.enabled}
+                        required={!assetInput.enabled&&!editingTradeId}
                       />
                     </label>
                     <label>
@@ -5602,7 +5610,6 @@ export default function Home() {
                       <input
                         type="number"
                         inputMode="numeric"
-                        min="0"
                         step="any"
                         value={draft.fees}
                         onFocus={selectNumericInput}
@@ -6639,10 +6646,11 @@ hoặc
           </section>
         </div>
       )}
+      {riskSync.conflict && <section className="panel sync-conflict" role="alert"><h3>Cấu hình vốn cần đối chiếu</h3><p>Bản thiết bị và cloud cùng sửa: {riskSync.conflict.fields.join(", ")}. Cả hai bản đã được lưu riêng trên thiết bị.</p><p>Vốn thiết bị: {String((riskSync.conflict.local as RiskSettings).initialCapital)} · Vốn cloud: {String((riskSync.conflict.remote as RiskSettings).initialCapital)}</p><button onClick={()=>void riskSync.resolve("local")}>Giữ cấu hình thiết bị</button><button onClick={()=>void riskSync.resolve("remote")}>Dùng cấu hình cloud</button><button onClick={()=>riskSync.download()}>Tải bản đối chiếu JSON</button></section>}
       {toast && (
-        <div className="toast" role="status">
-          <span>✓</span>
-          {toast}
+        <div className={"toast "+(/error|lỗi|không|chưa|thiếu|thất bại|khác nhau|đối chiếu/i.test(toast)?"toast-warning":"")} role={/error|lỗi|không|chưa|thiếu|thất bại|khác nhau|đối chiếu/i.test(toast)?"alert":"status"}>
+          <span>{/error|lỗi|không|chưa|thiếu|thất bại|khác nhau|đối chiếu/i.test(toast)?"!":"✓"}</span>
+          {toast.replace(/^Error:\s*/,"")}
         </div>
       )}
     </div>

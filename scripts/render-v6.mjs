@@ -4,7 +4,7 @@ import {resolve} from 'node:path';
 import {createRequire} from 'node:module';
 
 export const repo = fileURLToPath(new URL('../', import.meta.url));
-export const sharedModules = ['trade-normalizer.js','trade-form.js','journal-adapters.js','journal-unified.js','journal-lifecycle.js'];
+export const sharedModules = ['trade-normalizer.js','trade-form.js','journal-adapters.js','position-cycles.js','journal-unified.js','journal-lifecycle.js'];
 const read = name => fs.readFileSync(resolve(repo,name),'utf8');
 function replaceOnce(text, token, value) {
   if (text.split(token).length !== 2) throw Error(`Expected exactly one source slot: ${token}`);

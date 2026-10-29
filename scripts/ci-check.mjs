@@ -13,6 +13,7 @@ const steps=[
   ['v6-browser',[cli,'run','e2e'],path.join(repo,'v6')],
   ['two-tab-sync',['--experimental-loader','./scripts/cloudflare-validation-loader.mjs','tests/unified-two-tab-browser.mjs']],
   ['classic-lifecycle',['--experimental-loader','./scripts/cloudflare-validation-loader.mjs','tests/lifecycle-classic-browser.mjs']],
+  ['intake-browser',['--experimental-loader','./scripts/cloudflare-validation-loader.mjs','tests/intake-browser.mjs']],
   ['cloud-sync-safety',['tests/scale/sync-safety.mjs']],
 ];
 const results=[];
