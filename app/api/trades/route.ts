@@ -40,7 +40,6 @@ function cleanTrade(
       n !== undefined &&
       (!Number.isFinite(Number(n)) ||
         ([
-          "fees",
           "risk",
           "quantity",
           "entryPrice",
@@ -73,10 +72,10 @@ function cleanTrade(
     mae: value.mae,
     mfe: value.mfe,
     rulesJson: value.rulesJson,
-    feesKnown: value.feesKnown ?? true,
-    pnlKnown: value.pnlKnown ?? true,
+    feesKnown: value.feesKnown ?? (value.fees!==null&&value.fees!==undefined&&String(value.fees).trim()!==""),
+    pnlKnown: value.pnlKnown ?? (value.pnl!==null&&value.pnl!==undefined&&String(value.pnl).trim()!==""),
     recordKind: value.recordKind ?? "position",
-    riskKnown: value.riskKnown ?? true,
+    riskKnown: value.riskKnown ?? Number(value.risk)>0,
     rawPayloadJson: JSON.stringify(value),
     userId: accountUser.id,
     userEmail: accountUser.email,
@@ -87,7 +86,7 @@ function cleanTrade(
     date,
     symbol,
     side: value.side === "Sell" ? "Sell" : "Buy",
-    session: String(value.session ?? "Châu Á"),
+    session: String(value.session ?? "Chưa rõ"),
     setup: String(value.setup ?? "Nhập dữ liệu"),
     timeframe: String(value.timeframe ?? "—"),
     risk: Number(value.risk) || 0,

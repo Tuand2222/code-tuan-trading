@@ -5,12 +5,15 @@ export type ImportedJournalTrade = {
   date: string;
   symbol: string;
   side: "Buy" | "Sell";
-  session: "Châu Á" | "London" | "New York";
+  session: "Châu Á" | "London" | "New York" | "Chưa rõ";
   setup: string;
   timeframe: string;
   risk: number;
   riskKnown?: boolean;
   feesKnown?: boolean;
+  pnlKnown?: boolean;
+  swap?: number;
+  unifiedV6?: Record<string,any>;
   recordKind?: string;
   openedAt?: string | null;
   closedAt?: string | null;
@@ -47,6 +50,7 @@ type Field =
   | "entryPrice"
   | "exitPrice"
   | "fees"
+  | "swap"
   | "externalId"
   | "risk"
   | "setup"
@@ -62,6 +66,7 @@ type Field =
   | "durationMin";
 
 const ALIASES: Record<Field, string[]> = {
+  swap: ["swap", "swapcost", "fundingcost"],
   date: [
     "date",
     "datetime",
@@ -280,6 +285,7 @@ function dateFromValue(
   if (typeof value === "number" && serialDate) return serialDate(value);
   const text = String(value ?? "").trim();
   if (!text) return null;
+  if(/^\d{13}$/.test(text))return new Date(Number(text)).toISOString().slice(0,10);
   const formatParts = (year: number, month: number, day: number) => {
     const checked = new Date(Date.UTC(year, month - 1, day));
     if (
@@ -290,7 +296,7 @@ function dateFromValue(
       return null;
     return `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
   };
-  const iso = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  const iso = text.match(/^(\d{4})[-.](\d{1,2})[-.](\d{1,2})/);
   if (iso) return formatParts(Number(iso[1]), Number(iso[2]), Number(iso[3]));
   const local = text.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})/);
   if (local) {
@@ -326,7 +332,7 @@ function sessionFromValue(value: unknown): ImportedJournalTrade["session"] {
   const session = normalizeHeader(value);
   if (session.includes("london")) return "London";
   if (session.includes("newyork") || session === "ny") return "New York";
-  return "Châu Á";
+  return session.includes('chaua')||session.includes('asia') ? "Châu Á" : "Chưa rõ";
 }
 
 function tradeRows(
@@ -362,10 +368,14 @@ function tradeRows(
   const dataRows = rows
     .slice(headerIndex + 1)
     .filter((row) => row.some((value) => String(value ?? "").trim() !== ""));
+  const closingColumn=headers.findIndex(h=>['closetime','closedat','closingtime'].includes(h));
+  const timeColumns=headers.flatMap((h,i)=>h==='time'?[i]:[]),priceColumns=headers.flatMap((h,i)=>h==='price'?[i]:[]);
+  if(closingColumn>=0)positions.date=closingColumn;
+  else if(timeColumns.length===2&&priceColumns.length===2){positions.date=timeColumns[1];positions.entryPrice=priceColumns[0];positions.exitPrice=priceColumns[1];}
   const trades: ImportedJournalTrade[] = [];
   const errors: string[] = [];
 
-  const numericNames: Field[]=['pnl','quantity','entryPrice','exitPrice','fees','risk','stopLoss','takeProfit','discipline','durationMin'];
+  const numericNames: Field[]=['pnl','quantity','entryPrice','exitPrice','fees','swap','risk','stopLoss','takeProfit','discipline','durationMin'];
   const numberDecisions=numericNames.filter(field=>positions[field]>=0).map(field=>{const values=dataRows.map(row=>row[positions[field]]);const decision=Quant.decimalSeparator(values,'.');return {field,separator:decision.ambiguous&&separatorOverride?separatorOverride:decision.separator,ambiguous:decision.ambiguous&&values.some(v=>typeof v==='string'&&/[.,]/.test(v)),examples:values.filter(v=>typeof v==='string'&&/[.,]/.test(v)).slice(0,3).map(String)};});
   const columnNumber=(field:Field,value:unknown):number=>{if(value===null||value===undefined||value==='')return 0;const rule=numberDecisions.find(d=>d.field===field);const parsed=Quant.parseNumber(value,rule?.separator||'.');return parsed===null?Number.NaN:Number(parsed);};
   dataRows.forEach((row, index) => {
@@ -387,13 +397,14 @@ function tradeRows(
       );
       return;
     }
-    const pnl = columnNumber("pnl",pnlValue);
+    const rawPnl = columnNumber("pnl",pnlValue);
     const numericFields: Field[] = [
       "pnl",
       "quantity",
       "entryPrice",
       "exitPrice",
       "fees",
+      "swap",
       "risk",
       "stopLoss",
       "takeProfit",
@@ -414,7 +425,10 @@ function tradeRows(
     const externalValue = String(get("externalId") ?? "").trim();
     const rowKey = rowToString(row);
     const externalId = externalValue || `import-${stableHash(rowKey)}-${index}`;
-    const sideText = normalizeHeader(get("side") ?? "buy");
+    const sideText = normalizeHeader(get("side") ?? "");
+    if(!/^(buy|sell|long|short|mua|ban)(market|limit|stop)?$/.test(sideText)){
+      errors.push(`Dòng ${headerIndex + index + 2}: thiếu hoặc không nhận diện được hướng Buy/Sell; không tự gán hướng.`);return;
+    }
     const side =
       sideText.includes("sell") ||
       sideText.includes("short") ||
@@ -424,7 +438,25 @@ function tradeRows(
     const quantity = columnNumber("quantity",get("quantity"));
     const entryPrice = columnNumber("entryPrice",get("entryPrice"));
     const exitPrice = columnNumber("exitPrice",get("exitPrice"));
-    const suppliedRisk = Math.abs(columnNumber("risk",get("risk")));
+    const suppliedRisk = columnNumber("risk",get("risk"));
+    if(suppliedRisk<0){errors.push(`Dòng ${headerIndex + index + 2}: rủi ro ban đầu phải dương.`);return;}
+    const costIndices=headers.flatMap((h,i)=>ALIASES.fees.includes(h)?[i]:[]);
+    const mtSigned=/mt[45]|metatrader/i.test(sourceName)||headers.includes('swap');
+    const feesKnown=costIndices.length>0&&costIndices.every(i=>String(row[i]??'').trim()!=='')&&(positions.swap<0||String(get('swap')??'').trim()!=='');
+    let fees=0,costInvalid=false;
+    for(const i of costIndices){const v=columnNumber('fees',row[i]);if(!Number.isFinite(v))costInvalid=true;else fees+=mtSigned&&headers[i]==='commission'?-v:v;}
+    const swapRaw=columnNumber('swap',get('swap'));
+    const swap=positions.swap<0?0:headers[positions.swap]==='swap'?-swapRaw:swapRaw;
+    if(costInvalid){errors.push(`Dòng ${headerIndex+index+2}: phí không hợp lệ.`);return;}
+    const fileNet=/^(netpnl|netprofit|netprofitloss)$/.test(headers[positions.pnl]);
+    const feeCurrencyIndex=headers.findIndex(h=>['commissionasset','feecurrency','feecoin'].includes(h));
+    const moneyCurrencyIndex=headers.findIndex(h=>['currency','profitcurrency','pnlcurrency','accountcurrency'].includes(h));
+    const currency=String(moneyCurrencyIndex<0?'':row[moneyCurrencyIndex]||'').toUpperCase();
+    const feeCurrency=String(feeCurrencyIndex<0?'':row[feeCurrencyIndex]||'').toUpperCase();
+    const quote=/USDT$/.test(symbol)?'USDT':/USDC$/.test(symbol)?'USDC':currency;
+    const compatibleFees=!feeCurrency||!!quote&&feeCurrency===quote;
+    const pnl=fileNet?Number(Quant.decimal(rawPnl)!.plus(Quant.decimal(fees)!).plus(Quant.decimal(swap)!)):rawPnl;
+    const unifiedV6={...(fileNet?{netPnlSource:'file_net',is_net_pnl_verified:true}:{}),positionSide:String(row[headers.indexOf('positionside')]||''),currency:currency||quote||null,feeCurrency:feeCurrency||null,disciplineKnown:positions.discipline>=0&&String(get('discipline')??'').trim()!=='',importVersion:2};
     const rawNote = String(get("note") ?? "").trim();
     const importedNote = `Nhập từ ${sourceName}`;
     trades.push({
@@ -438,21 +470,24 @@ function tradeRows(
       timeframe: String(get("timeframe") ?? "").trim() || "—",
       risk: suppliedRisk,
       riskKnown: suppliedRisk > 0,
-      rawPayloadJson: JSON.stringify(row),
+      rawPayloadJson: JSON.stringify({headers:rows[headerIndex],row,unifiedV6}),
+      unifiedV6,
       recordKind:
         headers.includes("realizedpnl") &&
         headers.includes("price") &&
         headers.includes("qty")
-          ? "fill"
+          || (headers.includes('commission')&&['entry','direction'].some(h=>headers.includes(h)&&/^(in|out|inout|outby)$/i.test(String(row[headers.indexOf(h)])))) ? "fill"
           : "position",
       closedAt: (() => {
         const raw = String(get("date") ?? "");
-        const time = Date.parse(raw);
+        if(/^\d{13}$/.test(raw))return new Date(Number(raw)).toISOString();
+        const time = /(?:Z|[+-]\d\d:\d\d)$/.test(raw)?Date.parse(raw):NaN;
         return raw.length > 10 && Number.isFinite(time)
           ? new Date(time).toISOString()
           : null;
       })(),
       pnl,
+      pnlKnown: compatibleFees,
       discipline: Math.max(0, Math.min(100, columnNumber("discipline",get("discipline")))),
       psychology: String(get("psychology") ?? "").trim() || "Chưa review",
       note: [rawNote, importedNote].filter(Boolean).join(" · "),
@@ -464,11 +499,12 @@ function tradeRows(
       stopLoss: columnNumber("stopLoss",get("stopLoss")),
       takeProfit: columnNumber("takeProfit",get("takeProfit")),
       exitPrice,
-      fees: Math.abs(columnNumber("fees",get("fees"))),
-      feesKnown: positions.fees >= 0 && String(get("fees") ?? "").trim() !== "",
+      fees, swap,
+      feesKnown,
     });
   });
 
+  if(errors.length)for(const t of trades){t.unifiedV6={...t.unifiedV6,batchIncomplete:true};const receipt=JSON.parse(t.rawPayloadJson||'{}');t.rawPayloadJson=JSON.stringify({...receipt,unifiedV6:t.unifiedV6});}
   return { trades, errors, detected: dataRows.length, numberDecisions, needsNumberConfirmation:!separatorOverride&&numberDecisions.some(d=>d.ambiguous) };
 }
 

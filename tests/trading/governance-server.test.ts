@@ -20,7 +20,7 @@ vi.mock("../../lib/broker-crypto", () => ({
 import { runDueReports, duePeriod } from "../../lib/scheduled-reports";
 import { DEFAULT_RISK } from "../../lib/risk-analytics";
 import { ingestTrades } from "../../lib/server-ingestion";
-import { PATCH, DELETE } from "../../app/api/trades/route";
+import { POST, PATCH, DELETE } from "../../app/api/trades/route";
 const row = (id: string, extra = {}) => ({
   id,
   userId: "owner",
@@ -89,6 +89,24 @@ describe("D1 atomic ingestion, conflict control and recovery", () => {
     );
     expect(c.imported).toBe(1);
   });
+  it('enriches zero fees, swap and risk together without losing review or reviving unverified money',async()=>{
+    await ingestTrades([row('intake',{feesKnown:false,pnlKnown:false,riskKnown:false,risk:0,rawPayloadJson:JSON.stringify({unifiedV6:{review:'DONE',tag:'keep'}})})],'FILE');
+    const enriched=await ingestTrades([row('intake-next',{externalId:'intake',fees:0,swap:2,risk:50,riskKnown:true,feesKnown:true,pnlKnown:true})],'FILE');
+    expect(enriched.trades[0]).toMatchObject({fees:0,swap:2,risk:50,riskKnown:true,feesKnown:true,pnlKnown:true});
+    expect(JSON.parse(enriched.trades[0].rawPayloadJson!).unifiedV6.review).toBe('DONE');
+    await ingestTrades([row('intake-bad',{externalId:'intake',pnl:999999,fees:0,feesKnown:false,pnlKnown:true,riskKnown:false,risk:0})],'FILE');
+    const saved=await db.prepare("SELECT pnl,fees,swap,risk FROM trades WHERE id='intake'").first();
+    expect(saved).toMatchObject({pnl:100,fees:0,swap:2,risk:50});
+    const net=await ingestTrades([row('intake-net',{externalId:'intake',pnl:9.5,fees:0,swap:0,feesKnown:false,pnlKnown:true,rawPayloadJson:JSON.stringify({unifiedV6:{netPnlSource:'file_net',is_net_pnl_verified:true}})})],'FILE');
+    expect(net.trades[0]).toMatchObject({pnl:9.5,fees:0,swap:0,feesKnown:false});
+    expect(JSON.parse(net.trades[0].rawPayloadJson!).unifiedV6).toMatchObject({review:'DONE',netPnlSource:'file_net',is_net_pnl_verified:true,is_1r_verified:true});
+  });
+  it('API missing cost is unverified, explicit zero and signed rebates are retained',async()=>{
+    const missing=await POST(new Request('http://test/api/trades',{method:'POST',body:JSON.stringify({trades:[{...row('missing-cost'),fees:undefined,feesKnown:undefined}],sourceType:'FILE'})}));
+    expect(missing.status).toBe(201);expect((await missing.json() as any).trades[0].feesKnown).toBe(false);
+    const rebate=await POST(new Request('http://test/api/trades',{method:'POST',body:JSON.stringify({trades:[row('rebate',{fees:-2,swap:-1})],sourceType:'FILE'})}));
+    expect(rebate.status).toBe(201);expect((await rebate.json() as any).trades[0]).toMatchObject({fees:-2,swap:-1});
+  });
   it("rolls back every trade, audit and sync cursor when one row fails", async () => {
     await db
       .prepare(
@@ -140,7 +158,7 @@ describe("D1 atomic ingestion, conflict control and recovery", () => {
     await ingestTrades([row('annotation-receipt',{pnl:200})], 'FILE');
     const stored=await db.prepare("SELECT pnl,raw_payload_json FROM trades WHERE id='annotation-receipt'").first<{pnl:number;raw_payload_json:string}>();
     expect(stored?.pnl).toBe(200);
-    expect(JSON.parse(stored!.raw_payload_json).unifiedV6).toEqual({review:'DONE',tag:'Giữ nguyên'});
+    expect(JSON.parse(stored!.raw_payload_json).unifiedV6).toMatchObject({review:'DONE',tag:'Giữ nguyên'});
   });
   it("rejects a stale edit and keeps soft-deleted data recoverable", async () => {
     await ingestTrades([row("editable")], "MANUAL");

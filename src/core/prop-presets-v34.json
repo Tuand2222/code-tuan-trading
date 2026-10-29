@@ -1,0 +1,369 @@
+{
+  "topstep_50k_combine": {
+    "id": "topstep_50k_combine",
+    "firm_name": "Topstep",
+    "program_name": "50K Trading Combine",
+    "program_version": "2026-09",
+    "effective_from": "2026-09-17",
+    "last_verified": null,
+    "official_source_url": "https://help.topstep.com/",
+    "capital": "50000",
+    "phases": [
+      {
+        "name": "Combine",
+        "profit_target_pct": 6.0,
+        "min_trading_days": 0,
+        "min_profitable_days": 0,
+        "profitable_day_min_pct": 0.0,
+        "max_days": null
+      }
+    ],
+    "max_loss": {
+      "pct": 4.0,
+      "type": "EOD_TRAILING",
+      "lock_at_initial": true,
+      "lock_offset_amount": "0",
+      "after_first_payout": "LOCK_AT_INITIAL"
+    },
+    "daily_loss": {
+      "enabled": false,
+      "pct": 0.0,
+      "calculation_mode": "FIXED_INITIAL_PCT_FROM_MIDNIGHT_BALANCE"
+    },
+    "consistency": {
+      "enabled": true,
+      "max_day_share": 0.55,
+      "behavior": "INCREASE_TARGET_SOFT",
+      "applies_to": [
+        "evaluation"
+      ]
+    },
+    "fees": {
+      "challenge_fee": "49",
+      "activation_fee": "149",
+      "refund_on_funded": false
+    },
+    "profit_split": 0.9,
+    "payout_cycle_days": 14,
+    "min_payout": "0",
+    "stale_warn_after_months": 3,
+    "currency": "USD",
+    "daily_reset_time": "00:00",
+    "verified": false
+  },
+  "topstep_50k_xfa_standard": {
+    "id": "topstep_50k_xfa_standard",
+    "firm_name": "Topstep",
+    "program_name": "50K Express Funded Account (Standard Path)",
+    "program_version": "2026-09",
+    "effective_from": "2026-09-17",
+    "last_verified": null,
+    "official_source_url": "https://help.topstep.com/",
+    "capital": "50000",
+    "phases": [
+      {
+        "name": "XFA Standard",
+        "profit_target_pct": null,
+        "min_trading_days": 0,
+        "min_profitable_days": 0,
+        "profitable_day_min_pct": 0.0,
+        "max_days": null
+      }
+    ],
+    "max_loss": {
+      "pct": 4.0,
+      "type": "EOD_TRAILING",
+      "lock_at_initial": true,
+      "lock_offset_amount": "0",
+      "after_first_payout": "LOCK_AT_INITIAL"
+    },
+    "daily_loss": {
+      "enabled": false,
+      "pct": 0.0,
+      "calculation_mode": "FIXED_INITIAL_PCT_FROM_MIDNIGHT_BALANCE"
+    },
+    "consistency": {
+      "enabled": false,
+      "max_day_share": 1.0,
+      "behavior": "INCREASE_TARGET_SOFT",
+      "applies_to": [
+        "funded"
+      ]
+    },
+    "fees": {
+      "challenge_fee": "0",
+      "activation_fee": "0",
+      "refund_on_funded": false
+    },
+    "profit_split": 0.9,
+    "payout_cycle_days": 14,
+    "min_payout": "0",
+    "stale_warn_after_months": 3,
+    "currency": "USD",
+    "daily_reset_time": "00:00",
+    "verified": false
+  },
+  "topstep_50k_xfa_consistency": {
+    "id": "topstep_50k_xfa_consistency",
+    "firm_name": "Topstep",
+    "program_name": "50K Express Funded Account (Consistency Path)",
+    "program_version": "2026-09",
+    "effective_from": "2026-09-17",
+    "last_verified": null,
+    "official_source_url": "https://help.topstep.com/",
+    "capital": "50000",
+    "phases": [
+      {
+        "name": "XFA Consistency",
+        "profit_target_pct": null,
+        "min_trading_days": 0,
+        "min_profitable_days": 0,
+        "profitable_day_min_pct": 0.0,
+        "max_days": null
+      }
+    ],
+    "max_loss": {
+      "pct": 4.0,
+      "type": "EOD_TRAILING",
+      "lock_at_initial": true,
+      "lock_offset_amount": "0",
+      "after_first_payout": "LOCK_AT_INITIAL"
+    },
+    "daily_loss": {
+      "enabled": false,
+      "pct": 0.0,
+      "calculation_mode": "FIXED_INITIAL_PCT_FROM_MIDNIGHT_BALANCE"
+    },
+    "consistency": {
+      "enabled": true,
+      "max_day_share": 0.4,
+      "behavior": "INCREASE_TARGET_SOFT",
+      "applies_to": [
+        "funded"
+      ]
+    },
+    "fees": {
+      "challenge_fee": "0",
+      "activation_fee": "0",
+      "refund_on_funded": false
+    },
+    "profit_split": 0.9,
+    "payout_cycle_days": 14,
+    "min_payout": "0",
+    "stale_warn_after_months": 3,
+    "currency": "USD",
+    "daily_reset_time": "00:00",
+    "verified": false
+  },
+  "the5ers_100k_high_stakes_new": {
+    "id": "the5ers_100k_high_stakes_new",
+    "firm_name": "The5ers",
+    "program_name": "100K High Stakes (New 10%/5%)",
+    "program_version": "v2025_10pct",
+    "effective_from": "2025-01-01",
+    "last_verified": null,
+    "official_source_url": "https://the5ers.com/high-stakes/",
+    "capital": "100000",
+    "phases": [
+      {
+        "name": "Step 1",
+        "profit_target_pct": 10.0,
+        "min_trading_days": 0,
+        "min_profitable_days": 3,
+        "profitable_day_min_pct": 0.5,
+        "max_days": null
+      },
+      {
+        "name": "Step 2",
+        "profit_target_pct": 5.0,
+        "min_trading_days": 0,
+        "min_profitable_days": 3,
+        "profitable_day_min_pct": 0.5,
+        "max_days": null
+      }
+    ],
+    "max_loss": {
+      "pct": 10.0,
+      "type": "STATIC",
+      "lock_at_initial": false,
+      "lock_offset_amount": "0",
+      "after_first_payout": "KEEP_FLOOR"
+    },
+    "daily_loss": {
+      "enabled": true,
+      "pct": 5.0,
+      "calculation_mode": "PCT_OF_MAX_PREV_BALANCE_EQUITY"
+    },
+    "consistency": null,
+    "fees": {
+      "challenge_fee": "495",
+      "activation_fee": "0",
+      "refund_on_funded": true
+    },
+    "profit_split": 0.8,
+    "payout_cycle_days": 14,
+    "min_payout": "0",
+    "stale_warn_after_months": 3,
+    "currency": "USD",
+    "daily_reset_time": "00:00",
+    "verified": false
+  },
+  "the5ers_100k_high_stakes_classic": {
+    "id": "the5ers_100k_high_stakes_classic",
+    "firm_name": "The5ers",
+    "program_name": "100K High Stakes (Classic 8%/5%)",
+    "program_version": "v2024_8pct",
+    "effective_from": "2024-01-01",
+    "last_verified": null,
+    "official_source_url": "https://the5ers.com/high-stakes/",
+    "capital": "100000",
+    "phases": [
+      {
+        "name": "Step 1",
+        "profit_target_pct": 8.0,
+        "min_trading_days": 0,
+        "min_profitable_days": 3,
+        "profitable_day_min_pct": 0.5,
+        "max_days": null
+      },
+      {
+        "name": "Step 2",
+        "profit_target_pct": 5.0,
+        "min_trading_days": 0,
+        "min_profitable_days": 3,
+        "profitable_day_min_pct": 0.5,
+        "max_days": null
+      }
+    ],
+    "max_loss": {
+      "pct": 10.0,
+      "type": "STATIC",
+      "lock_at_initial": false,
+      "lock_offset_amount": "0",
+      "after_first_payout": "KEEP_FLOOR"
+    },
+    "daily_loss": {
+      "enabled": true,
+      "pct": 5.0,
+      "calculation_mode": "PCT_OF_MAX_PREV_BALANCE_EQUITY"
+    },
+    "consistency": null,
+    "fees": {
+      "challenge_fee": "495",
+      "activation_fee": "0",
+      "refund_on_funded": true
+    },
+    "profit_split": 0.8,
+    "payout_cycle_days": 14,
+    "min_payout": "0",
+    "stale_warn_after_months": 3,
+    "currency": "USD",
+    "daily_reset_time": "00:00",
+    "verified": false
+  },
+  "ftmo_100k_2step": {
+    "id": "ftmo_100k_2step",
+    "firm_name": "FTMO",
+    "program_name": "100K 2-Step Evaluation",
+    "program_version": "2025-v1",
+    "effective_from": "2025-01-01",
+    "last_verified": null,
+    "official_source_url": "https://ftmo.com/",
+    "capital": "100000",
+    "phases": [
+      {
+        "name": "FTMO Challenge",
+        "profit_target_pct": 10.0,
+        "min_trading_days": 4,
+        "min_profitable_days": 0,
+        "profitable_day_min_pct": 0.0,
+        "max_days": null
+      },
+      {
+        "name": "Verification",
+        "profit_target_pct": 5.0,
+        "min_trading_days": 4,
+        "min_profitable_days": 0,
+        "profitable_day_min_pct": 0.0,
+        "max_days": null
+      }
+    ],
+    "max_loss": {
+      "pct": 10.0,
+      "type": "STATIC",
+      "lock_at_initial": false,
+      "lock_offset_amount": "0",
+      "after_first_payout": "FULL_RESET"
+    },
+    "daily_loss": {
+      "enabled": true,
+      "pct": 5.0,
+      "calculation_mode": "FIXED_INITIAL_PCT_FROM_MIDNIGHT_BALANCE"
+    },
+    "consistency": null,
+    "fees": {
+      "challenge_fee": "540",
+      "activation_fee": "0",
+      "refund_on_funded": true
+    },
+    "profit_split": 0.8,
+    "payout_cycle_days": 14,
+    "min_payout": "0",
+    "stale_warn_after_months": 3,
+    "currency": "USD",
+    "daily_reset_time": "00:00",
+    "verified": false
+  },
+  "apex_50k_intraday": {
+    "id": "apex_50k_intraday",
+    "firm_name": "Apex Trader Funding",
+    "program_name": "50K Evaluation / PA Intraday Trailing",
+    "program_version": "2025-v1",
+    "effective_from": "2025-01-01",
+    "last_verified": null,
+    "official_source_url": "https://apextraderfunding.com/",
+    "capital": "50000",
+    "phases": [
+      {
+        "name": "Evaluation",
+        "profit_target_pct": 6.0,
+        "min_trading_days": 0,
+        "min_profitable_days": 0,
+        "profitable_day_min_pct": 0.0,
+        "max_days": null
+      }
+    ],
+    "max_loss": {
+      "pct": 4.0,
+      "type": "INTRADAY_TRAILING",
+      "lock_at_initial": true,
+      "lock_offset_amount": "100",
+      "after_first_payout": "LOCK_AT_BUFFER"
+    },
+    "daily_loss": {
+      "enabled": false,
+      "pct": 0.0,
+      "calculation_mode": "FIXED_INITIAL_PCT_FROM_MIDNIGHT_BALANCE"
+    },
+    "consistency": {
+      "enabled": true,
+      "max_day_share": 0.3,
+      "behavior": "INCREASE_TARGET_SOFT",
+      "applies_to": [
+        "funded"
+      ]
+    },
+    "fees": {
+      "challenge_fee": "0",
+      "activation_fee": "0",
+      "refund_on_funded": false
+    },
+    "profit_split": 0.9,
+    "payout_cycle_days": 14,
+    "min_payout": "0",
+    "stale_warn_after_months": 3,
+    "currency": "USD",
+    "daily_reset_time": "00:00",
+    "verified": false
+  }
+}

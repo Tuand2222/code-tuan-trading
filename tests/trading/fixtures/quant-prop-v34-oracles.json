@@ -1,0 +1,1892 @@
+[
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "KEEP_FLOOR",
+      "lockOffset": 10,
+      "ddType": "STATIC",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      20,
+      30,
+      40,
+      50
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": true,
+      "reason": null,
+      "balance": "1000",
+      "floor": "900",
+      "gross_payout": "140",
+      "net_payout": "112.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "50",
+          "net": "40.0"
+        },
+        {
+          "day": 4,
+          "gross": "90",
+          "net": "72.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1020",
+          "floor": "900",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "900",
+          "event": "payout"
+        },
+        {
+          "day": 3,
+          "balance": "1040",
+          "floor": "900",
+          "event": "trade"
+        },
+        {
+          "day": 4,
+          "balance": "1000",
+          "floor": "900",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "KEEP_FLOOR",
+      "lockOffset": 10,
+      "ddType": "STATIC",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      -50,
+      100
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "daily_loss",
+      "balance": "950",
+      "floor": "900",
+      "gross_payout": "0",
+      "net_payout": "0.0",
+      "payouts": [],
+      "path": [
+        {
+          "day": 1,
+          "balance": "950",
+          "floor": "900",
+          "event": "daily_loss"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "KEEP_FLOOR",
+      "lockOffset": 10,
+      "ddType": "STATIC",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      100,
+      100,
+      -20
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": true,
+      "reason": null,
+      "balance": "980",
+      "floor": "900",
+      "gross_payout": "200",
+      "net_payout": "160.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "200",
+          "net": "160.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1100",
+          "floor": "900",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "900",
+          "event": "payout"
+        },
+        {
+          "day": 3,
+          "balance": "980",
+          "floor": "900",
+          "event": "trade"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_INITIAL",
+      "lockOffset": 10,
+      "ddType": "STATIC",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      20,
+      30,
+      40,
+      50
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "post_payout_floor_reached",
+      "balance": "1000",
+      "floor": "1000",
+      "gross_payout": "50",
+      "net_payout": "40.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "50",
+          "net": "40.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1020",
+          "floor": "900",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "1000",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_INITIAL",
+      "lockOffset": 10,
+      "ddType": "STATIC",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      -50,
+      100
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "daily_loss",
+      "balance": "950",
+      "floor": "900",
+      "gross_payout": "0",
+      "net_payout": "0.0",
+      "payouts": [],
+      "path": [
+        {
+          "day": 1,
+          "balance": "950",
+          "floor": "900",
+          "event": "daily_loss"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_INITIAL",
+      "lockOffset": 10,
+      "ddType": "STATIC",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      100,
+      100,
+      -20
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "post_payout_floor_reached",
+      "balance": "1000",
+      "floor": "1000",
+      "gross_payout": "200",
+      "net_payout": "160.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "200",
+          "net": "160.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1100",
+          "floor": "900",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "1000",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_BUFFER",
+      "lockOffset": 10,
+      "ddType": "STATIC",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      20,
+      30,
+      40,
+      50
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "post_payout_floor_reached",
+      "balance": "1000",
+      "floor": "1010",
+      "gross_payout": "50",
+      "net_payout": "40.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "50",
+          "net": "40.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1020",
+          "floor": "900",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "1010",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_BUFFER",
+      "lockOffset": 10,
+      "ddType": "STATIC",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      -50,
+      100
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "daily_loss",
+      "balance": "950",
+      "floor": "900",
+      "gross_payout": "0",
+      "net_payout": "0.0",
+      "payouts": [],
+      "path": [
+        {
+          "day": 1,
+          "balance": "950",
+          "floor": "900",
+          "event": "daily_loss"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_BUFFER",
+      "lockOffset": 10,
+      "ddType": "STATIC",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      100,
+      100,
+      -20
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "post_payout_floor_reached",
+      "balance": "1000",
+      "floor": "1010",
+      "gross_payout": "200",
+      "net_payout": "160.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "200",
+          "net": "160.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1100",
+          "floor": "900",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "1010",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "FULL_RESET",
+      "lockOffset": 10,
+      "ddType": "STATIC",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      20,
+      30,
+      40,
+      50
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": true,
+      "reason": null,
+      "balance": "1000",
+      "floor": "900",
+      "gross_payout": "140",
+      "net_payout": "112.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "50",
+          "net": "40.0"
+        },
+        {
+          "day": 4,
+          "gross": "90",
+          "net": "72.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1020",
+          "floor": "900",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "900",
+          "event": "payout"
+        },
+        {
+          "day": 3,
+          "balance": "1040",
+          "floor": "900",
+          "event": "trade"
+        },
+        {
+          "day": 4,
+          "balance": "1000",
+          "floor": "900",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "FULL_RESET",
+      "lockOffset": 10,
+      "ddType": "STATIC",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      -50,
+      100
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "daily_loss",
+      "balance": "950",
+      "floor": "900",
+      "gross_payout": "0",
+      "net_payout": "0.0",
+      "payouts": [],
+      "path": [
+        {
+          "day": 1,
+          "balance": "950",
+          "floor": "900",
+          "event": "daily_loss"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "FULL_RESET",
+      "lockOffset": 10,
+      "ddType": "STATIC",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      100,
+      100,
+      -20
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": true,
+      "reason": null,
+      "balance": "980",
+      "floor": "900",
+      "gross_payout": "200",
+      "net_payout": "160.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "200",
+          "net": "160.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1100",
+          "floor": "900",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "900",
+          "event": "payout"
+        },
+        {
+          "day": 3,
+          "balance": "980",
+          "floor": "900",
+          "event": "trade"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "KEEP_FLOOR",
+      "lockOffset": 10,
+      "ddType": "EOD_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      20,
+      30,
+      40,
+      50
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": true,
+      "reason": null,
+      "balance": "1000",
+      "floor": "990",
+      "gross_payout": "140",
+      "net_payout": "112.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "50",
+          "net": "40.0"
+        },
+        {
+          "day": 4,
+          "gross": "90",
+          "net": "72.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1020",
+          "floor": "920",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "950",
+          "event": "payout"
+        },
+        {
+          "day": 3,
+          "balance": "1040",
+          "floor": "950",
+          "event": "trade"
+        },
+        {
+          "day": 4,
+          "balance": "1000",
+          "floor": "990",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "KEEP_FLOOR",
+      "lockOffset": 10,
+      "ddType": "EOD_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      -50,
+      100
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "daily_loss",
+      "balance": "950",
+      "floor": "900",
+      "gross_payout": "0",
+      "net_payout": "0.0",
+      "payouts": [],
+      "path": [
+        {
+          "day": 1,
+          "balance": "950",
+          "floor": "900",
+          "event": "daily_loss"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "KEEP_FLOOR",
+      "lockOffset": 10,
+      "ddType": "EOD_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      100,
+      100,
+      -20
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "post_payout_floor_reached",
+      "balance": "1000",
+      "floor": "1100",
+      "gross_payout": "200",
+      "net_payout": "160.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "200",
+          "net": "160.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1100",
+          "floor": "1000",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "1100",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_INITIAL",
+      "lockOffset": 10,
+      "ddType": "EOD_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      20,
+      30,
+      40,
+      50
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "post_payout_floor_reached",
+      "balance": "1000",
+      "floor": "1000",
+      "gross_payout": "50",
+      "net_payout": "40.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "50",
+          "net": "40.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1020",
+          "floor": "920",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "1000",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_INITIAL",
+      "lockOffset": 10,
+      "ddType": "EOD_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      -50,
+      100
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "daily_loss",
+      "balance": "950",
+      "floor": "900",
+      "gross_payout": "0",
+      "net_payout": "0.0",
+      "payouts": [],
+      "path": [
+        {
+          "day": 1,
+          "balance": "950",
+          "floor": "900",
+          "event": "daily_loss"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_INITIAL",
+      "lockOffset": 10,
+      "ddType": "EOD_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      100,
+      100,
+      -20
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "post_payout_floor_reached",
+      "balance": "1000",
+      "floor": "1000",
+      "gross_payout": "200",
+      "net_payout": "160.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "200",
+          "net": "160.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1100",
+          "floor": "1000",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "1000",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_BUFFER",
+      "lockOffset": 10,
+      "ddType": "EOD_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      20,
+      30,
+      40,
+      50
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "post_payout_floor_reached",
+      "balance": "1000",
+      "floor": "1010",
+      "gross_payout": "50",
+      "net_payout": "40.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "50",
+          "net": "40.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1020",
+          "floor": "920",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "1010",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_BUFFER",
+      "lockOffset": 10,
+      "ddType": "EOD_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      -50,
+      100
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "daily_loss",
+      "balance": "950",
+      "floor": "900",
+      "gross_payout": "0",
+      "net_payout": "0.0",
+      "payouts": [],
+      "path": [
+        {
+          "day": 1,
+          "balance": "950",
+          "floor": "900",
+          "event": "daily_loss"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_BUFFER",
+      "lockOffset": 10,
+      "ddType": "EOD_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      100,
+      100,
+      -20
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "post_payout_floor_reached",
+      "balance": "1000",
+      "floor": "1010",
+      "gross_payout": "200",
+      "net_payout": "160.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "200",
+          "net": "160.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1100",
+          "floor": "1000",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "1010",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "FULL_RESET",
+      "lockOffset": 10,
+      "ddType": "EOD_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      20,
+      30,
+      40,
+      50
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": true,
+      "reason": null,
+      "balance": "1000",
+      "floor": "990",
+      "gross_payout": "140",
+      "net_payout": "112.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "50",
+          "net": "40.0"
+        },
+        {
+          "day": 4,
+          "gross": "90",
+          "net": "72.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1020",
+          "floor": "920",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "900",
+          "event": "payout"
+        },
+        {
+          "day": 3,
+          "balance": "1040",
+          "floor": "940",
+          "event": "trade"
+        },
+        {
+          "day": 4,
+          "balance": "1000",
+          "floor": "990",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "FULL_RESET",
+      "lockOffset": 10,
+      "ddType": "EOD_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      -50,
+      100
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "daily_loss",
+      "balance": "950",
+      "floor": "900",
+      "gross_payout": "0",
+      "net_payout": "0.0",
+      "payouts": [],
+      "path": [
+        {
+          "day": 1,
+          "balance": "950",
+          "floor": "900",
+          "event": "daily_loss"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "FULL_RESET",
+      "lockOffset": 10,
+      "ddType": "EOD_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      100,
+      100,
+      -20
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": true,
+      "reason": null,
+      "balance": "980",
+      "floor": "900",
+      "gross_payout": "200",
+      "net_payout": "160.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "200",
+          "net": "160.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1100",
+          "floor": "1000",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "900",
+          "event": "payout"
+        },
+        {
+          "day": 3,
+          "balance": "980",
+          "floor": "900",
+          "event": "trade"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "KEEP_FLOOR",
+      "lockOffset": 10,
+      "ddType": "INTRADAY_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      20,
+      30,
+      40,
+      50
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": true,
+      "reason": null,
+      "balance": "1000",
+      "floor": "990",
+      "gross_payout": "140",
+      "net_payout": "112.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "50",
+          "net": "40.0"
+        },
+        {
+          "day": 4,
+          "gross": "90",
+          "net": "72.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1020",
+          "floor": "920",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "950",
+          "event": "payout"
+        },
+        {
+          "day": 3,
+          "balance": "1040",
+          "floor": "950",
+          "event": "trade"
+        },
+        {
+          "day": 4,
+          "balance": "1000",
+          "floor": "990",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "KEEP_FLOOR",
+      "lockOffset": 10,
+      "ddType": "INTRADAY_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      -50,
+      100
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "daily_loss",
+      "balance": "950",
+      "floor": "900",
+      "gross_payout": "0",
+      "net_payout": "0.0",
+      "payouts": [],
+      "path": [
+        {
+          "day": 1,
+          "balance": "950",
+          "floor": "900",
+          "event": "daily_loss"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "KEEP_FLOOR",
+      "lockOffset": 10,
+      "ddType": "INTRADAY_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      100,
+      100,
+      -20
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "post_payout_floor_reached",
+      "balance": "1000",
+      "floor": "1100",
+      "gross_payout": "200",
+      "net_payout": "160.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "200",
+          "net": "160.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1100",
+          "floor": "1000",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "1100",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_INITIAL",
+      "lockOffset": 10,
+      "ddType": "INTRADAY_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      20,
+      30,
+      40,
+      50
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "post_payout_floor_reached",
+      "balance": "1000",
+      "floor": "1000",
+      "gross_payout": "50",
+      "net_payout": "40.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "50",
+          "net": "40.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1020",
+          "floor": "920",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "1000",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_INITIAL",
+      "lockOffset": 10,
+      "ddType": "INTRADAY_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      -50,
+      100
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "daily_loss",
+      "balance": "950",
+      "floor": "900",
+      "gross_payout": "0",
+      "net_payout": "0.0",
+      "payouts": [],
+      "path": [
+        {
+          "day": 1,
+          "balance": "950",
+          "floor": "900",
+          "event": "daily_loss"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_INITIAL",
+      "lockOffset": 10,
+      "ddType": "INTRADAY_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      100,
+      100,
+      -20
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "post_payout_floor_reached",
+      "balance": "1000",
+      "floor": "1000",
+      "gross_payout": "200",
+      "net_payout": "160.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "200",
+          "net": "160.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1100",
+          "floor": "1000",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "1000",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_BUFFER",
+      "lockOffset": 10,
+      "ddType": "INTRADAY_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      20,
+      30,
+      40,
+      50
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "post_payout_floor_reached",
+      "balance": "1000",
+      "floor": "1010",
+      "gross_payout": "50",
+      "net_payout": "40.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "50",
+          "net": "40.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1020",
+          "floor": "920",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "1010",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_BUFFER",
+      "lockOffset": 10,
+      "ddType": "INTRADAY_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      -50,
+      100
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "daily_loss",
+      "balance": "950",
+      "floor": "900",
+      "gross_payout": "0",
+      "net_payout": "0.0",
+      "payouts": [],
+      "path": [
+        {
+          "day": 1,
+          "balance": "950",
+          "floor": "900",
+          "event": "daily_loss"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "LOCK_AT_BUFFER",
+      "lockOffset": 10,
+      "ddType": "INTRADAY_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      100,
+      100,
+      -20
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "post_payout_floor_reached",
+      "balance": "1000",
+      "floor": "1010",
+      "gross_payout": "200",
+      "net_payout": "160.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "200",
+          "net": "160.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1100",
+          "floor": "1000",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "1010",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "FULL_RESET",
+      "lockOffset": 10,
+      "ddType": "INTRADAY_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      20,
+      30,
+      40,
+      50
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": true,
+      "reason": null,
+      "balance": "1000",
+      "floor": "990",
+      "gross_payout": "140",
+      "net_payout": "112.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "50",
+          "net": "40.0"
+        },
+        {
+          "day": 4,
+          "gross": "90",
+          "net": "72.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1020",
+          "floor": "920",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "900",
+          "event": "payout"
+        },
+        {
+          "day": 3,
+          "balance": "1040",
+          "floor": "940",
+          "event": "trade"
+        },
+        {
+          "day": 4,
+          "balance": "1000",
+          "floor": "990",
+          "event": "payout"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "FULL_RESET",
+      "lockOffset": 10,
+      "ddType": "INTRADAY_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      -50,
+      100
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": false,
+      "reason": "daily_loss",
+      "balance": "950",
+      "floor": "900",
+      "gross_payout": "0",
+      "net_payout": "0.0",
+      "payouts": [],
+      "path": [
+        {
+          "day": 1,
+          "balance": "950",
+          "floor": "900",
+          "event": "daily_loss"
+        }
+      ]
+    }
+  },
+  {
+    "config": {
+      "size": 1000,
+      "ml": 0.1,
+      "dl": 0.05,
+      "f": 0.01,
+      "sp": 0.8,
+      "payoutDays": 2,
+      "minPayout": 0,
+      "payoutFraction": 1,
+      "payoutCap": null,
+      "afterPayout": "FULL_RESET",
+      "lockOffset": 10,
+      "ddType": "INTRADAY_TRAILING",
+      "mode": "funded",
+      "comp": false
+    },
+    "daily": [
+      100,
+      100,
+      -20
+    ],
+    "expected": {
+      "status": "ok",
+      "survived": true,
+      "reason": null,
+      "balance": "980",
+      "floor": "900",
+      "gross_payout": "200",
+      "net_payout": "160.0",
+      "payouts": [
+        {
+          "day": 2,
+          "gross": "200",
+          "net": "160.0"
+        }
+      ],
+      "path": [
+        {
+          "day": 1,
+          "balance": "1100",
+          "floor": "1000",
+          "event": "trade"
+        },
+        {
+          "day": 2,
+          "balance": "1000",
+          "floor": "900",
+          "event": "payout"
+        },
+        {
+          "day": 3,
+          "balance": "980",
+          "floor": "900",
+          "event": "trade"
+        }
+      ]
+    }
+  }
+]

@@ -29,7 +29,7 @@ Ngày ghi nhận: 29/10/2026 (Asia/Saigon). Nhánh: fix/audit-missing-net, PR #9
 ## Phạm vi chưa nên tuyên bố hoàn tất
 
 Đây là lần đưa bộ tham chiếu và phần lõi dùng chung vào mã ứng dụng, không phải xác nhận mọi màn hình đã hoàn thành toàn bộ P0–P3.
-Engine Python có B1–B8 đầy đủ và kiểm thử; giao diện Prop hiện có chưa được thay toàn bộ bằng funded lifecycle/day-cluster model mới của Python.
+Báo cáo này ghi nhận trạng thái PR #9. Phần Prop sau đó đã được bổ sung funded lifecycle/day-cluster trên web; xem [WEB_PROP_V3_4.md](WEB_PROP_V3_4.md) để biết phạm vi và giả định hiện tại.
 Các preset giao diện vẫn là ví dụ nguồn chưa xác minh; không coi các mức phí/payout là hợp đồng quỹ hiện hành.
 Dataclass AccountProfile và pipeline đầy đủ trong Python là hợp đồng tham chiếu; phần ứng dụng giữ schema/ledger hiện có, chưa chuyển toàn bộ cấu hình UI sang dataclass này.
 Tệp sao kê thật, cloud nhiều thiết bị 50k và mọi trình duyệt/thiết bị vật lý không được kiểm thử ở lượt này; 18 ca hai tab không thay thế kiểm thử cloud quy mô lớn.
